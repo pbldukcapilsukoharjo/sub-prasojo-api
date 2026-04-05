@@ -8,8 +8,7 @@ on:
 
 jobs:
   protect-branches:
-    runs-on: ubuntu-latest\
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/staging')
+    runs-on: ubuntu-latest
     steps:
       - name: Notify Telegram
         uses: appleboy/telegram-action@master
@@ -19,6 +18,7 @@ jobs:
           message: |
             🚫 DILARANG PUSH LANGSUNG KE BRANCH 🚫
 
+            Oleh: ${{ github.actor }}
             Branch: ${{ github.ref_name }}
             Event: ${{ github.event_name }}
 
