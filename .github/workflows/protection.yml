@@ -1,0 +1,31 @@
+name: Branch Protection
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+
+jobs:
+  protect-branches:
+    runs-on: ubuntu-latest\
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/staging')
+    steps:
+      - name: Notify Telegram
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          message: |
+            🚫 DILARANG PUSH LANGSUNG KE BRANCH 🚫
+
+            Branch: ${{ github.ref_name }}
+            Event: ${{ github.event_name }}
+
+            Lakukan pull request untuk menggabungkan perubahan ke main atau staging.
+
+      - name: Protect Branches
+        run: |
+          echo "Langsung push ke main atau staging tidak diperbolehkan!"
+          echo "Silakan buat pull request untuk menggabungkan perubahan ke main atau staging."
+          exit 1
