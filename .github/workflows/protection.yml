@@ -8,6 +8,7 @@ on:
 
 jobs:
   protect-branches:
+    if: ${{ !startsWith(github.event.head_commit.message, 'revert:') && !startsWith(github.event.head_commit.message, 'ci:') }}
     runs-on: ubuntu-latest
     steps:
       - name: Notify Telegram
@@ -18,11 +19,14 @@ jobs:
           message: |
             🚫 DILARANG PUSH LANGSUNG KE BRANCH 🚫
 
+            ${{ github.repository }}
+
             Oleh: ${{ github.actor }}
             Branch: ${{ github.ref_name }}
-            Event: ${{ github.event_name }}
 
             Lakukan pull request untuk menggabungkan perubahan ke main atau staging.
+
+            Silahkan lakukan revert dengan menggunakan `git revert` kemudian push menggunakan commit `revert:<commit-hash>`
 
       - name: Protect Branches
         run: |
