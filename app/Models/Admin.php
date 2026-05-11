@@ -6,11 +6,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 
 /**
- * App\Models\User
+ * App\Models\Admin
  *
  * @property int $id
  * @property string|null $username
@@ -21,14 +22,12 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * @property string|null $phone
  * @property string|null $password
  * @property string|null $image
- * @property string|null $swafoto
  * @property string $level
  * @property int $role_id
  * @property bool $is_active
  * @property bool $is_verified
  * @property bool $is_verified_email
  * @property bool $is_verified_phone
- * @property bool $is_request_update
  * @property string|null $kecamatan_code
  * @property string|null $kecamatan_name
  * @property string|null $kelurahan_code
@@ -37,44 +36,38 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * @property string|null $rt
  * @property string|null $rw
  * @property array|null $extra
- * @property array|null $quota
  * @property string|null $fcm
- * @property string|null $role_kabupaten_name
- * @property string|null $role_kabupaten_code
- * @property string|null $role_kecamatan_name
- * @property string|null $role_kecamatan_code
- * @property string|null $role_kelurahan_name
- * @property string|null $role_kelurahan_code
  * @property \Illuminate\Support\Carbon|null $create_datetime
  * @property \Illuminate\Support\Carbon|null $update_datetime
  *
- * @property-read \Illuminate\Database\Eloquent\Collection<int, UserAuth> $authTokens
- * @property-read \Illuminate\Database\Eloquent\Collection<int, Ajuan> $ajuans
- * @property-read \Illuminate\Database\Eloquent\Collection<int, Produk> $produks
- * @property-read \Illuminate\Database\Eloquent\Collection<int, Delivery> $deliveries
- * @property-read \Illuminate\Database\Eloquent\Collection<int, Bpp> $bpps
- * @property-read \Illuminate\Database\Eloquent\Collection<int, AjuanReview> $reviews
- * @property-read \Illuminate\Database\Eloquent\Collection<int, Notification> $notifications
+ * @property-read AdminRole|null $role
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, AdminAuth> $authTokens
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, LogAjuanStatus> $logAjuanStatuses
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, LogProdukStatus> $logProdukStatuses
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Announcement> $announcements
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, LayananContent> $layananContents
  */
-final class User extends Authenticatable
+final class Admin extends Model
 {
     // ──────────────────────────────────────────────
     // Constants
     // ──────────────────────────────────────────────
 
-    public const string LEVEL_USER = 'user';
-    public const string LEVEL_PERANTARA = 'perantara';
+    public const string LEVEL_ADMINISTRATOR = 'administrator';
+    public const string LEVEL_ADMIN = 'admin';
+    public const string LEVEL_OPERATOR = 'operator';
 
     public const array LEVELS = [
-        self::LEVEL_USER,
-        self::LEVEL_PERANTARA,
+        self::LEVEL_ADMINISTRATOR,
+        self::LEVEL_ADMIN,
+        self::LEVEL_OPERATOR,
     ];
 
     // ──────────────────────────────────────────────
     // Table Configuration
     // ──────────────────────────────────────────────
 
-    protected $table = 'user';
+    protected $table = 'admin';
 
     protected $primaryKey = 'id';
 
@@ -92,14 +85,12 @@ final class User extends Authenticatable
         'phone',
         'password',
         'image',
-        'swafoto',
         'level',
         'role_id',
         'is_active',
         'is_verified',
         'is_verified_email',
         'is_verified_phone',
-        'is_request_update',
         'kecamatan_code',
         'kecamatan_name',
         'kelurahan_code',
@@ -108,14 +99,7 @@ final class User extends Authenticatable
         'rt',
         'rw',
         'extra',
-        'quota',
         'fcm',
-        'role_kabupaten_name',
-        'role_kabupaten_code',
-        'role_kecamatan_name',
-        'role_kecamatan_code',
-        'role_kelurahan_name',
-        'role_kelurahan_code',
         'create_datetime',
         'update_datetime',
     ];
@@ -131,55 +115,48 @@ final class User extends Authenticatable
      * @var array<string, string>
      */
     protected $casts = [
-        'role_id'            => 'integer',
-        'is_active'          => 'boolean',
-        'is_verified'        => 'boolean',
-        'is_verified_email'  => 'boolean',
-        'is_verified_phone'  => 'boolean',
-        'is_request_update'  => 'boolean',
-        'extra'              => 'array',
-        'quota'              => 'array',
-        'create_datetime'    => 'datetime',
-        'update_datetime'    => 'datetime',
+        'is_active'         => 'boolean',
+        'is_verified'       => 'boolean',
+        'is_verified_email' => 'boolean',
+        'is_verified_phone' => 'boolean',
+        'extra'             => 'array',
+        'role_id'           => 'integer',
+        'create_datetime'   => 'datetime',
+        'update_datetime'   => 'datetime',
     ];
 
     // ──────────────────────────────────────────────
     // Relationships
     // ──────────────────────────────────────────────
 
+    public function role(): BelongsTo
+    {
+        return $this->belongsTo(AdminRole::class, 'role_id', 'admin_role_id');
+    }
+
     public function authTokens(): HasMany
     {
-        return $this->hasMany(UserAuth::class, 'auth_user_id', 'id');
+        return $this->hasMany(AdminAuth::class, 'auth_admin_id', 'id');
     }
 
-    public function ajuans(): HasMany
+    public function logAjuanStatuses(): HasMany
     {
-        return $this->hasMany(Ajuan::class, 'ajuan_pelapor_id', 'id');
+        return $this->hasMany(LogAjuanStatus::class, 'log_admin_id', 'id');
     }
 
-    public function produks(): HasMany
+    public function logProdukStatuses(): HasMany
     {
-        return $this->hasMany(Produk::class, 'prod_pelapor_id', 'id');
+        return $this->hasMany(LogProdukStatus::class, 'log_admin_id', 'id');
     }
 
-    public function deliveries(): HasMany
+    public function announcements(): HasMany
     {
-        return $this->hasMany(Delivery::class, 'delivery_pelapor_id', 'id');
+        return $this->hasMany(Announcement::class, 'announcement_author_id', 'id');
     }
 
-    public function bpps(): HasMany
+    public function layananContents(): HasMany
     {
-        return $this->hasMany(Bpp::class, 'bpp_pelapor_id', 'id');
-    }
-
-    public function reviews(): HasMany
-    {
-        return $this->hasMany(AjuanReview::class, 'review_pelapor_id', 'id');
-    }
-
-    public function notifications(): HasMany
-    {
-        return $this->hasMany(Notification::class, 'notification_user_id', 'id');
+        return $this->hasMany(LayananContent::class, 'lc_author_id', 'id');
     }
 
     // ──────────────────────────────────────────────
@@ -187,7 +164,7 @@ final class User extends Authenticatable
     // ──────────────────────────────────────────────
 
     /**
-     * Scope to filter only active users.
+     * Scope to filter only active admins.
      */
     public function scopeActive(Builder $query): Builder
     {
@@ -195,7 +172,7 @@ final class User extends Authenticatable
     }
 
     /**
-     * Scope to filter only verified users.
+     * Scope to filter only verified admins.
      */
     public function scopeVerified(Builder $query): Builder
     {
@@ -216,14 +193,6 @@ final class User extends Authenticatable
     public function scopeByKecamatan(Builder $query, string $code): Builder
     {
         return $query->where('kecamatan_code', $code);
-    }
-
-    /**
-     * Scope to filter users requesting data update.
-     */
-    public function scopeRequestingUpdate(Builder $query): Builder
-    {
-        return $query->where('is_request_update', true);
     }
 
     /**
@@ -250,7 +219,7 @@ final class User extends Authenticatable
     }
 
     /**
-     * Normalize phone number (strip non-numeric except +).
+     * Normalize phone number.
      */
     protected function phone(): Attribute
     {
@@ -261,22 +230,12 @@ final class User extends Authenticatable
     }
 
     /**
-     * Build full address from component fields.
+     * Uppercase level accessor.
      */
-    protected function fullAddress(): Attribute
+    protected function levelLabel(): Attribute
     {
         return Attribute::make(
-            get: function (): string {
-                $parts = array_filter([
-                    $this->dukuh,
-                    $this->rt ? "RT {$this->rt}" : null,
-                    $this->rw ? "RW {$this->rw}" : null,
-                    $this->kelurahan_name,
-                    $this->kecamatan_name,
-                ]);
-
-                return implode(', ', $parts);
-            },
+            get: fn (): string => strtoupper($this->level),
         );
     }
 
@@ -294,18 +253,18 @@ final class User extends Authenticatable
         return (bool) $this->is_verified;
     }
 
-    public function isPerantara(): bool
+    public function isAdministrator(): bool
     {
-        return $this->level === self::LEVEL_PERANTARA;
+        return $this->level === self::LEVEL_ADMINISTRATOR;
     }
 
-    public function isUser(): bool
+    public function isAdmin(): bool
     {
-        return $this->level === self::LEVEL_USER;
+        return $this->level === self::LEVEL_ADMIN;
     }
 
-    public function isRequestingUpdate(): bool
+    public function isOperator(): bool
     {
-        return (bool) $this->is_request_update;
+        return $this->level === self::LEVEL_OPERATOR;
     }
 }
