@@ -10,25 +10,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * App\Models\LembarKerja
- *
- * @property int $lk_id
- * @property int $lk_ajuan_id
- * @property string|null $lk_ajuan_no_reg
- * @property int $lk_jenis_ajuan_id
- * @property string|null $lk_from_layanan_kode
- * @property string|null $lk_layanan_kode
- * @property bool $lk_is_produk
- * @property bool $lk_ajuan_is_online
- * @property bool $lk_ajuan_is_mandiri
- * @property int $lk_produk_id
- * @property int $lk_pelapor_role_id
- * @property string|null $lk_pelapor_role_name
- * @property string|null $lk_status
- * @property \Illuminate\Support\Carbon|null $lk_create_datetime
- * @property \Illuminate\Support\Carbon|null $lk_update_datetime
- *
- * @property-read Ajuan|null $ajuan
- * @property-read Produk|null $produk
  */
 final class LembarKerja extends Model
 {
@@ -79,12 +60,20 @@ final class LembarKerja extends Model
 
     public function ajuan(): BelongsTo
     {
-        return $this->belongsTo(Ajuan::class, 'lk_ajuan_id', 'ajuan_id');
+        return $this->belongsTo(
+            Ajuan::class,
+            'lk_ajuan_id',
+            'ajuan_id'
+        );
     }
 
     public function produk(): BelongsTo
     {
-        return $this->belongsTo(Produk::class, 'lk_produk_id', 'prod_id');
+        return $this->belongsTo(
+            Produk::class,
+            'lk_produk_id',
+            'prod_id'
+        );
     }
 
     // ──────────────────────────────────────────────
@@ -92,47 +81,7 @@ final class LembarKerja extends Model
     // ──────────────────────────────────────────────
 
     /**
-     * Scope to filter by status.
-     */
-    public function scopeByStatus(Builder $query, string $status): Builder
-    {
-        return $query->where('lk_status', $status);
-    }
-
-    /**
-     * Scope to filter by layanan kode.
-     */
-    public function scopeByLayanan(Builder $query, string $kode): Builder
-    {
-        return $query->where('lk_layanan_kode', $kode);
-    }
-
-    /**
-     * Scope to filter online.
-     */
-    public function scopeOnline(Builder $query): Builder
-    {
-        return $query->where('lk_ajuan_is_online', true);
-    }
-
-    /**
-     * Scope to filter mandiri.
-     */
-    public function scopeMandiri(Builder $query): Builder
-    {
-        return $query->where('lk_ajuan_is_mandiri', true);
-    }
-
-    /**
-     * Scope to filter produk worksheets.
-     */
-    public function scopeProduk(Builder $query): Builder
-    {
-        return $query->where('lk_is_produk', true);
-    }
-
-    /**
-     * Scope to order by latest creation.
+     * Scope latest data.
      */
     public function scopeLatest(Builder $query): Builder
     {
