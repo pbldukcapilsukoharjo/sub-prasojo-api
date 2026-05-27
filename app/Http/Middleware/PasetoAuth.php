@@ -6,9 +6,17 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Services\PasetoService;
+use Illuminate\Support\Facades\Cache;
 
 class PasetoAuth
 {
+    protected $pasetoService;
+
+    public function __construct(PasetoService $pasetoService)
+    {
+        $this->pasetoService = $pasetoService;
+    }
+
     /**
      * Handle an incoming request.
      *
@@ -16,17 +24,21 @@ class PasetoAuth
      */
     public function handle($request, Closure $next)
     {
-        $token = str_replace('Bearer ', '', $request->header('Authorization'));
+        $token = $request->bearerToken();
 
         if (!$token) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
         try {
-            $paseto = new PasetoService();
-            $parsed = $paseto->parseToken($token);
+            $parsed = $this->pasetoService->parseToken($token);
+            $jti = $parsed->get('jti');
 
-            $request->attributes->set('user_id', $parsed->get('user_id'));
+            if (Cache::has("blacklist:$jti")) {
+                return response()->json(['message' => 'Token Revoked'], 401);
+            }
+
+            $request->attributes->set('auth_user_id', $parsed->get('user_id'));
         } catch (\Exception $e) {
             return response()->json(['message' => 'Invalid token'], 401);
         }

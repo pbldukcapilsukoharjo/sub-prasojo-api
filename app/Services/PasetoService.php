@@ -8,25 +8,41 @@ use ParagonIE\Paseto\Keys\SymmetricKey;
 use ParagonIE\Paseto\Protocol\Version2;
 use ParagonIE\Paseto\Purpose;
 use ParagonIE\Paseto\ProtocolCollection;
+use Illuminate\Support\Str;
 
 class PasetoService
 {
-    protected $key;
+    private SymmetricKey $key;
 
     public function __construct()
     {
-        $this->key = new SymmetricKey(base64_decode(str_replace('base64:', '', env('PASETO_KEY'))));
+        $this->key = new SymmetricKey(base64_decode(config('app.paseto_key')));
     }
 
-    public function generateToken($user)
+    public function generateAccessToken($user)
     {
         return (new Builder())
             ->setVersion(new Version2())
             ->setPurpose(Purpose::local())
             ->setKey($this->key)
-            ->setIssuedAt()
-            ->setExpiration((new \DateTime())->modify('+1 day'))
+            ->set('jti', Str::uuid()->toString())
             ->set('user_id', $user->id)
+            ->setIssuedAt()
+            ->setExpiration(now()->addMinutes(10))
+            ->toString();
+    }
+
+    public function generateRefreshToken($user) 
+    {
+        return (new Builder())
+            ->setVersion(new Version2())
+            ->setPurpose(Purpose::local())
+            ->setKey($this->key)
+            ->set('jti', Str::uuid()->toString())
+            ->set('user_id', $user->id)
+            ->set('type', 'refresh')
+            ->setIssuedAt()
+            ->setExpiration(now()->addDays(7))
             ->toString();
     }
 
