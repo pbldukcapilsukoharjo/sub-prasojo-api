@@ -9,6 +9,9 @@ use ParagonIE\Paseto\Protocol\Version2;
 use ParagonIE\Paseto\Purpose;
 use ParagonIE\Paseto\ProtocolCollection;
 use Illuminate\Support\Str;
+use ParagonIE\Paseto\Exception\PasetoException;
+use ParagonIE\Paseto\Exception\RuleViolation;
+use ParagonIE\Paseto\Rules\NotExpired;
 
 class PasetoService
 {
@@ -48,7 +51,14 @@ class PasetoService
 
     public function parseToken($token)
     {
-        return Parser::getLocal($this->key, ProtocolCollection::v2())
-            ->parse($token);
+        try {
+            return Parser::getLocal($this->key, ProtocolCollection::v2())
+                ->addRule(new NotExpired())
+                ->parse($token);
+        } catch (RuleViolation $e) {
+            throw new \Exception('Token Expired: ' . $e->getMessage());
+        } catch (PasetoException $e) {
+            throw new \Exception('Invalid token: ' . $e->getMessage());
+        }
     }
 }
