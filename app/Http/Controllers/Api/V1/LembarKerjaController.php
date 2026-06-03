@@ -28,10 +28,19 @@ final class LembarKerjaController extends Controller
             $request->validated()
         );
 
+        $resource = new LembarKerjaCollection($data);
+
         return response()->json([
-            'success' => true,
-            'message' => 'Berhasil mengambil data lembar kerja',
-            'data' => new LembarKerjaCollection($data),
+            'status' => true,
+            'code' => 200,
+            'message' => 'Berhasil mendapatkan lembar kerja',
+            'data' => $resource->collection,
+            'meta' => [
+                'page' => $data->currentPage(),
+                'per_page' => $data->perPage(),
+                'total' => $data->total(),
+                'total_page' => $data->lastPage(),
+            ]
         ]);
     }
 
@@ -45,7 +54,8 @@ final class LembarKerjaController extends Controller
         $data = $this->service->getDetail($lk_id);
 
         return response()->json([
-            'success' => true,
+            'status' => true,
+            'code' => 200,
             'message' => 'Berhasil mengambil detail lembar kerja',
             'data' => new LembarKerjaResource($data),
         ]);
