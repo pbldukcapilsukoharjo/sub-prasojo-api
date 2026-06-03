@@ -31,7 +31,7 @@ final class ReviewController extends Controller
         if (isset($result['rekap']) && isset($result['list'])) {
             // Format dari code kedua (dengan rekap)
             return response()->json([
-                'success' => true,
+                'code' => 200,
                 'message' => 'Berhasil mengambil data ulasan',
                 'data' => [
                     'rekap' => $result['rekap'],
@@ -41,7 +41,7 @@ final class ReviewController extends Controller
         } else {
             // Format dari code pertama (tanpa rekap)
             return response()->json([
-                'success' => true,
+                'code' => 200,
                 'message' => 'Berhasil mengambil data ulasan',
                 'data' => new ReviewCollection($result),
             ]);
@@ -61,7 +61,7 @@ final class ReviewController extends Controller
         }
 
         return response()->json([
-            'success' => true,
+            'code' => 200,
             'message' => 'Berhasil mengambil detail ulasan',
             'data' => new ReviewResource($data),
         ]);
@@ -79,7 +79,7 @@ final class ReviewController extends Controller
         }
 
         return response()->json([
-            'success' => true,
+            'code' => 201,
             'message' => 'Ulasan berhasil disimpan',
             'data' => new ReviewResource($data),
         ], 201);
@@ -96,7 +96,7 @@ final class ReviewController extends Controller
         );
 
         return response()->json([
-            'success' => true,
+            'code' => 200,
             'message' => 'Ulasan berhasil diperbarui',
             'data' => new ReviewResource($data),
         ]);
@@ -108,8 +108,9 @@ final class ReviewController extends Controller
         $this->service->delete($review_id);
 
         return response()->json([
-            'success' => true,
+            'code' => 200,
             'message' => 'Ulasan berhasil dihapus',
+            'data' => null,
         ]);
     }
 }

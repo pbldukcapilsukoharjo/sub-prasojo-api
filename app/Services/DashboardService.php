@@ -7,7 +7,7 @@ namespace App\Services;
 use App\Models\Ajuan;
 use App\Models\LogAjuanStatus;
 use App\Models\Produk;
-use App\Models\Ulasan;
+use App\Models\AjuanReview;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
@@ -50,24 +50,26 @@ final class DashboardService
     }
 
     /**
-     * Total Selesai
+     * Total Selesai - Case insensitive
+     * Mencakup: SELESAI, Selesai, selesai, dll
      */
     private function getTotalSelesai($startDate = null, $endDate = null): int
     {
         return Ajuan::query()
-            ->where('ajuan_status', 'SELESAI')
+            ->whereRaw('LOWER(ajuan_status) = ?', ['selesai'])
             ->when($startDate, fn($q) => $q->whereDate('ajuan_create_datetime', '>=', $startDate))
             ->when($endDate, fn($q) => $q->whereDate('ajuan_create_datetime', '<=', $endDate))
             ->count();
     }
 
     /**
-     * Total Ditolak
+     * Total Ditolak - Case insensitive
+     * Mencakup: DITOLAK, Ditolak, ditolak, dll
      */
     private function getTotalDitolak($startDate = null, $endDate = null): int
     {
         return Ajuan::query()
-            ->where('ajuan_status', 'DITOLAK')
+            ->whereRaw('LOWER(ajuan_status) = ?', ['ditolak'])
             ->when($startDate, fn($q) => $q->whereDate('ajuan_create_datetime', '>=', $startDate))
             ->when($endDate, fn($q) => $q->whereDate('ajuan_create_datetime', '<=', $endDate))
             ->count();
@@ -164,34 +166,34 @@ final class DashboardService
      */
     private function getUlasanPengguna($startDate = null, $endDate = null): array
     {
-        $query = Ulasan::query()
+        $query = AjuanReview::query()
             ->selectRaw('
                 AVG(rating) as rata_rating,
                 COUNT(*) as total_ulasan
             ');
         
         if ($startDate) {
-            $query->whereDate('created_at', '>=', $startDate);
+            $query->whereDate('review_create_datetime', '>=', $startDate);
         }
         if ($endDate) {
-            $query->whereDate('created_at', '<=', $endDate);
+            $query->whereDate('review_create_datetime', '<=', $endDate);
         }
         
         $result = $query->first();
         
         // Ambil 5 ulasan terbaru
-        $ulasanTerbaru = Ulasan::query()
+        $ulasanTerbaru = AjuanReview::query()
             ->with('pengguna')
-            ->when($startDate, fn($q) => $q->whereDate('created_at', '>=', $startDate))
-            ->when($endDate, fn($q) => $q->whereDate('created_at', '<=', $endDate))
-            ->orderByDesc('created_at')
+            ->when($startDate, fn($q) => $q->whereDate('review_create_datetime', '>=', $startDate))
+            ->when($endDate, fn($q) => $q->whereDate('review_create_datetime', '<=', $endDate))
+            ->orderByDesc('review_create_datetime')
             ->limit(5)
             ->get()
             ->map(fn($item) => [
                 'nama' => $item->pengguna?->fullname,
                 'rating' => $item->rating,
                 'komentar' => $item->komentar,
-                'tanggal' => optional($item->created_at)->format('Y-m-d'),
+                'tanggal' => optional($item->review_create_datetime)->format('Y-m-d'),
             ]);
         
         return [
@@ -202,7 +204,7 @@ final class DashboardService
     }
 
     /**
-     * Kepatuhan SLA
+     * Kepatuhan SLA - Case insensitive untuk status SELESAI
      */
     private function getKepatuhanSla($startDate = null, $endDate = null): float
     {
@@ -216,7 +218,7 @@ final class DashboardService
         }
         
         $tepatWaktu = Ajuan::query()
-            ->where('ajuan_status', 'SELESAI')
+            ->whereRaw('LOWER(ajuan_status) = ?', ['selesai'])
             ->whereRaw('DATEDIFF(ajuan_update_datetime, ajuan_create_datetime) <= 7') // SLA 7 hari
             ->when($startDate, fn($q) => $q->whereDate('ajuan_create_datetime', '>=', $startDate))
             ->when($endDate, fn($q) => $q->whereDate('ajuan_create_datetime', '<=', $endDate))
@@ -257,12 +259,12 @@ final class DashboardService
     }
 
     /**
-     * Rata-rata Proses Selesai
+     * Rata-rata Proses Selesai - Case insensitive untuk status SELESAI
      */
     private function getRataProsesSelesai($startDate = null, $endDate = null): array
     {
         $rataHari = Ajuan::query()
-            ->where('ajuan_status', 'SELESAI')
+            ->whereRaw('LOWER(ajuan_status) = ?', ['selesai'])
             ->selectRaw('AVG(DATEDIFF(ajuan_update_datetime, ajuan_create_datetime)) as rata_hari')
             ->when($startDate, fn($q) => $q->whereDate('ajuan_create_datetime', '>=', $startDate))
             ->when($endDate, fn($q) => $q->whereDate('ajuan_create_datetime', '<=', $endDate))
@@ -286,7 +288,7 @@ final class DashboardService
             ->count();
         
         $selesaiHariIni = Ajuan::query()
-            ->where('ajuan_status', 'SELESAI')
+            ->whereRaw('LOWER(ajuan_status) = ?', ['selesai'])
             ->whereDate('ajuan_update_datetime', $today)
             ->count();
         
@@ -303,7 +305,7 @@ final class DashboardService
     }
 
     /**
-     * Status Proses
+     * Status Proses - Menampilkan semua status yang ada di database (as-is)
      */
     private function getStatusProses($startDate = null, $endDate = null): array
     {
@@ -340,6 +342,29 @@ final class DashboardService
             'paduka' => (int) ($pelapor['PADUKA'] ?? 0),
             'tamat'  => (int) ($pelapor['TAMAT'] ?? 0),
             'total_ajuan' => Ajuan::count(),
+        ];
+    }
+
+    /**
+     * DEBUG: Method untuk melihat nilai status aktual di database
+     * Hanya untuk debugging, bisa dihapus setelah production terverifikasi
+     */
+    public function debugActualStatusValues(): array
+    {
+        $statuses = Ajuan::query()
+            ->select('ajuan_status', DB::raw('COUNT(*) as total'))
+            ->groupBy('ajuan_status')
+            ->orderBy('ajuan_status')
+            ->get();
+        
+        return [
+            'unique_status_values' => $statuses->toArray(),
+            'total_records' => Ajuan::count(),
+            'sample_data' => Ajuan::query()
+                ->select('id', 'ajuan_status')
+                ->limit(10)
+                ->get()
+                ->toArray()
         ];
     }
 }

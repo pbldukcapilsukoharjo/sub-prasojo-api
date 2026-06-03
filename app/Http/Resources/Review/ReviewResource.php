@@ -19,10 +19,10 @@ final class ReviewResource extends JsonResource
             
             // Data relasi ajuan (jika ada)
             'ajuan_no_reg' => optional($this->ajuan)->ajuan_no_reg,
-            'layanan_nama' => optional($this->ajuan)->ajuan_layanan_nama,
+            'layanan_kode' => optional($this->ajuan)->ajuan_layanan_kode,
             
             // Data relasi pelapor (jika ada)
-            'pelapor_nama' => optional($this->pelapor)->name,
+            'pelapor_nama' => optional($this->pelapor)->fullname,
             
             // Isi review
             'rating' => $this->review_rating,
