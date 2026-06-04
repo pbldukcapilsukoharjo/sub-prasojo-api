@@ -227,7 +227,7 @@ final class Ajuan extends Model
 
     public function logStatuses(): HasMany
     {
-        return $this->hasMany(LogAjuanStatus::class, 'log_ajuan_ajuan_id', 'ajuan_id');
+        return $this->hasMany(LogAjuanStatus::class, 'log_ajuan_id', 'ajuan_id');
     }
 
     public function deliveries(): HasMany

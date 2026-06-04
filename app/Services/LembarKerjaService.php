@@ -32,7 +32,7 @@ final class LembarKerjaService
         );
 
         return $query
-            ->latest()
+            ->latest('lk_create_datetime')
             ->paginate(10);
     }
 

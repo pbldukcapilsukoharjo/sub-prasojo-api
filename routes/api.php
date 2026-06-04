@@ -58,32 +58,6 @@ Route::prefix('v1')->group(function () {
 
     });
 
-    // Route untuk reviews (bahasa Inggris)
-    Route::prefix('reviews')->group(function () {
-
-        Route::get('/', [ReviewController::class, 'index']);
-
-        Route::get(
-            '/{review_id}',
-            [ReviewController::class, 'show']
-        );
-
-        Route::post(
-            '/',
-            [ReviewController::class, 'store']
-        );
-
-        Route::put(
-            '/{review_id}',
-            [ReviewController::class, 'update']
-        );
-
-        Route::delete(
-            '/{review_id}',
-            [ReviewController::class, 'destroy']
-        );
-    });
-
     // Route untuk ulasan (bahasa Indonesia) - API endpoint terpisah
     Route::prefix('ulasan')->group(function () {
 
@@ -100,16 +74,6 @@ Route::prefix('v1')->group(function () {
         Route::post(
             '/',
             [ReviewController::class, 'store']
-        );
-
-        Route::put(
-            '/{review_id}',
-            [ReviewController::class, 'update']
-        );
-
-        Route::delete(
-            '/{review_id}',
-            [ReviewController::class, 'destroy']
         );
     });
 

@@ -7,7 +7,7 @@ namespace App\Http\Resources\Produk;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-final class ProdukDetailResource extends JsonResource
+final class ProdukResource extends JsonResource
 {
     public function toArray(Request $request): array
     {

@@ -14,9 +14,7 @@ final class AjuanService
         protected AjuanFilter $filter
     ) {}
 
-    public function getAll(
-        array $filters
-    ): LengthAwarePaginator {
+    public function getAll (array $filters): LengthAwarePaginator {
         $query = Ajuan::query()
             ->with([
                 'jenisAjuan',

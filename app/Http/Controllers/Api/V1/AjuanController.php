@@ -18,9 +18,7 @@ final class AjuanController extends Controller
         protected AjuanService $service
     ) {}
 
-    public function index(
-        IndexAjuanRequest $request
-    ): JsonResponse {
+    public function index (IndexAjuanRequest $request): JsonResponse {
         $data = $this->service->getAll(
             $request->validated()
         );

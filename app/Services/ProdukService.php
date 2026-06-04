@@ -33,14 +33,13 @@ final class ProdukService
             ->paginate(10);
     }
 
-    public function getDetail(
-        int $produkId
-    ): Produk {
+    public function getDetail(int $produkId): Produk
+    {
         return Produk::query()
             ->with([
                 'ajuan',
                 'pelapor',
-                'logStatuses',
+                'logStatuses'
             ])
             ->findOrFail($produkId);
     }
