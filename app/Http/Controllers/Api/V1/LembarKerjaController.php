@@ -7,8 +7,8 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LembarKerja\IndexLembarKerjaRequest;
 use App\Http\Requests\LembarKerja\ShowLembarKerjaRequest;
-use App\Http\Resources\LembarKerja\LembarKerjaCollection;
-use App\Http\Resources\LembarKerja\LembarKerjaResource;
+use App\Http\Resources\LembarKerja\LembarKerjaDetailResource;
+use App\Http\Resources\LembarKerja\LembarKerjaListResource;
 use App\Services\LembarKerjaService;
 use Illuminate\Http\JsonResponse;
 
@@ -28,19 +28,19 @@ final class LembarKerjaController extends Controller
             $request->validated()
         );
 
-        $resource = new LembarKerjaCollection($data);
-
         return response()->json([
             'status' => true,
             'code' => 200,
             'message' => 'Berhasil mendapatkan lembar kerja',
-            'data' => $resource->collection,
+            'data' => LembarKerjaListResource::collection(
+                $data->items()
+            ),
             'meta' => [
                 'page' => $data->currentPage(),
                 'per_page' => $data->perPage(),
                 'total' => $data->total(),
                 'total_page' => $data->lastPage(),
-            ]
+            ],
         ]);
     }
 
@@ -49,15 +49,19 @@ final class LembarKerjaController extends Controller
      */
     public function show(
         ShowLembarKerjaRequest $request,
-        int $lk_id
+        int $lk_id  // Changed from int to string
     ): JsonResponse {
-        $data = $this->service->getDetail($lk_id);
+        $data = $this->service->getDetail(
+             $lk_id  // Cast to int here
+        );
 
         return response()->json([
             'status' => true,
             'code' => 200,
             'message' => 'Berhasil mengambil detail lembar kerja',
-            'data' => new LembarKerjaResource($data),
+            'data' => new LembarKerjaDetailResource(
+                $data
+            ),
         ]);
     }
 }
