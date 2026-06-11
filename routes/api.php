@@ -56,6 +56,16 @@ Route::prefix('v1')->group(function () {
             [DashboardController::class, 'peringkatOperator']
         );
 
+        Route::get(
+            '/waktu-rata',
+            [DashboardController::class, 'waktuRata']
+        );
+        
+        Route::get(
+            '/ulasan',
+            [DashboardController::class, 'ulasan']
+        );
+
     });
 
     // Route untuk ulasan (bahasa Indonesia) - API endpoint terpisah

@@ -5,9 +5,13 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Dashboard\IndexDashboardRequest;
+use App\Http\Requests\Dashboard\DistribusiWilayahRequest;
+use App\Http\Requests\Dashboard\PeringkatOperatorRequest;
+use App\Http\Requests\Dashboard\UlasanRequest;
+use App\Http\Requests\Dashboard\WaktuRataRequest;
 use App\Services\DashboardService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 final class DashboardController extends Controller
 {
@@ -15,44 +19,69 @@ final class DashboardController extends Controller
         protected DashboardService $service
     ) {}
 
-    /**
-     * GET /api/v1/dashboard
-     */
-    public function index(): JsonResponse
-    {
+    public function index(
+        IndexDashboardRequest $request
+    ): JsonResponse {
+
+        $data = $this->service->getDashboard(
+            $request->validated()
+        );
+
         return response()->json([
             'success' => true,
             'message' => 'Berhasil mengambil data dashboard',
-            'data' => $this->service->getSummary(),
+            'data' => $data,
         ]);
     }
 
-    /**
-     * GET /api/v1/dashboard/distribusi-wilayah
-     */
     public function distribusiWilayah(
-        Request $request
+        DistribusiWilayahRequest $request
     ): JsonResponse {
+
         return response()->json([
             'success' => true,
             'message' => 'Berhasil mengambil distribusi wilayah',
             'data' => $this->service->getDistribusiWilayah(
-                $request->all()
+                $request->validated()
             ),
         ]);
     }
 
-    /**
-     * GET /api/v1/dashboard/peringkat-operator
-     */
     public function peringkatOperator(
-        Request $request
+        PeringkatOperatorRequest $request
     ): JsonResponse {
+
         return response()->json([
             'success' => true,
             'message' => 'Berhasil mengambil peringkat operator',
             'data' => $this->service->getPeringkatOperator(
-                $request->all()
+                $request->validated()
+            ),
+        ]);
+    }
+
+    public function waktuRata(
+        WaktuRataRequest $request
+    ): JsonResponse {
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Berhasil mengambil waktu rata-rata',
+            'data' => $this->service->getWaktuRata(
+                $request->validated()
+            ),
+        ]);
+    }
+
+    public function ulasan(
+        UlasanRequest $request
+    ): JsonResponse {
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Berhasil mengambil ulasan',
+            'data' => $this->service->getUlasan(
+                $request->validated()
             ),
         ]);
     }
