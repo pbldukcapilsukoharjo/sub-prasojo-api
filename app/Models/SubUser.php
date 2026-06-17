@@ -4,12 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Notifications\Notifiable;
 
-class SubUser extends Model
+class SubUser extends Authenticatable implements MustVerifyEmail
 {
-    use HasFactory, SoftDeletes, HasUuids;
+    use HasFactory, SoftDeletes, HasUuids, Notifiable;
 
     protected $table = 'sub_users';
 
@@ -17,9 +19,41 @@ class SubUser extends Model
         'fullname',
         'email',
         'hashed_password',
+        'verified_at'
     ];
 
     protected $hidden = [
         'hashed_password',
     ];
+
+    protected $casts = [
+        'verified_at' => 'datetime',
+    ];
+
+    public function getAuthPasswordName()
+    {
+        return 'hashed_password';
+    }
+
+    public function getAuthPassword()
+    {
+        return $this->hashed_password;
+    }
+
+    public function hasVerifiedEmail()
+    {
+        return !is_null($this->verified_at);
+    }
+
+    public function markEmailAsVerified()
+    {
+        return $this->forceFill([
+            'verified_at' => $this->freshTimestamp(),
+        ])->save();
+    }
+
+    public function getEmailForVerification()
+    {
+        return $this->email;
+    }
 }

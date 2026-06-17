@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('fullname');
             $table->string('email')->unique();
             $table->string('hashed_password');
+            $table->timestamp('verified_at')->nullable();
             $table->timestamps();
             $table->timestamp('deleted_at')->nullable();
         });

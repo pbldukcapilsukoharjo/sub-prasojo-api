@@ -5,13 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 class RefreshToken extends Model
-{   
+{
     protected $table = 'refresh_tokens';
-    
+
     protected $fillable = [
         'sub_user_id',
         'jti',
-        'expired_at',
+        'expires_at',
         'revoked',
     ];
 

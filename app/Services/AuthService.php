@@ -16,7 +16,7 @@ class AuthService
     {
         $this->pasetoService = $pasetoService;
     }
-    
+
     public function register(array $validatedData)
     {
         try {
@@ -25,6 +25,10 @@ class AuthService
                 'email' => $validatedData['email'],
                 'hashed_password' => Hash::make($validatedData['password']),
             ]);
+
+            event(new \Illuminate\Auth\Events\Registered($user));
+
+            \Illuminate\Support\Facades\RateLimiter::hit('resend-verification:' . $user->email, 60);
 
             return ['user' => $user];
         } catch (\Exception $e) {
@@ -53,7 +57,7 @@ class AuthService
             RefreshToken::create([
                 'sub_user_id' => $data->get('user_id'),
                 'jti' => $data->get('jti'),
-                'expired_at' => now()->addDays(7),
+                'expires_at' => now()->addDays(7),
                 'revoked' => false,
             ]);
         } catch (\Exception $e) {
@@ -68,13 +72,13 @@ class AuthService
         try {
             $jti = $data->get('jti');
             $refreshToken = RefreshToken::where('jti', $jti)->where('revoked', false)->first();
-            
+
             if (!$refreshToken) {
                 throw ValidationException::withMessages([
                     'error' => ['Token tidak ditemukan atau sudah di-revoke.'],
                 ]);
             }
-            
+
             RefreshToken::where('jti', $jti)->update(['revoked' => true, 'updated_at' => now()]);
 
             $user = SubUser::find($data->get('user_id'));
@@ -85,7 +89,7 @@ class AuthService
             RefreshToken::create([
                 'sub_user_id' => $user->id,
                 'jti' => $this->pasetoService->parseToken($newRefreshToken)->get('jti'),
-                'expired_at' => now()->addDays(7),
+                'expires_at' => now()->addDays(7),
             ]);
 
             return [
@@ -125,5 +129,52 @@ class AuthService
                 'error' => ['Gagal logout: ' . $e->getMessage()],
             ]);
         }
+    }
+    public function verifyEmail(string $id, string $hash, bool $hasValidSignature)
+    {
+        $user = SubUser::findOrFail($id);
+
+        if (!hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
+            throw new \Exception('Invalid hash');
+        }
+
+        if (!$hasValidSignature) {
+            throw new \Exception('Invalid or expired url signature');
+        }
+
+        if ($user->hasVerifiedEmail()) {
+            throw new \Exception('Email sudah diverifikasi sebelumnya.');
+        }
+
+        if ($user->markEmailAsVerified()) {
+            event(new \Illuminate\Auth\Events\Verified($user));
+        }
+
+        return true;
+    }
+
+    public function resendVerification(array $validatedData)
+    {
+        $email = $validatedData['email'];
+        
+        if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts('resend-verification:' . $email, 1)) {
+            $seconds = \Illuminate\Support\Facades\RateLimiter::availableIn('resend-verification:' . $email);
+            throw new \Exception('Harap tunggu ' . $seconds . ' detik sebelum meminta email verifikasi lagi.');
+        }
+
+        $user = SubUser::where('email', $email)->first();
+        if (!$user) {
+            throw new \Exception('Pengguna tidak ditemukan.');
+        }
+
+        if ($user->hasVerifiedEmail()) {
+            throw new \Exception('Email sudah diverifikasi sebelumnya.');
+        }
+
+        $user->sendEmailVerificationNotification();
+
+        \Illuminate\Support\Facades\RateLimiter::hit('resend-verification:' . $email, 60);
+
+        return true;
     }
 }

@@ -39,6 +39,10 @@ class PasetoAuth
             }
 
             $request->attributes->set('auth_user_id', $parsed->get('user_id'));
+
+            $request->setUserResolver(function () use ($parsed) {
+                return \App\Models\SubUser::find($parsed->get('user_id'));
+            });
         } catch (\Exception $e) {
             return response()->json(['code' => 401, 'message' => $e->getMessage()], 401);
         }

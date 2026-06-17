@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
+use App\Http\Requests\ResendRequest;
 use App\Services\AuthService;
 use App\Services\PasetoService;
 use Illuminate\Http\Request;
@@ -132,5 +133,47 @@ class AuthController extends Controller
                 'error' => $e->getMessage()
             ], 400);
         }
+    }
+
+    public function verifyEmail(string $id, string $hash, Request $request)
+    {
+        $frontendUrl = config('app.frontend_url');
+
+        try {
+            $this->authService->verifyEmail(
+                $id,
+                $hash,
+                $request->hasValidSignature()
+            );
+
+            return redirect()->away($frontendUrl . '/verify-success');
+        } catch (\Exception $e) {
+            return redirect()->away($frontendUrl . '/verify-failed?message=' . urlencode($e->getMessage()));
+        }
+    }
+
+    public function resendVerification(ResendRequest $request)
+    {
+        try {
+            $this->authService->resendVerification($request->validated());
+
+            return response()->json([
+                'code' => 200,
+                'message' => 'Email verifikasi telah dikirim ulang.'
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'code' => 400,
+                'message' => $e->getMessage()
+            ], 400);
+        }
+    }
+
+    public function verificationNotice()
+    {
+        return response()->json([
+            'code' => 403,
+            'message' => 'Email belum diverifikasi. Silakan periksa email Anda.'
+        ], 403);
     }
 }
