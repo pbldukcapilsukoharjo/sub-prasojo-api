@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ForgotPasswordRequest;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\ResendRequest;
+use App\Http\Requests\ResetPasswordRequest;
 use App\Services\AuthService;
 use App\Services\PasetoService;
 use Illuminate\Http\Request;
@@ -175,5 +177,41 @@ class AuthController extends Controller
             'code' => 403,
             'message' => 'Email belum diverifikasi. Silakan periksa email Anda.'
         ], 403);
+    }
+
+    public function forgotPassword(ForgotPasswordRequest $request)
+    {
+        try {
+            $this->authService->forgotPassword($request->validated());
+
+            return response()->json([
+                'code' => 200,
+                'message' => 'Link reset password telah dikirim ke email Anda.'
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'code' => 400,
+                'message' => 'Gagal mengirim link reset password',
+                'error' => $e->getMessage()
+            ], 400);
+        }
+    }
+
+    public function resetPassword(ResetPasswordRequest $request)
+    {
+        try {
+            $this->authService->resetPassword($request->validated());
+
+            return response()->json([
+                'code' => 200,
+                'message' => 'Password berhasil direset.'
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'code' => 400,
+                'message' => 'Gagal reset password',
+                'error' => $e->getMessage()
+            ], 400);
+        }
     }
 }

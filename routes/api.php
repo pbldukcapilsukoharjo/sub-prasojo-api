@@ -16,6 +16,9 @@ Route::prefix('v1')->group(function () {
             Route::get('/verify/{id}/{hash}', 'verifyEmail')->name('verification.verify');
             Route::post('/resend', 'resendVerification')->name('verification.send');
         });
+
+        Route::post('/forgot-password', 'forgotPassword');
+        Route::post('/reset-password', 'resetPassword');
     });
 
     Route::middleware(['paseto.auth', 'verified'])->group(function () {

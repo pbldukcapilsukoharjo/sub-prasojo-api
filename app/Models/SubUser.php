@@ -7,11 +7,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\CanResetPassword;
+use Illuminate\Auth\Passwords\CanResetPassword as CanResetPasswordTrait;
 use Illuminate\Notifications\Notifiable;
 
-class SubUser extends Authenticatable implements MustVerifyEmail
+class SubUser extends Authenticatable implements MustVerifyEmail, CanResetPassword
 {
-    use HasFactory, SoftDeletes, HasUuids, Notifiable;
+    use HasFactory, SoftDeletes, HasUuids, Notifiable, CanResetPasswordTrait;
 
     protected $table = 'sub_users';
 

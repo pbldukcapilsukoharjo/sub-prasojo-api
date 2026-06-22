@@ -28,7 +28,7 @@ class AuthService
 
             event(new \Illuminate\Auth\Events\Registered($user));
 
-            \Illuminate\Support\Facades\RateLimiter::hit('resend-verification:' . $user->email, 60);
+            \Illuminate\Support\Facades\RateLimiter::hit('resend-verification:' . $user->email, 180);
 
             return ['user' => $user];
         } catch (\Exception $e) {
@@ -173,7 +173,40 @@ class AuthService
 
         $user->sendEmailVerificationNotification();
 
-        \Illuminate\Support\Facades\RateLimiter::hit('resend-verification:' . $email, 60);
+        \Illuminate\Support\Facades\RateLimiter::hit('resend-verification:' . $email, 180);
+
+        return true;
+    }
+
+    public function forgotPassword(array $validatedData)
+    {
+        $status = \Illuminate\Support\Facades\Password::broker()->sendResetLink(
+            ['email' => $validatedData['email']]
+        );
+
+        if ($status !== \Illuminate\Support\Facades\Password::RESET_LINK_SENT) {
+            throw new \Exception(__($status));
+        }
+
+        return true;
+    }
+
+    public function resetPassword(array $validatedData)
+    {
+        $status = \Illuminate\Support\Facades\Password::broker()->reset(
+            $validatedData,
+            function ($user, $password) {
+                $user->forceFill([
+                    'hashed_password' => Hash::make($password)
+                ])->save();
+
+                event(new \Illuminate\Auth\Events\PasswordReset($user));
+            }
+        );
+
+        if ($status !== \Illuminate\Support\Facades\Password::PASSWORD_RESET) {
+            throw new \Exception(__($status));
+        }
 
         return true;
     }
