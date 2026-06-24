@@ -68,23 +68,4 @@ Route::prefix('v1')->group(function () {
 
     });
 
-    // Route untuk ulasan (bahasa Indonesia) - API endpoint terpisah
-    Route::prefix('ulasan')->group(function () {
-
-        Route::get(
-            '/',
-            [ReviewController::class, 'index']
-        );
-
-        Route::get(
-            '/{review_id}',
-            [ReviewController::class, 'show']
-        );
-
-        Route::post(
-            '/',
-            [ReviewController::class, 'store']
-        );
-    });
-
 });

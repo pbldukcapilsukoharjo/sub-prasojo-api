@@ -6,7 +6,7 @@ namespace App\Services;
 
 use App\Filters\DashboardFilter;
 use App\Models\Ajuan;
-use App\Models\AjuanReview; // Tambahkan import ini
+use App\Models\AjuanReview; 
 use App\Models\Produk;
 use App\Models\User;
 
@@ -36,7 +36,7 @@ final class DashboardService
 
             'ulasan_pengguna' => $this->ulasanPengguna(),
 
-            'kepatuhan_sla' => 92,
+            'kepatuhan_sla' => 92, //belum tahu datanya bagian SLA
 
             'total_produk' => $this->totalProduk($filters),
 
@@ -78,18 +78,29 @@ final class DashboardService
 
 public function getWaktuRata(array $filters): array
 {
-    return [
-        'rata_rata_waktu_proses' => 8.5,
-        'pencapaian_sla' => 92,
+    $totalAjuan = Ajuan::count();
+
+    $rataHari = Ajuan::query()
+        ->whereNotNull('ajuan_create_datetime')
+        ->selectRaw(
+            'AVG(TIMESTAMPDIFF(HOUR, ajuan_create_datetime, NOW())) as rata'
+        )
+        ->value('rata');
+
+    return [  
+        'rata_rata_waktu_proses' => round((float) $rataHari, 2),
+
+        'pencapaian_sla' => 92,  //belum tahu datanya bagian SLA
         'target_sla' => 6,
+
         'tabel' => [
             'layanan' => [
                 [
-                    'id' => 1,
-                    'peringkat' => 1,
+                    'id' => 1,  //belum tahu datanya bagian ID
+                    'peringkat' => 1, //belum tahu datanya bagian peringkat
                     'jenis_ajuan' => 'TOTAL_AJUAN',
-                    'jumlah_ajuan' => Ajuan::count(),
-                    'rata_rata_waktu' => 3,
+                    'jumlah_ajuan' => $totalAjuan,
+                    'rata_rata_waktu' => round((float) $rataHari, 2),
                     'status_sla' => 'ON TIME',
                 ]
             ],
@@ -152,17 +163,27 @@ public function getUlasan(array $filters): array
     ];
 }
 
-    public function getPeringkatOperator(array $filters): array
+    public function getPeringkatOperator(array $filters): array //Belum tahu datanya
 {
     $operator = $this->peringkatOperator();
 
     return [
         'total_layanan' => count($operator),
-        'rata_rata_durasi' => 14.5,
+        'rata_rata_durasi' => round(
+            floatval(
+                Ajuan::query()
+                    ->whereNotNull('ajuan_create_datetime')
+                    ->selectRaw(
+                        'AVG(TIMESTAMPDIFF(HOUR, ajuan_create_datetime, NOW())) as rata'
+                    )
+                    ->value('rata')
+            ),
+            2
+        ),
         'tabel' => [
             'operator' => $operator,
             'meta' => [
-                'page' => 1,
+                'page' => 1, 
                 'per_page' => count($operator),
                 'total' => count($operator),
                 'total_page' => 1,
@@ -310,14 +331,25 @@ public function getUlasan(array $filters): array
 
     private function rataProses(): array
     {
+        $rata = (float) (
+            Ajuan::query()
+                ->whereNotNull('ajuan_create_datetime')
+                ->selectRaw(
+                    'AVG(TIMESTAMPDIFF(HOUR, ajuan_create_datetime, NOW())) as rata'
+                )
+                ->value('rata') ?? 0
+        );
+
+        $rata = round($rata, 2);
+
         return [
-            'kartu_keluarga' => 4.5,
-            'ktp_el' => 8.5,
-            'akta_kelahiran' => 12.0,
+            'kartu_keluarga' => $rata,
+            'ktp_el' => $rata,
+            'akta_kelahiran' => $rata,
         ];
     }
 
-    private function ringkasanHariIni(): array
+    private function ringkasanHariIni(): array 
     {
         return [
             'ajuan_masuk' => Ajuan::whereDate(
@@ -325,9 +357,20 @@ public function getUlasan(array $filters): array
                 today()
             )->count(),
 
-            'sla' => 92,
+            'sla' => 92, //belum tahu datanya bagian SLA
 
-            'rata_rata_menit' => 15.3,
+            'rata_rata_menit' => round(
+                Ajuan::query()
+                    ->whereDate(
+                        'ajuan_create_datetime',
+                        today()
+                    )
+                    ->selectRaw(
+                        'AVG(TIMESTAMPDIFF(MINUTE, ajuan_create_datetime, NOW())) as rata'
+                    )
+                    ->value('rata') ?? 0,
+                2
+            ),
         ];
     }
 
