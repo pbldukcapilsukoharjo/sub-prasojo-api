@@ -16,28 +16,25 @@ final class LembarKerjaListResource extends JsonResource
 
             'no_regis' => $this->lk_ajuan_no_reg,
 
-            'kode_produk' => $this->produk?->produk_kode
-                ?? $this->lk_layanan_kode,
+            'kode_produk' => $this->produk?->prod_layanan_kode,
 
             'kode_ajuan' => $this->lk_layanan_kode,
 
-            'jalur' => (
-                $this->ajuan?->ajuan_is_online ?? 0
-            )
+            'jalur' => $this->lk_ajuan_is_online
                 ? 'online'
                 : 'offline',
 
-            'pelapor' => $this->ajuan?->ajuan_pelapor_role_name,
+            'pelapor' => $this->lk_pelapor_role_name,
 
             'kecamatan' => $this->ajuan?->ajuan_kecamatan_name,
 
             'tanggal' => optional(
                 $this->lk_create_datetime
-            )->format('Y-m-d'),
+            )?->format('Y-m-d'),
 
             'waktu' => optional(
                 $this->lk_create_datetime
-            )->format('H:i'),
+            )?->format('H:i'),
 
             'status' => $this->lk_status,
         ];

@@ -14,15 +14,13 @@ final class LembarKerjaService
         protected LembarKerjaFilter $filter
     ) {}
 
-    /**
-     * Get all lembar kerja.
-     */
     public function getAll(
         array $filters
     ): LengthAwarePaginator {
+
         $query = LembarKerja::query()
             ->with([
-                'ajuan',
+                'ajuan.pelapor',
                 'produk',
             ]);
 
@@ -31,20 +29,33 @@ final class LembarKerjaService
             $filters
         );
 
-        return $query
-            ->latest('lk_create_datetime')
-            ->paginate(10);
+        $sortBy = $filters['sortBy']
+            ?? 'newest';
+
+        if ($sortBy === 'oldest') {
+
+            $query->orderBy(
+                'lk_create_datetime',
+                'asc'
+            );
+
+        } else {
+
+            $query->orderByDesc(
+                'lk_create_datetime'
+            );
+        }
+
+        return $query->paginate(10);
     }
 
-    /**
-     * Get detail lembar kerja.
-     */
     public function getDetail(
         int $lkId
     ): LembarKerja {
+
         return LembarKerja::query()
             ->with([
-                'ajuan',
+                'ajuan.pelapor',
                 'produk',
             ])
             ->findOrFail($lkId);

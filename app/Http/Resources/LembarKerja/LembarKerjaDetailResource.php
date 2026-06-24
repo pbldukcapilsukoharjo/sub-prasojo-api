@@ -16,7 +16,8 @@ final class LembarKerjaDetailResource extends JsonResource
 
             'no_regis' => $this->lk_ajuan_no_reg,
 
-            'nama' => $this->ajuan?->ajuan_pelapor_role_name,
+            'nama' => $this->ajuan?->pelapor?->fullname
+                ?? $this->lk_pelapor_role_name,
 
             'nik' => $this->ajuan?->ajuan_pelapor_nik,
 

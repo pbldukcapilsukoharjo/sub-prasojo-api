@@ -13,23 +13,17 @@ final class IndexLembarKerjaRequest extends FormRequest
         return true;
     }
 
-    /**
-     * @return array<string, mixed>
-     */
     public function rules(): array
     {
         return [
-            'status' => ['nullable', 'string'],
-
-            'layanan_kode' => ['nullable', 'string'],
-
-            'is_online' => ['nullable', 'boolean'],
-
-            'is_mandiri' => ['nullable', 'boolean'],
-
-            'is_produk' => ['nullable', 'boolean'],
-
             'page' => ['nullable', 'integer', 'min:1'],
+            'search' => ['nullable', 'string'],
+            'district' => ['nullable', 'string'],
+            'period' => ['nullable', 'string'],
+            'sortBy' => ['nullable', 'in:newest,oldest'],
+            'startDate' => ['nullable', 'date'],
+            'endDate' => ['nullable', 'date'],
+            'reporter' => ['nullable', 'string'],
         ];
     }
 }

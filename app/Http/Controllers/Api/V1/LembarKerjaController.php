@@ -18,22 +18,20 @@ final class LembarKerjaController extends Controller
         protected LembarKerjaService $service
     ) {}
 
-    /**
-     * GET /api/v1/lembar-kerja
-     */
     public function index(
         IndexLembarKerjaRequest $request
     ): JsonResponse {
+
         $data = $this->service->getAll(
             $request->validated()
         );
 
         return response()->json([
-            'status' => true,
+            'success' => true,
             'code' => 200,
             'message' => 'Berhasil mendapatkan lembar kerja',
             'data' => LembarKerjaListResource::collection(
-                $data->items()
+                collect($data->items())
             ),
             'meta' => [
                 'page' => $data->currentPage(),
@@ -44,19 +42,17 @@ final class LembarKerjaController extends Controller
         ]);
     }
 
-    /**
-     * GET /api/v1/lembar-kerja/{lk_id}
-     */
     public function show(
         ShowLembarKerjaRequest $request,
-        int $lk_id  // Changed from int to string
+        string $lk_id
     ): JsonResponse {
+
         $data = $this->service->getDetail(
-             $lk_id  // Cast to int here
+            (int) $lk_id
         );
 
         return response()->json([
-            'status' => true,
+            'success' => true,
             'code' => 200,
             'message' => 'Berhasil mengambil detail lembar kerja',
             'data' => new LembarKerjaDetailResource(

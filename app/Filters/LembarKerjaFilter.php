@@ -12,51 +12,75 @@ final class LembarKerjaFilter
         Builder $query,
         array $filters
     ): Builder {
-        return $query
 
-            ->when(
-                !empty($filters['status']),
-                fn (Builder $q) =>
-                    $q->where(
-                        'lk_status',
-                        $filters['status']
-                    )
-            )
+        $query->when(
+            !empty($filters['search']),
+            function (Builder $q) use ($filters) {
 
-            ->when(
-                !empty($filters['layanan_kode']),
-                fn (Builder $q) =>
-                    $q->where(
-                        'lk_layanan_kode',
-                        $filters['layanan_kode']
-                    )
-            )
+                $search = $filters['search'];
 
-            ->when(
-                isset($filters['is_online']),
-                fn (Builder $q) =>
-                    $q->where(
-                        'lk_ajuan_is_online',
-                        $filters['is_online']
-                    )
-            )
+                $q->where(function (Builder $sub) use ($search) {
 
-            ->when(
-                isset($filters['is_mandiri']),
-                fn (Builder $q) =>
-                    $q->where(
-                        'lk_ajuan_is_mandiri',
-                        $filters['is_mandiri']
+                    $sub->where(
+                        'lk_ajuan_no_reg',
+                        'like',
+                        "%{$search}%"
                     )
-            )
+                    ->orWhere(
+                        'lk_pelapor_role_name',
+                        'like',
+                        "%{$search}%"
+                    );
+                });
+            }
+        );
 
-            ->when(
-                isset($filters['is_produk']),
-                fn (Builder $q) =>
-                    $q->where(
-                        'lk_is_produk',
-                        $filters['is_produk']
-                    )
-            );
+        $query->when(
+            !empty($filters['district']),
+            function (Builder $q) use ($filters) {
+
+                $q->whereHas(
+                    'ajuan',
+                    fn (Builder $aq)
+                        => $aq->where(
+                            'ajuan_kecamatan_name',
+                            $filters['district']
+                        )
+                );
+            }
+        );
+
+        $query->when(
+            !empty($filters['reporter']),
+            function (Builder $q) use ($filters) {
+
+                $q->where(
+                    'lk_pelapor_role_name',
+                    $filters['reporter']
+                );
+            }
+        );
+
+        $query->when(
+            !empty($filters['startDate']),
+            fn (Builder $q)
+                => $q->whereDate(
+                    'lk_create_datetime',
+                    '>=',
+                    $filters['startDate']
+                )
+        );
+
+        $query->when(
+            !empty($filters['endDate']),
+            fn (Builder $q)
+                => $q->whereDate(
+                    'lk_create_datetime',
+                    '<=',
+                    $filters['endDate']
+                )
+        );
+
+        return $query;
     }
 }
