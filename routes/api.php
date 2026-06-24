@@ -1,13 +1,25 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\V1\AjuanController;
+
 use App\Http\Controllers\Api\V1\DashboardController;
 use App\Http\Controllers\Api\V1\LembarKerjaController;
+use App\Http\Controllers\Api\V1\AjuanController;
 use App\Http\Controllers\Api\V1\ProdukController;
 use App\Http\Controllers\Api\V1\ReviewController;
+use App\Http\Controllers\Api\V1\DistribusiWilayahController;
 
 Route::prefix('v1')->group(function () {
+
+    /*
+    |--------------------------------------------------------------------------
+    | Dashboard
+    |--------------------------------------------------------------------------
+    */
+    Route::get(
+        '/dashboard',
+        [DashboardController::class, 'index']
+    );
 
     /*
     |--------------------------------------------------------------------------
@@ -59,16 +71,6 @@ Route::prefix('v1')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | Dashboard 
-    |--------------------------------------------------------------------------
-    */
-    Route::get(
-        '/dashboard',
-        [DashboardController::class, 'index']
-    );
-
-    /*
-    |--------------------------------------------------------------------------
     | Review / Ulasan
     |--------------------------------------------------------------------------
     */
@@ -80,5 +82,15 @@ Route::prefix('v1')->group(function () {
     Route::get(
         '/review/{review_id}',
         [ReviewController::class, 'show']
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Distribusi Wilayah
+    |--------------------------------------------------------------------------
+    */
+    Route::get(
+        '/distribusi-wilayah',
+        [DistribusiWilayahController::class, 'index']
     );
 });
