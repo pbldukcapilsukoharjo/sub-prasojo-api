@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\Api\V1\SLAController;
 use App\Http\Controllers\Api\V1\DashboardController;
 use App\Http\Controllers\Api\V1\LembarKerjaController;
 use App\Http\Controllers\Api\V1\AjuanController;
@@ -92,5 +93,14 @@ Route::prefix('v1')->group(function () {
     Route::get(
         '/distribusi-wilayah',
         [DistribusiWilayahController::class, 'index']
+    );
+      /*
+    |--------------------------------------------------------------------------
+    | SLA
+    |--------------------------------------------------------------------------
+    */
+    Route::get(
+        '/sla',
+        [SLAController::class, 'index']
     );
 });
