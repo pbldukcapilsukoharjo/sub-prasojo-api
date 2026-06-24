@@ -8,13 +8,17 @@ use Illuminate\Foundation\Http\FormRequest;
 
 final class IndexDashboardRequest extends FormRequest
 {
+    public function authorize(): bool
+    {
+        return true;
+    }
+
     public function rules(): array
     {
         return [
             'serviceType' => ['nullable', 'string'],
             'district' => ['nullable', 'string'],
             'period' => ['nullable', 'string'],
-            'sortBy' => ['nullable', 'string'],
             'startDate' => ['nullable', 'date'],
             'endDate' => ['nullable', 'date'],
         ];

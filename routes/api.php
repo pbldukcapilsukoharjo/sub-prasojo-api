@@ -1,24 +1,37 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\V1\LembarKerjaController;
 use App\Http\Controllers\Api\V1\AjuanController;
-use App\Http\Controllers\Api\V1\ProdukController;
 use App\Http\Controllers\Api\V1\DashboardController;
+use App\Http\Controllers\Api\V1\LembarKerjaController;
+use App\Http\Controllers\Api\V1\ProdukController;
 use App\Http\Controllers\Api\V1\ReviewController;
 
 Route::prefix('v1')->group(function () {
 
+    /*
+    |--------------------------------------------------------------------------
+    | Lembar Kerja
+    |--------------------------------------------------------------------------
+    */
     Route::prefix('lembar-kerja')->group(function () {
 
-        // GET /api/v1/lembar-kerja
-        Route::get('/', [LembarKerjaController::class, 'index']);
+        Route::get(
+            '/',
+            [LembarKerjaController::class, 'index']
+        );
 
-        // GET /api/v1/lembar-kerja/{lk_id}
-        Route::get('/{lk_id}', [LembarKerjaController::class, 'show']);
-
+        Route::get(
+            '/{lk_id}',
+            [LembarKerjaController::class, 'show']
+        );
     });
 
+    /*
+    |--------------------------------------------------------------------------
+    | Ajuan
+    |--------------------------------------------------------------------------
+    */
     Route::get(
         '/ajuan',
         [AjuanController::class, 'index']
@@ -29,6 +42,11 @@ Route::prefix('v1')->group(function () {
         [AjuanController::class, 'show']
     );
 
+    /*
+    |--------------------------------------------------------------------------
+    | Produk
+    |--------------------------------------------------------------------------
+    */
     Route::get(
         '/produk',
         [ProdukController::class, 'index']
@@ -39,33 +57,28 @@ Route::prefix('v1')->group(function () {
         [ProdukController::class, 'show']
     );
 
-    Route::prefix('dashboard')->group(function () {
+    /*
+    |--------------------------------------------------------------------------
+    | Dashboard 
+    |--------------------------------------------------------------------------
+    */
+    Route::get(
+        '/dashboard',
+        [DashboardController::class, 'index']
+    );
 
-        Route::get(
-            '/',
-            [DashboardController::class, 'index']
-        );
+    /*
+    |--------------------------------------------------------------------------
+    | Review / Ulasan
+    |--------------------------------------------------------------------------
+    */
+    Route::get(
+        '/review',
+        [ReviewController::class, 'index']
+    );
 
-        Route::get(
-            '/distribusi-wilayah',
-            [DashboardController::class, 'distribusiWilayah']
-        );
-
-        Route::get(
-            '/peringkat-operator',
-            [DashboardController::class, 'peringkatOperator']
-        );
-
-        Route::get(
-            '/waktu-rata',
-            [DashboardController::class, 'waktuRata']
-        );
-        
-        Route::get(
-            '/ulasan',
-            [DashboardController::class, 'ulasan']
-        );
-
-    });
-
+    Route::get(
+        '/review/{review_id}',
+        [ReviewController::class, 'show']
+    );
 });

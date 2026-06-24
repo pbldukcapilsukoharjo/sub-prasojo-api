@@ -13,26 +13,46 @@ final class DashboardFilter
         array $filters
     ): Builder {
 
-        return $query
-
-            ->when(
-                !empty($filters['startDate']),
-                fn (Builder $query) =>
-                    $query->whereDate(
-                        'create_datetime',
-                        '>=',
-                        $filters['startDate']
-                    )
-            )
-
-            ->when(
-                !empty($filters['endDate']),
-                fn (Builder $query) =>
-                    $query->whereDate(
-                        'create_datetime',
-                        '<=',
-                        $filters['endDate']
-                    )
+        if (
+            !empty($filters['serviceType']) &&
+            $filters['serviceType'] !== 'all'
+        ) {
+            $query->where(
+                'ajuan_layanan_kode',
+                $filters['serviceType']
             );
+        }
+
+        if (
+            !empty($filters['district']) &&
+            $filters['district'] !== 'all'
+        ) {
+            $query->where(
+                'ajuan_kecamatan_name',
+                $filters['district']
+            );
+        }
+
+        if (
+            !empty($filters['startDate'])
+        ) {
+            $query->whereDate(
+                'ajuan_create_datetime',
+                '>=',
+                $filters['startDate']
+            );
+        }
+
+        if (
+            !empty($filters['endDate'])
+        ) {
+            $query->whereDate(
+                'ajuan_create_datetime',
+                '<=',
+                $filters['endDate']
+            );
+        }
+
+        return $query;
     }
 }
