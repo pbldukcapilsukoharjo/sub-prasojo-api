@@ -5,7 +5,7 @@
 
 ---
 
-## Fase 1 — Foundation & Standarisasi 🔴
+## Task 1 — Foundation & Standarisasi 🔴
 
 ### Docs
 - [x] Update `docs/api_documentation.md` — tambah prefix `/api/v1/` ke semua endpoint
@@ -27,7 +27,7 @@
 
 ---
 
-## Fase 2 — Auth & Profile 🔴
+## Task 2 — Auth & Profile 🔴
 
 ### Endpoint Baru
 - [ ] Buat `app/Http/Requests/UpdateProfileRequest.php`
@@ -45,7 +45,7 @@
 
 ---
 
-## Fase 3 — Dashboard 🔴
+## Task 3 — Dashboard 🔴
 
 ### Model
 - [ ] Buat `app/Models/Ajuan.php` (connection: mysql_prasojo)
@@ -64,7 +64,7 @@
 
 ---
 
-## Fase 4 — Pengajuan 🟡
+## Task 4 — Pengajuan 🟡
 
 ### Fitur
 - [ ] Buat `app/Filters/PengajuanFilter.php` — status_kategori, kecamatan, layanan, pelapor
@@ -78,7 +78,7 @@
 
 ---
 
-## Fase 5A — Monitoring Operator 🟡
+## Task 5A — Monitoring Operator 🟡
 
 ### Fitur
 - [ ] Buat `app/Filters/OperatorFilter.php`
@@ -92,7 +92,7 @@
 
 ---
 
-## Fase 5B — Monitoring Wilayah 🟡
+## Task 5B — Monitoring Wilayah 🟡
 
 ### Fitur
 - [ ] Buat `app/Filters/WilayahFilter.php`
@@ -106,7 +106,7 @@
 
 ---
 
-## Fase 5C — SLA Monitoring 🟡
+## Task 5C — SLA Monitoring 🟡
 
 ### Fitur
 - [ ] Buat `app/Filters/SlaFilter.php`
@@ -120,7 +120,7 @@
 
 ---
 
-## Fase 5D — Monitoring Ulasan 🟡
+## Task 5D — Monitoring Ulasan 🟡
 
 ### Fitur
 - [ ] Buat `app/Filters/UlasanFilter.php`
@@ -134,7 +134,7 @@
 
 ---
 
-## Fase 6 — Optimisasi & Finalisasi 🟢
+## Task 6 — Optimisasi & Finalisasi 🟢
 
 ### Caching
 - [ ] Redis cache pada `OperatorService::getKpiGlobal()`
