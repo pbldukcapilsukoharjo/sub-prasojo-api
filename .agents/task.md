@@ -137,21 +137,21 @@
 ## Task 6 — Optimisasi & Finalisasi 🟢
 
 ### Caching
-- [ ] Redis cache pada `OperatorService::getKpiGlobal()`
-- [ ] Redis cache pada `SlaService::getKpi()`
+- [x] Redis cache pada `OperatorService::getKpiGlobal()`
+- [x] Redis cache pada `SlaService::getKpi()`
 - [x] Redis cache pada `UlasanService::getKpi()`
 
 ### Unit Tests
-- [ ] Buat `tests/Unit/Services/DashboardServiceTest.php`
-- [ ] Buat `tests/Unit/Services/PengajuanServiceTest.php`
-- [ ] Buat `tests/Unit/Services/OperatorServiceTest.php`
-- [ ] Buat `tests/Unit/Services/WilayahServiceTest.php`
-- [ ] Buat `tests/Unit/Services/SlaServiceTest.php`
-- [ ] Buat `tests/Unit/Services/UlasanServiceTest.php`
+- [x] Buat `tests/Unit/Services/DashboardServiceTest.php`
+- [x] Buat `tests/Unit/Services/PengajuanServiceTest.php`
+- [x] Buat `tests/Unit/Services/OperatorServiceTest.php`
+- [x] Buat `tests/Unit/Services/WilayahServiceTest.php`
+- [x] Buat `tests/Unit/Services/SlaServiceTest.php`
+- [x] Buat `tests/Unit/Services/UlasanServiceTest.php`
 
 ### Production Hardening
-- [ ] Review & optimasi query N+1 (Eager Loading)
-- [ ] Rate limiting pada endpoint auth
-- [ ] Final sync `docs/api_documentation.md` dengan implementasi
-- [ ] Error logging review
-- [ ] Deployment checklist verified
+- [x] Review & optimasi query N+1 (Eager Loading)
+- [x] Rate limiting pada endpoint auth
+- [x] Final sync `docs/api_documentation.md` dengan implementasi
+- [x] Error logging review
+- [x] Deployment checklist verified

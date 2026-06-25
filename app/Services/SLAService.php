@@ -8,57 +8,63 @@ use App\Enums\AjuanStatus;
 use App\Filters\SlaFilter;
 use App\Models\Ajuan;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 class SlaService
 {
     public function getKpi(SlaFilter $filter): array
     {
-        $query = Ajuan::query();
-        $query = $filter->apply($query);
+        $requestParams = request()->all();
+        $cacheKey = 'sla:kpi:' . md5(json_encode($requestParams));
 
-        $statusSelesai = AjuanStatus::getStatusSelesai();
+        return Cache::remember($cacheKey, 600, function () use ($filter) {
+            $query = Ajuan::query();
+            $query = $filter->apply($query);
 
-        $defaultSla = config('sla.default_jam', 6) * 60;
-        $perLayanan = config('sla.per_layanan', []);
+            $statusSelesai = AjuanStatus::getStatusSelesai();
 
-        $caseSql = "CASE ";
-        foreach ($perLayanan as $kode => $jam) {
-            $menit = $jam * 60;
-            $caseSql .= "WHEN ajuan_layanan_kode = '{$kode}' THEN {$menit} ";
-        }
-        $caseSql .= "ELSE {$defaultSla} END";
+            $defaultSla = config('sla.default_jam', 6) * 60;
+            $perLayanan = config('sla.per_layanan', []);
 
-        $sqlMemenuhi = "SUM(CASE WHEN TIMESTAMPDIFF(MINUTE, ajuan_create_datetime, ajuan_update_datetime) <= ($caseSql) THEN 1 ELSE 0 END) as total_memenuhi";
+            $caseSql = "CASE ";
+            foreach ($perLayanan as $kode => $jam) {
+                $menit = $jam * 60;
+                $caseSql .= "WHEN ajuan_layanan_kode = '{$kode}' THEN {$menit} ";
+            }
+            $caseSql .= "ELSE {$defaultSla} END";
 
-        $kpiData = (clone $query)->whereIn('ajuan_status', $statusSelesai)
-            ->select(
-                DB::raw('COUNT(ajuan_id) as total_selesai'),
-                DB::raw($sqlMemenuhi),
-                DB::raw('AVG(TIMESTAMPDIFF(MINUTE, ajuan_create_datetime, ajuan_update_datetime)) as rata_rata_menit')
-            )->first();
+            $sqlMemenuhi = "SUM(CASE WHEN TIMESTAMPDIFF(MINUTE, ajuan_create_datetime, ajuan_update_datetime) <= ($caseSql) THEN 1 ELSE 0 END) as total_memenuhi";
 
-        $totalSelesai = (int)($kpiData->total_selesai ?? 0);
-        $totalMemenuhi = (int)($kpiData->total_memenuhi ?? 0);
-        $rataRataMenit = (float)($kpiData->rata_rata_menit ?? 0);
+            $kpiData = (clone $query)->whereIn('ajuan_status', $statusSelesai)
+                ->select(
+                    DB::raw('COUNT(ajuan_id) as total_selesai'),
+                    DB::raw($sqlMemenuhi),
+                    DB::raw('AVG(TIMESTAMPDIFF(MINUTE, ajuan_create_datetime, ajuan_update_datetime)) as rata_rata_menit')
+                )->first();
 
-        $capaianPersen = $totalSelesai > 0 ? round(($totalMemenuhi / $totalSelesai) * 100, 2) : 0.0;
+            $totalSelesai = (int)($kpiData->total_selesai ?? 0);
+            $totalMemenuhi = (int)($kpiData->total_memenuhi ?? 0);
+            $rataRataMenit = (float)($kpiData->rata_rata_menit ?? 0);
 
-        $jam = floor($rataRataMenit / 60);
-        $menit = round($rataRataMenit % 60);
-        $slaText = "";
-        if ($jam > 0) {
-            $slaText .= $jam . " Jam ";
-        }
-        $slaText .= $menit . " Menit";
-        $slaText = trim($slaText);
-        if ($slaText === "0 Menit") {
-            $slaText = "0 Menit";
-        }
+            $capaianPersen = $totalSelesai > 0 ? round(($totalMemenuhi / $totalSelesai) * 100, 2) : 0.0;
 
-        return [
-            'rata_rata_global_text' => $slaText,
-            'capaian_sla_persen' => $capaianPersen,
-        ];
+            $jam = floor($rataRataMenit / 60);
+            $menit = round($rataRataMenit % 60);
+            $slaText = "";
+            if ($jam > 0) {
+                $slaText .= $jam . " Jam ";
+            }
+            $slaText .= $menit . " Menit";
+            $slaText = trim($slaText);
+            if ($slaText === "0 Menit") {
+                $slaText = "0 Menit";
+            }
+
+            return [
+                'rata_rata_global_text' => $slaText,
+                'capaian_sla_persen' => $capaianPersen,
+            ];
+        });
     }
 
     public function getLayanan(SlaFilter $filter)

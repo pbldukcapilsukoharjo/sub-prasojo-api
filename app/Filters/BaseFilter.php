@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 abstract class BaseFilter
 {
-    protected array $request;
+    public array $request;
     protected string $dateColumn = 'created_at';
 
     public function __construct(array $request = [])
