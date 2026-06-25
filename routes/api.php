@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Api\V1\SLAController;
+use App\Http\Controllers\Api\V1\OperatorController;
 use App\Http\Controllers\Api\V1\DashboardController;
 use App\Http\Controllers\Api\V1\LembarKerjaController;
 use App\Http\Controllers\Api\V1\AjuanController;
@@ -24,6 +25,18 @@ Route::prefix('v1')->group(function () {
     Route::middleware('paseto.auth')->prefix('auth')->group(function () {
         Route::get('/me', [UserController::class, 'getUser']);
         Route::put('/profile', [UserController::class, 'updateProfile']);
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Operator
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('operator')->controller(OperatorController::class)->group(function () {
+        Route::get('/kpi-global', 'kpiGlobal');
+        Route::get('/ranking', 'ranking');
+        Route::get('/export', 'exportRanking');
+        Route::get('/{id_operator}/detail', 'detail');
     });
 
     /*

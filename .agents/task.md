@@ -83,14 +83,14 @@
 ## Task 5A — Monitoring Operator 🟡
 
 ### Fitur
-- [ ] Buat `app/Filters/OperatorFilter.php`
-- [ ] Buat `app/Services/OperatorService.php` — getKpiGlobal, getRanking, getDetail, exportRanking
-- [ ] Buat `app/Exports/OperatorRankingExport.php`
-- [ ] Buat `app/Http/Controllers/OperatorController.php`
-- [ ] Registrasi 4 route operator di `api.php`
+- [x] Buat `app/Filters/OperatorFilter.php`
+- [x] Buat `app/Services/OperatorService.php` — getKpiGlobal, getRanking, getDetail, exportRanking
+- [x] Buat `app/Exports/OperatorRankingExport.php`
+- [x] Buat `app/Http/Controllers/OperatorController.php`
+- [x] Registrasi 4 route operator di `api.php`
 
 ### Testing
-- [ ] Buat `tests/Feature/Operator/OperatorRankingTest.php`
+- [x] Buat `tests/Feature/Operator/OperatorRankingTest.php`
 
 ---
 
