@@ -8,22 +8,22 @@
 ## Fase 1 — Foundation & Standarisasi 🔴
 
 ### Docs
-- [ ] Update `docs/api_documentation.md` — tambah prefix `/api/v1/` ke semua endpoint
-- [ ] Update `docs/api_documentation.md` — tambah section `POST /api/v1/auth/register`
+- [x] Update `docs/api_documentation.md` — tambah prefix `/api/v1/` ke semua endpoint
+- [x] Update `docs/api_documentation.md` — tambah section `POST /api/v1/auth/register`
 
 ### Core Infrastructure
-- [ ] Buat `app/Http/Responses/ApiResponse.php` — helper class (success, error, paginated)
-- [ ] Buat `app/Enums/AjuanStatus.php` — 14 case + 2 helper methods
-- [ ] Buat `config/sla.php` — default 6 jam per layanan
-- [ ] Buat `app/Filters/BaseFilter.php` — abstract class filter (periode, tanggal, sort, search)
-- [ ] Buat migration `add_indexes_to_ajuan_table` — 8 index pada tabel ajuan
+- [x] Buat `app/Http/Responses/ApiResponse.php` — helper class (success, error, paginated)
+- [x] Buat `app/Enums/AjuanStatus.php` — 14 case + 2 helper methods
+- [x] Buat `config/sla.php` — default 6 jam per layanan
+- [x] Buat `app/Filters/BaseFilter.php` — abstract class filter (periode, tanggal, sort, search)
+- [x] Buat migration `add_indexes_to_ajuan_table` — 8 index pada tabel ajuan
 
 ### Refactor
-- [ ] Refactor `AuthController.php` → gunakan `ApiResponse`
-- [ ] Refactor `UserController.php` → gunakan `ApiResponse`
+- [x] Refactor `AuthController.php` → gunakan `ApiResponse`
+- [x] Refactor `UserController.php` → gunakan `ApiResponse`
 
 ### Dependency
-- [ ] Install `maatwebsite/excel` + publish config
+- [x] Install `maatwebsite/excel` + publish config
 
 ---
 

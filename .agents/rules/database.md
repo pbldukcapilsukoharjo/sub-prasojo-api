@@ -1,3 +1,7 @@
+---
+trigger: always_on
+---
+
 # Aturan Database — Sub Prasojo API
 
 ## Dual Connection
@@ -48,3 +52,8 @@ ajuan_pelapor_id
 | Input API | `dd-mm-yyyy` |
 | Database MariaDB | `datetime` standard |
 | Konversi | Di Filter layer via `Carbon::createFromFormat('d-m-Y', $value)` |
+
+## Mencegah N+1 Query (CRITICAL)
+N+1 query **DILARANG KERAS** karena dapat menyebabkan beban fatal pada server, terutama saat melakukan aggregasi atau mengambil *list* data yang cukup besar.
+- **Eager Loading:** Gunakan `with()` atau `loadMissing()` pada setiap relasi Eloquent yang akan dipanggil di dalam loop atau di-*serialize* sebagai JSON (misalnya relasi `pelapor` pada `Ajuan`).
+- **Validasi Kinerja:** Sebelum membuat Pull Request atau menyelesaikan task, pastikan tidak ada query relasional yang dieksekusi berulang kali di dalam loop. Gunakan `DB::raw` atau query *join* jika pengambilan data relasional terlalu kompleks dan butuh perhitungan statistik (aggregasi).

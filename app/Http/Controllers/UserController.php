@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\UserService;
+use App\Http\Responses\ApiResponse;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
@@ -20,17 +21,9 @@ class UserController extends Controller
             $user_id = $request->attributes->get('auth_user_id');
             $user = $this->userService->getUser($user_id);
             
-            return response()->json([
-                'code' => 200,
-                'message' => 'Data user berhasil diambil',
-                'data' => $user
-            ], 200);
+            return ApiResponse::success('Data user berhasil diambil', $user);
         } catch (\Exception $e) {
-            return response()->json([
-                'code' => 400,
-                'message' => 'Gagal mengambil data user',
-                'error' => $e->getMessage()
-            ], 400);
+            return ApiResponse::error('Gagal mengambil data user', 400, ['error' => $e->getMessage()]);
         }
     }
 }
