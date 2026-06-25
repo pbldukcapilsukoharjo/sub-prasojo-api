@@ -1,5 +1,4 @@
 ---
-name: git-branching
 description: Otomatisasi pembuatan branch baru dari staging-amru saat eksekusi task fitur
 ---
 
