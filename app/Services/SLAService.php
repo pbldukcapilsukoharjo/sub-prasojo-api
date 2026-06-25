@@ -1,271 +1,166 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
+use App\Enums\AjuanStatus;
+use App\Filters\SlaFilter;
 use App\Models\Ajuan;
-use App\Models\Layanan;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
-class SLAService
+class SlaService
 {
-    public function getAll(array $filters): array
+    public function getKpi(SlaFilter $filter): array
     {
-        $page = (int) ($filters['page'] ?? 1);
-        $perPage = 5;
-
         $query = Ajuan::query();
+        $query = $filter->apply($query);
 
-        /*
-        |--------------------------------------------------------------------------
-        | Search
-        |--------------------------------------------------------------------------
-        */
-        if (!empty($filters['search'])) {
+        $statusSelesai = AjuanStatus::getStatusSelesai();
 
-            $search = $filters['search'];
+        $defaultSla = config('sla.default_jam', 6) * 60;
+        $perLayanan = config('sla.per_layanan', []);
 
-            $query->where(function ($q) use ($search) {
-
-                $q->where('ajuan_no_reg', 'like', "%{$search}%")
-                    ->orWhere('ajuan_pelapor_nik', 'like', "%{$search}%")
-                    ->orWhere('ajuan_kecamatan_name', 'like', "%{$search}%");
-            });
+        $caseSql = "CASE ";
+        foreach ($perLayanan as $kode => $jam) {
+            $menit = $jam * 60;
+            $caseSql .= "WHEN ajuan_layanan_kode = '{$kode}' THEN {$menit} ";
         }
+        $caseSql .= "ELSE {$defaultSla} END";
 
-        /*
-        |--------------------------------------------------------------------------
-        | District
-        |--------------------------------------------------------------------------
-        */
-        if (!empty($filters['district'])) {
+        $sqlMemenuhi = "SUM(CASE WHEN TIMESTAMPDIFF(MINUTE, ajuan_create_datetime, ajuan_update_datetime) <= ($caseSql) THEN 1 ELSE 0 END) as total_memenuhi";
 
-            $query->where(
-                'ajuan_kecamatan_name',
-                $filters['district']
-            );
+        $kpiData = (clone $query)->whereIn('ajuan_status', $statusSelesai)
+            ->select(
+                DB::raw('COUNT(ajuan_id) as total_selesai'),
+                DB::raw($sqlMemenuhi),
+                DB::raw('AVG(TIMESTAMPDIFF(MINUTE, ajuan_create_datetime, ajuan_update_datetime)) as rata_rata_menit')
+            )->first();
+
+        $totalSelesai = (int)($kpiData->total_selesai ?? 0);
+        $totalMemenuhi = (int)($kpiData->total_memenuhi ?? 0);
+        $rataRataMenit = (float)($kpiData->rata_rata_menit ?? 0);
+
+        $capaianPersen = $totalSelesai > 0 ? round(($totalMemenuhi / $totalSelesai) * 100, 2) : 0.0;
+
+        $jam = floor($rataRataMenit / 60);
+        $menit = round($rataRataMenit % 60);
+        $slaText = "";
+        if ($jam > 0) {
+            $slaText .= $jam . " Jam ";
         }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Date Range
-        |--------------------------------------------------------------------------
-        */
-        if (!empty($filters['startDate'])) {
-
-            $query->whereDate(
-                'ajuan_create_datetime',
-                '>=',
-                $filters['startDate']
-            );
+        $slaText .= $menit . " Menit";
+        $slaText = trim($slaText);
+        if ($slaText === "0 Menit") {
+            $slaText = "0 Menit";
         }
-
-        if (!empty($filters['endDate'])) {
-
-            $query->whereDate(
-                'ajuan_create_datetime',
-                '<=',
-                $filters['endDate']
-            );
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Period
-        |--------------------------------------------------------------------------
-        */
-        if (!empty($filters['period'])) {
-
-            switch ($filters['period']) {
-
-                case 'today':
-                    $query->whereDate(
-                        'ajuan_create_datetime',
-                        now()->toDateString()
-                    );
-                    break;
-
-                case 'this_week':
-                    $query->whereBetween(
-                        'ajuan_create_datetime',
-                        [
-                            now()->startOfWeek(),
-                            now()->endOfWeek()
-                        ]
-                    );
-                    break;
-
-                case 'this_month':
-                    $query->whereMonth(
-                        'ajuan_create_datetime',
-                        now()->month
-                    )->whereYear(
-                        'ajuan_create_datetime',
-                        now()->year
-                    );
-                    break;
-
-                case 'this_year':
-                    $query->whereYear(
-                        'ajuan_create_datetime',
-                        now()->year
-                    );
-                    break;
-            }
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Ambil Data
-        |--------------------------------------------------------------------------
-        */
-        $allAjuan = (clone $query)->get();
-
-        /*
-        |--------------------------------------------------------------------------
-        | Rata-rata waktu proses
-        |--------------------------------------------------------------------------
-        */
-        $durations = $allAjuan->map(function ($ajuan) {
-
-            if (
-                empty($ajuan->ajuan_create_datetime) ||
-                empty($ajuan->ajuan_update_datetime)
-            ) {
-                return 0;
-            }
-
-            return Carbon::parse($ajuan->ajuan_create_datetime)
-                ->diffInMinutes(
-                    Carbon::parse($ajuan->ajuan_update_datetime)
-                ) / 60;
-        });
-
-        $avgDuration = round(
-            (float) ($durations->avg() ?? 0),
-            1
-        );
-
-        /*
-        |--------------------------------------------------------------------------
-        | Target SLA
-        |--------------------------------------------------------------------------
-        */
-        $targetSla = 6;
-
-        $achievedCount = $durations
-            ->filter(fn($hour) => $hour <= $targetSla)
-            ->count();
-
-        $slaPercentage = $allAjuan->count() > 0
-            ? round(
-                ($achievedCount / $allAjuan->count()) * 100
-            )
-            : 0;
-
-        /*
-        |--------------------------------------------------------------------------
-        | Detail Per Jenis Layanan
-        |--------------------------------------------------------------------------
-        */
-        $list = [];
-
-        $list[] = [
-            'id' => 1,
-            'jenis_layanan' => 'TOTAL AJUAN',
-            'jumlah_ajuan' => $allAjuan->count(),
-            'rata_rata_waktu' => $avgDuration
-        ];
-
-        $layanans = Layanan::query()
-            ->orderBy('layanan_pos')
-            ->get();
-
-        foreach ($layanans as $index => $layanan) {
-
-            $layananAjuan = (clone $query)
-                ->where(
-                    'ajuan_layanan_kode',
-                    $layanan->layanan_kode
-                )
-                ->get();
-
-            $avg = $layananAjuan
-                ->map(function ($ajuan) {
-
-                    if (
-                        empty($ajuan->ajuan_create_datetime) ||
-                        empty($ajuan->ajuan_update_datetime)
-                    ) {
-                        return 0;
-                    }
-
-                    return Carbon::parse(
-                        $ajuan->ajuan_create_datetime
-                    )->diffInMinutes(
-                        Carbon::parse(
-                            $ajuan->ajuan_update_datetime
-                        )
-                    ) / 60;
-                })
-                ->avg();
-
-            $list[] = [
-                'id' => $index + 2,
-                'jenis_layanan' => strtoupper(
-                    $layanan->layanan_nama
-                ),
-                'jumlah_ajuan' => $layananAjuan->count(),
-                'rata_rata_waktu' => round(
-                    (float) ($avg ?? 0),
-                    1
-                )
-            ];
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Sorting
-        |--------------------------------------------------------------------------
-        */
-        if (($filters['sortBy'] ?? 'newest') === 'oldest') {
-
-            $list = collect($list)
-                ->sortBy('rata_rata_waktu')
-                ->values()
-                ->toArray();
-        } else {
-
-            $list = collect($list)
-                ->sortByDesc('rata_rata_waktu')
-                ->values()
-                ->toArray();
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Pagination Manual
-        |--------------------------------------------------------------------------
-        */
-        $total = count($list);
-
-        $paginated = collect($list)
-            ->forPage($page, $perPage)
-            ->values()
-            ->toArray();
 
         return [
-            'rata_rata_waktu_proses' => $avgDuration,
-            'pencapaian_sla' => $slaPercentage,
-            'target_sla' => $targetSla,
-            'daftar_rincian' => [
-                'list' => $paginated,
-                'meta' => [
-                    'page' => $page,
-                    'per_page' => $perPage,
-                    'total' => $total,
-                    'total_page' => (int) ceil($total / $perPage),
-                ]
-            ]
+            'rata_rata_global_text' => $slaText,
+            'capaian_sla_persen' => $capaianPersen,
         ];
+    }
+
+    public function getLayanan(SlaFilter $filter)
+    {
+        $query = Ajuan::query()->from('ajuan');
+        $query = $filter->apply($query);
+
+        $statusSelesai = AjuanStatus::getStatusSelesai();
+        $perPage = $filter->request['per_page'] ?? 10;
+
+        $data = $query->join('layanan', 'layanan.layanan_kode', '=', 'ajuan.ajuan_layanan_kode')
+            ->whereIn('ajuan.ajuan_status', $statusSelesai)
+            ->select(
+                'layanan.layanan_kode',
+                'layanan.layanan_nama',
+                DB::raw('AVG(TIMESTAMPDIFF(MINUTE, ajuan.ajuan_create_datetime, ajuan.ajuan_update_datetime)) as rata_rata_menit')
+            )
+            ->groupBy('layanan.layanan_kode', 'layanan.layanan_nama')
+            ->paginate($perPage);
+
+        $defaultSla = config('sla.default_jam', 6) * 60;
+        $perLayanan = config('sla.per_layanan', []);
+
+        $data->getCollection()->transform(function ($item) use ($defaultSla, $perLayanan) {
+            $rataRataMenit = (float)$item->rata_rata_menit;
+            $jamAktual = floor($rataRataMenit / 60);
+            $menitAktual = round($rataRataMenit % 60);
+            $aktualText = "";
+            if ($jamAktual > 0) $aktualText .= $jamAktual . " Jam ";
+            $aktualText .= $menitAktual . " Menit";
+            
+            $targetMenit = isset($perLayanan[$item->layanan_kode]) 
+                ? $perLayanan[$item->layanan_kode] * 60 
+                : $defaultSla;
+
+            $statusSla = $rataRataMenit <= $targetMenit ? 'MEMENUHI' : 'TIDAK MEMENUHI';
+            
+            $targetJam = floor($targetMenit / 60);
+            $targetMenitSisa = $targetMenit % 60;
+            $targetText = "";
+            if ($targetJam > 0) $targetText .= $targetJam . " Jam ";
+            if ($targetMenitSisa > 0) $targetText .= $targetMenitSisa . " Menit";
+
+            return [
+                'layanan_kode' => $item->layanan_kode,
+                'nama_layanan' => $item->layanan_nama,
+                'target_sla' => trim($targetText),
+                'aktual_rata_rata' => trim($aktualText),
+                'status_sla' => $statusSla,
+            ];
+        });
+
+        return $data;
+    }
+
+    public function exportLayanan(SlaFilter $filter)
+    {
+        $query = Ajuan::query()->from('ajuan');
+        $query = $filter->apply($query);
+
+        $statusSelesai = AjuanStatus::getStatusSelesai();
+
+        $data = $query->join('layanan', 'layanan.layanan_kode', '=', 'ajuan.ajuan_layanan_kode')
+            ->whereIn('ajuan.ajuan_status', $statusSelesai)
+            ->select(
+                'layanan.layanan_kode',
+                'layanan.layanan_nama',
+                DB::raw('AVG(TIMESTAMPDIFF(MINUTE, ajuan.ajuan_create_datetime, ajuan.ajuan_update_datetime)) as rata_rata_menit')
+            )
+            ->groupBy('layanan.layanan_kode', 'layanan.layanan_nama')
+            ->get();
+
+        $defaultSla = config('sla.default_jam', 6) * 60;
+        $perLayanan = config('sla.per_layanan', []);
+
+        return $data->map(function ($item) use ($defaultSla, $perLayanan) {
+            $rataRataMenit = (float)$item->rata_rata_menit;
+            $jamAktual = floor($rataRataMenit / 60);
+            $menitAktual = round($rataRataMenit % 60);
+            $aktualText = "";
+            if ($jamAktual > 0) $aktualText .= $jamAktual . " Jam ";
+            $aktualText .= $menitAktual . " Menit";
+            
+            $targetMenit = isset($perLayanan[$item->layanan_kode]) 
+                ? $perLayanan[$item->layanan_kode] * 60 
+                : $defaultSla;
+
+            $statusSla = $rataRataMenit <= $targetMenit ? 'MEMENUHI' : 'TIDAK MEMENUHI';
+            
+            $targetJam = floor($targetMenit / 60);
+            $targetMenitSisa = $targetMenit % 60;
+            $targetText = "";
+            if ($targetJam > 0) $targetText .= $targetJam . " Jam ";
+            if ($targetMenitSisa > 0) $targetText .= $targetMenitSisa . " Menit";
+
+            return [
+                'layanan_kode' => $item->layanan_kode,
+                'nama_layanan' => $item->layanan_nama,
+                'target_sla' => trim($targetText),
+                'aktual_rata_rata' => trim($aktualText),
+                'status_sla' => $statusSla,
+            ];
+        });
     }
 }

@@ -1,19 +1,32 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filters;
 
-class SLAFilter
+use Illuminate\Database\Eloquent\Builder;
+
+final class SlaFilter extends BaseFilter
 {
-    public function transform(array $params): array
+    protected string $dateColumn = 'ajuan_create_datetime';
+
+    public function apply(Builder $query): Builder
     {
-        return [
-            'page'      => $params['page'] ?? 1,
-            'search'    => $params['search'] ?? null,
-            'district'  => $params['district'] ?? null,
-            'period'    => $params['period'] ?? null,
-            'sortBy'    => $params['sortBy'] ?? 'newest',
-            'startDate' => $params['startDate'] ?? null,
-            'endDate'   => $params['endDate'] ?? null,
-        ];
+        parent::apply($query);
+
+        if (!empty($this->request['id_kecamatan'])) {
+            $query->where('ajuan_kecamatan_code', $this->request['id_kecamatan']);
+        }
+
+        if (!empty($this->request['id_layanan'])) {
+            $query->where('ajuan_layanan_kode', $this->request['id_layanan']);
+        }
+
+        return $query;
+    }
+
+    protected function applySearch(Builder $query): void
+    {
+        // Search spesifik tidak didefinisikan untuk SLA
     }
 }

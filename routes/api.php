@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\Api\V1\SLAController;
 use App\Http\Controllers\Api\V1\OperatorController;
 use App\Http\Controllers\Api\V1\DashboardController;
 use App\Http\Controllers\Api\V1\LembarKerjaController;
@@ -149,8 +148,9 @@ Route::prefix('v1')->group(function () {
     | SLA
     |--------------------------------------------------------------------------
     */
-    Route::get(
-        '/sla',
-        [SLAController::class, 'index']
-    );
+    Route::prefix('sla')->controller(\App\Http\Controllers\SlaController::class)->group(function () {
+        Route::get('/kpi', 'kpi');
+        Route::get('/layanan', 'layanan');
+        Route::get('/export', 'export');
+    });
 });

@@ -111,14 +111,14 @@
 ## Task 5C — SLA Monitoring 🟡
 
 ### Fitur
-- [ ] Buat `app/Filters/SlaFilter.php`
-- [ ] Buat `app/Services/SlaService.php` — getKpi, getLayanan, exportLayanan
-- [ ] Buat `app/Exports/SlaLayananExport.php`
-- [ ] Buat `app/Http/Controllers/SlaController.php`
-- [ ] Registrasi 3 route SLA di `api.php`
+- [x] Buat `app/Filters/SlaFilter.php`
+- [x] Buat `app/Services/SlaService.php` — getKpi, getLayanan, exportLayanan
+- [x] Buat `app/Exports/SlaLayananExport.php`
+- [x] Buat `app/Http/Controllers/SlaController.php`
+- [x] Registrasi 3 route SLA di `api.php`
 
 ### Testing
-- [ ] Buat `tests/Feature/Sla/SlaKpiTest.php`
+- [x] Buat `tests/Feature/Sla/SlaKpiTest.php`
 
 ---
 
