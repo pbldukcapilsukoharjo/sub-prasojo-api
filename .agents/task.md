@@ -125,14 +125,12 @@
 ## Task 5D — Monitoring Ulasan 🟡
 
 ### Fitur
-- [ ] Buat `app/Filters/UlasanFilter.php`
-- [ ] Buat `app/Services/UlasanService.php` — getKpi, getList, exportUlasan
-- [ ] Buat `app/Exports/UlasanExport.php`
-- [ ] Buat `app/Http/Controllers/UlasanController.php`
-- [ ] Registrasi 3 route ulasan di `api.php`
-
-### Testing
-- [ ] Buat `tests/Feature/Ulasan/UlasanKpiTest.php`
+- [x] 5D. Monitoring Ulasan (Tambahan)
+- [x] `app/Services/UlasanService.php` (Logic: aggregasi bintang, distribusi rating)
+- [x] `app/Http/Controllers/Api/V1/UlasanController.php`
+- [x] `app/Filters/UlasanFilter.php` (Filter: layanan, rating)
+- [x] Tambah routing di `routes/api.php`
+- [x] Unit Test / Feature Test/Ulasan/UlasanKpiTest.php`
 
 ---
 
@@ -141,7 +139,7 @@
 ### Caching
 - [ ] Redis cache pada `OperatorService::getKpiGlobal()`
 - [ ] Redis cache pada `SlaService::getKpi()`
-- [ ] Redis cache pada `UlasanService::getKpi()`
+- [x] Redis cache pada `UlasanService::getKpi()`
 
 ### Unit Tests
 - [ ] Buat `tests/Unit/Services/DashboardServiceTest.php`

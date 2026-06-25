@@ -128,10 +128,11 @@ Route::prefix('v1')->group(function () {
     | Ulasan (Tambahan)
     |--------------------------------------------------------------------------
     */
-    Route::get(
-        '/ulasan',
-        [UlasanController::class, 'index']
-    );
+    Route::prefix('ulasan')->controller(UlasanController::class)->group(function () {
+        Route::get('/kpi', 'kpi');
+        Route::get('/list', 'index');
+        Route::get('/export', 'export');
+    });
 
     /*
     |--------------------------------------------------------------------------

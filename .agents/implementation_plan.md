@@ -134,7 +134,7 @@ Route::prefix('dashboard')->controller(DashboardController::class)->group(functi
 
 ---
 
-## Fase 4 — Modul Pengajuan (TARGET CURRENT SPRINT)
+## Fase 4 — Modul Pengajuan
 
 ### 4.1 PengajuanFilter
 **File baru:** `app/Filters/PengajuanFilter.php`
@@ -179,7 +179,7 @@ Route::prefix('dashboard')->controller(DashboardController::class)->group(functi
 - Komparasi: aktual AVG vs target
 - Status: `MEMENUHI` jika aktual <= target, `TIDAK MEMENUHI` jika aktual > target
 
-### 5D Ulasan
+### 5D Ulasan (TARGET CURRENT SPRINT)
 **File baru:** `UlasanFilter`, `UlasanService`, `UlasanController`, `UlasanExport`
 - Model dependency: `AjuanReview` (connection: `mysql_prasojo`)
 - KPI: AVG(review_rating) + COUNT per bintang (1-5)

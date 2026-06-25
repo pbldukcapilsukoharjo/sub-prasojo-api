@@ -1,91 +1,42 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filters;
 
 use Illuminate\Database\Eloquent\Builder;
 
-class UlasanFilter
+final class UlasanFilter extends BaseFilter
 {
-    public static function apply(
-        Builder $query,
-        array $filters
-    ): Builder {
+    protected string $dateColumn = 'review_create_datetime';
 
-        if (!empty($filters['search'])) {
+    public function apply(Builder $query): Builder
+    {
+        parent::apply($query);
 
-            $search = $filters['search'];
-
-            $query->where(function ($q) use ($search) {
-
-                $q->where(
-                    'review_content',
-                    'like',
-                    "%{$search}%"
-                );
-
-                $q->orWhereHas('ajuan', function ($ajuan) use ($search) {
-
-                    $ajuan->where(
-                        'ajuan_no_reg',
-                        'like',
-                        "%{$search}%"
-                    );
-                });
+        if (!empty($this->request['id_layanan'])) {
+            $query->whereHas('ajuan', function ($q) {
+                $q->where('ajuan_layanan_kode', $this->request['id_layanan']);
             });
         }
 
-        if (
-            !empty($filters['rating']) &&
-            $filters['rating'] !== 'all'
-        ) {
-            $query->where(
-                'review_rating',
-                (int) $filters['rating']
-            );
+        if (!empty($this->request['rating'])) {
+            $query->where('review_rating', (int)$this->request['rating']);
         }
-
-        if (
-            !empty($filters['serviceType']) &&
-            $filters['serviceType'] !== 'all'
-        ) {
-
-            $serviceType = $filters['serviceType'];
-
-            $query->whereHas('ajuan', function ($q) use ($serviceType) {
-
-                $q->where(
-                    'ajuan_layanan_kode',
-                    $serviceType
-                );
-            });
-        }
-
-        if (
-            !empty($filters['startDate']) &&
-            !empty($filters['endDate'])
-        ) {
-
-            $query->whereBetween(
-                'review_create_datetime',
-                [
-                    $filters['startDate'] . ' 00:00:00',
-                    $filters['endDate'] . ' 23:59:59'
-                ]
-            );
-        }
-
-        match ($filters['sortBy'] ?? 'newest') {
-            'oldest' => $query->orderBy(
-                'review_create_datetime',
-                'asc'
-            ),
-
-            default => $query->orderBy(
-                'review_create_datetime',
-                'desc'
-            )
-        };
 
         return $query;
+    }
+
+    protected function applySearch(Builder $query): void
+    {
+        if (!empty($this->request['search'])) {
+            $search = $this->request['search'];
+            $query->where(function ($q) use ($search) {
+                $q->where('review_content', 'like', "%{$search}%")
+                  ->orWhereHas('ajuan', function ($q2) use ($search) {
+                      $q2->where('ajuan_no_reg', 'like', "%{$search}%");
+                  });
+            });
+        }
     }
 }
