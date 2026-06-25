@@ -40,11 +40,12 @@ Backend API yang bersifat **READ-ONLY** untuk menyajikan data operasional kepend
 ## Cara Kerja Agent
 1. **SELALU baca rules** di `.agents/rules/` sebelum membuat perubahan
 2. **Cek task.md** untuk mengetahui item yang sedang dikerjakan
-3. **Ikuti implementation_plan.md** untuk detail teknis setiap task
-4. **Update task.md** setelah menyelesaikan item (mark `[x]`)
-5. **Jalankan test** setelah setiap perubahan: `php artisan test`
-6. **Commit** dengan format conventional commits
-7. **Buat Log Eksekusi** di `.agents/logs/` setelah menyelesaikan batch pekerjaan (lihat `.agents/rules/agent-logging.md`)
+3. **Persiapan Branch:** Sebelum memulai implementasi fitur/task, **WAJIB** membuat *feature branch* baru dari parent branch `staging-amru` (contoh: `git checkout -b feature/<nama-task> staging-amru`).
+4. **Ikuti implementation_plan.md** untuk detail teknis setiap task
+5. **Update task.md** setelah menyelesaikan item (mark `[x]`)
+6. **Jalankan test** setelah setiap perubahan: `php artisan test`
+7. **Commit** dengan format conventional commits
+8. **Buat Log Eksekusi** di `.agents/logs/` setelah menyelesaikan batch pekerjaan (lihat `.agents/rules/agent-logging.md`)
 
 ## Peringatan Penting
 - ⚠️ Database operasional bersifat **READ-ONLY** — jangan pernah modify data

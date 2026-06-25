@@ -5,10 +5,16 @@
 |--------|--------|---------------|
 | `main` | Production | ❌ DILARANG (ada protection.yml) |
 | `staging` | Staging/QA | ❌ DILARANG (ada protection.yml) |
+| `staging-amru` | Staging Dev (Parent) | ❌ DILARANG |
 | `feature/*` | Development | ✅ Boleh |
 | `fix/*` | Bugfix | ✅ Boleh |
 
-**Alur kerja:** Feature branch → Pull Request → CI test otomatis → Review → Merge
+**Alur Kerja Utama Agen (Wajib):**
+Saat mengeksekusi task/fitur baru, agen **TIDAK BOLEH** langsung menulis kode di branch utama/parent. Agen WAJIB melakukan:
+1. Pastikan checkout dan update dari *parent branch* yaitu `staging-amru`.
+2. Buat branch baru untuk fitur tersebut (contoh: `git checkout -b feature/<nama-task> staging-amru`).
+3. Tulis kode, tes, lalu commit (Conventional Commits) di branch feature tersebut.
+4. Buat Pull Request (atau informasikan user) untuk review/merge.
 
 ## Conventional Commits (WAJIB)
 ```
