@@ -9,9 +9,21 @@ use App\Http\Controllers\Api\V1\AjuanController;
 use App\Http\Controllers\Api\V1\ProdukController;
 use App\Http\Controllers\Api\V1\ReviewController;
 use App\Http\Controllers\Api\V1\DistribusiWilayahController;
-use App\Http\Controllers\Api\V1\UlasanController; // Tambahkan import ini
+use App\Http\Controllers\Api\V1\UlasanController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
 
 Route::prefix('v1')->group(function () {
+    Route::prefix('auth')->controller(AuthController::class)->group(function () {
+        Route::post('/register', 'register'); 
+        Route::post('/login', 'login');
+        Route::post('/logout', 'logout');
+        Route::post('/refresh', 'refresh');
+    });
+
+    Route::middleware('paseto.auth')->group(function () {
+        Route::get('/me', [UserController::class, 'getUser']);
+    });
 
     /*
     |--------------------------------------------------------------------------
