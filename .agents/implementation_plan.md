@@ -134,7 +134,7 @@ Route::prefix('dashboard')->controller(DashboardController::class)->group(functi
 
 ---
 
-## Fase 4 — Modul Pengajuan
+## Fase 4 — Modul Pengajuan (TARGET CURRENT SPRINT)
 
 ### 4.1 PengajuanFilter
 **File baru:** `app/Filters/PengajuanFilter.php`

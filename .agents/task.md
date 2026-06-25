@@ -64,17 +64,19 @@
 
 ---
 
-## Task 4 — Pengajuan 🟡
-
-### Fitur
-- [ ] Buat `app/Filters/PengajuanFilter.php` — status_kategori, kecamatan, layanan, pelapor
-- [ ] Buat `app/Services/PengajuanService.php` — getList, export
-- [ ] Buat `app/Exports/PengajuanExport.php` — FromQuery, WithHeadings, WithStyles
-- [ ] Buat `app/Http/Controllers/PengajuanController.php`
-- [ ] Registrasi 2 route pengajuan di `api.php`
-
-### Testing
-- [ ] Buat `tests/Feature/Pengajuan/PengajuanListTest.php`
+## Fase 4: Implementasi Modul Pengajuan
+- [x] Buat `app/Filters/PengajuanFilter.php`
+  - [x] Implementasi filter berdasarkan kategori, wilayah, layanan, dll.
+- [x] Buat `app/Exports/PengajuanExport.php`
+  - [x] Konfigurasi export excel (headings, mapping data, styling).
+- [x] Buat `app/Services/PengajuanService.php`
+  - [x] Logika query menggunakan Eloquent (Filter, Transformasi, Pagination).
+  - [x] Logika trigger export file excel.
+- [x] Buat `app/Http/Controllers/PengajuanController.php`
+  - [x] Endpoint `index` untuk paginasi.
+  - [x] Endpoint `export` untuk download Excel.
+- [x] Daftarkan route di `routes/api.php`
+- [x] Buat `tests/Feature/Pengajuan/PengajuanListTest.php`
 
 ---
 
