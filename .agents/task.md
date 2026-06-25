@@ -30,18 +30,18 @@
 ## Task 2 — Auth & Profile 🔴
 
 ### Endpoint Baru
-- [ ] Buat `app/Http/Requests/UpdateProfileRequest.php`
-- [ ] Tambah method `updateProfile()` di `UserService.php`
-- [ ] Tambah method `updateProfile()` di Controller
-- [ ] Registrasi route `PUT /api/v1/auth/profile`
-- [ ] Pindahkan route `GET /me` ke `GET /api/v1/auth/me`
+- [x] Buat `app/Http/Requests/UpdateProfileRequest.php`
+- [x] Tambah method `updateProfile()` di `UserService.php`
+- [x] Tambah method `updateProfile()` di Controller
+- [x] Registrasi route `PUT /api/v1/auth/profile`
+- [x] Pindahkan route `GET /me` ke `GET /api/v1/auth/me`
 
 ### Testing
-- [ ] Buat `tests/Feature/Auth/LoginTest.php`
-- [ ] Buat `tests/Feature/Auth/RegisterTest.php`
-- [ ] Buat `tests/Feature/Auth/LogoutTest.php`
-- [ ] Buat `tests/Feature/Auth/RefreshTokenTest.php`
-- [ ] Buat `tests/Feature/Auth/ProfileTest.php`
+- [x] Buat `tests/Feature/Auth/LoginTest.php`
+- [x] Buat `tests/Feature/Auth/RegisterTest.php`
+- [x] Buat `tests/Feature/Auth/LogoutTest.php`
+- [x] Buat `tests/Feature/Auth/RefreshTokenTest.php`
+- [x] Buat `tests/Feature/Auth/ProfileTest.php`
 
 ---
 
