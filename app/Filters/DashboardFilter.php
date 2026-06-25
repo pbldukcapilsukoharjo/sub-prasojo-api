@@ -6,53 +6,27 @@ namespace App\Filters;
 
 use Illuminate\Database\Eloquent\Builder;
 
-final class DashboardFilter
+final class DashboardFilter extends BaseFilter
 {
-    public function apply(
-        Builder $query,
-        array $filters
-    ): Builder {
+    protected string $dateColumn = 'ajuan_create_datetime';
 
-        if (
-            !empty($filters['serviceType']) &&
-            $filters['serviceType'] !== 'all'
-        ) {
-            $query->where(
-                'ajuan_layanan_kode',
-                $filters['serviceType']
-            );
+    public function apply(Builder $query): Builder
+    {
+        parent::apply($query);
+
+        if (!empty($this->request['id_kecamatan'])) {
+            $query->where('ajuan_kecamatan_code', $this->request['id_kecamatan']);
         }
 
-        if (
-            !empty($filters['district']) &&
-            $filters['district'] !== 'all'
-        ) {
-            $query->where(
-                'ajuan_kecamatan_name',
-                $filters['district']
-            );
-        }
-
-        if (
-            !empty($filters['startDate'])
-        ) {
-            $query->whereDate(
-                'ajuan_create_datetime',
-                '>=',
-                $filters['startDate']
-            );
-        }
-
-        if (
-            !empty($filters['endDate'])
-        ) {
-            $query->whereDate(
-                'ajuan_create_datetime',
-                '<=',
-                $filters['endDate']
-            );
+        if (!empty($this->request['id_layanan'])) {
+            $query->where('ajuan_layanan_kode', $this->request['id_layanan']);
         }
 
         return $query;
+    }
+
+    protected function applySearch(Builder $query): void
+    {
+        // Untuk Dashboard, pencarian teks bebas (search) tidak didefinisikan secara khusus
     }
 }

@@ -67,6 +67,8 @@ final class Admin extends Model
     // Table Configuration
     // ──────────────────────────────────────────────
 
+    protected $connection = 'mysql_prasojo';
+
     protected $table = 'admin';
 
     protected $primaryKey = 'id';

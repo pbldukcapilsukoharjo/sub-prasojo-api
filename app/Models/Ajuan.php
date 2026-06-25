@@ -99,6 +99,8 @@ final class Ajuan extends Model
     // Table Configuration
     // ──────────────────────────────────────────────
 
+    protected $connection = 'mysql_prasojo';
+
     protected $table = 'ajuan';
 
     protected $primaryKey = 'ajuan_id';

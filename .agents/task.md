@@ -45,22 +45,22 @@
 
 ---
 
-## Task 3 — Dashboard 🔴
+## Task 3 — Dashboard 🟢
 
 ### Model
-- [ ] Buat `app/Models/Ajuan.php` (connection: mysql_prasojo)
-- [ ] Buat `app/Models/Admin.php` (connection: mysql_prasojo) — jika belum ada
-- [ ] Buat `app/Models/AjuanReview.php` (connection: mysql_prasojo) — jika belum ada
+- [x] Buat `app/Models/Ajuan.php` (connection: mysql_prasojo)
+- [x] Buat `app/Models/Admin.php` (connection: mysql_prasojo) — jika belum ada
+- [x] Buat `app/Models/AjuanReview.php` (connection: mysql_prasojo) — jika belum ada
 
 ### Fitur
-- [ ] Buat `app/Filters/DashboardFilter.php`
-- [ ] Buat `app/Services/DashboardService.php` — getKpi, getChartTrend, getTopWilayah
-- [ ] Buat `app/Http/Controllers/DashboardController.php`
-- [ ] Registrasi 3 route dashboard di `api.php`
-- [ ] Implementasi Redis cache pada DashboardService (TTL 10 menit)
+- [x] Buat `app/Filters/DashboardFilter.php`
+- [x] Buat `app/Services/DashboardService.php` — getKpi, getChartTrend, getTopWilayah
+- [x] Buat `app/Http/Controllers/DashboardController.php`
+- [x] Registrasi 3 route dashboard di `api.php`
+- [x] Implementasi Redis cache pada DashboardService (TTL 10 menit)
 
 ### Testing
-- [ ] Buat `tests/Feature/Dashboard/DashboardKpiTest.php`
+- [x] Buat `tests/Feature/Dashboard/DashboardKpiTest.php`
 
 ---
 

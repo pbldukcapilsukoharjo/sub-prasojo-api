@@ -26,5 +26,4 @@ Workflow ini dijalankan saat pengguna meminta agen untuk menambahkan atau mengim
 ### 4. Penyelesaian (Wrap Up)
 - **Log Eksekusi:** Catat ringkasan apa saja yang telah dilakukan beserta timestamp ke dalam direktori `.agents/logs/`.
 - **Update Checklist:** Tandai task yang sudah selesai dengan `[x]` pada `.agents/task.md`.
-- **Commit:** Lakukan commit menggunakan format Conventional Commits.
-- **Merge/PR:** Laporkan kepada pengguna bahwa branch fitur sudah siap untuk di-merge atau dibuatkan Pull Request.
+- **Commit, Push, & Merge:** Panggil atau rekomendasikan untuk menggunakan slash command `/finish-feature` (berdasarkan `finish-feature.md`) guna mengeksekusi proses commit, push, pull request, hingga merge ke `staging-amru`.

@@ -31,10 +31,11 @@ Route::prefix('v1')->group(function () {
     | Dashboard
     |--------------------------------------------------------------------------
     */
-    Route::get(
-        '/dashboard',
-        [DashboardController::class, 'index']
-    );
+    Route::prefix('dashboard')->group(function () {
+        Route::get('/kpi', [DashboardController::class, 'kpi']);
+        Route::get('/chart-trend', [DashboardController::class, 'chartTrend']);
+        Route::get('/top-wilayah', [DashboardController::class, 'topWilayah']);
+    });
 
     /*
     |--------------------------------------------------------------------------
