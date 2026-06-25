@@ -11,6 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (app()->environment('testing')) {
+            return;
+        }
+
         Schema::connection('mysql_prasojo')->table('ajuan', function (Blueprint $table) {
             $table->index('ajuan_status', 'idx_ajuan_status');
             $table->index('ajuan_create_datetime', 'idx_ajuan_create_dt');
@@ -28,6 +32,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (app()->environment('testing')) {
+            return;
+        }
+
         Schema::connection('mysql_prasojo')->table('ajuan', function (Blueprint $table) {
             $table->dropIndex('idx_ajuan_status');
             $table->dropIndex('idx_ajuan_create_dt');

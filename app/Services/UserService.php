@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Models\SubUser;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Hash;
+
 class UserService 
 {   
     public function getUser(string $userId) 
@@ -15,5 +17,27 @@ class UserService
             ]);
         }
         return $user;
+    }
+
+    public function updateProfile(string $userId, array $data)
+    {
+        $user = SubUser::find($userId);
+        if (!$user) {
+            throw ValidationException::withMessages([
+                'error' => ['User tidak ditemukan'],
+            ]);
+        }
+
+        if (isset($data['email'])) {
+            $user->email = $data['email'];
+        }
+
+        if (isset($data['password'])) {
+            $user->hashed_password = Hash::make($data['password']);
+        }
+
+        $user->save();
+
+        return $this->getUser($userId);
     }
 }

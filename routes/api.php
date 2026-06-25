@@ -21,8 +21,9 @@ Route::prefix('v1')->group(function () {
         Route::post('/refresh', 'refresh');
     });
 
-    Route::middleware('paseto.auth')->group(function () {
+    Route::middleware('paseto.auth')->prefix('auth')->group(function () {
         Route::get('/me', [UserController::class, 'getUser']);
+        Route::put('/profile', [UserController::class, 'updateProfile']);
     });
 
     /*
