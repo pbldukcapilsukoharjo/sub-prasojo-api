@@ -97,14 +97,14 @@
 ## Task 5B — Monitoring Wilayah 🟡
 
 ### Fitur
-- [ ] Buat `app/Filters/WilayahFilter.php`
-- [ ] Buat `app/Services/WilayahService.php` — getDistribusi, exportDistribusi
-- [ ] Buat `app/Exports/WilayahDistribusiExport.php`
-- [ ] Buat `app/Http/Controllers/WilayahController.php`
-- [ ] Registrasi 2 route wilayah di `api.php`
+- [x] Buat `app/Filters/WilayahFilter.php`
+- [x] Buat `app/Services/WilayahService.php` — getDistribusi, exportDistribusi
+- [x] Buat `app/Exports/WilayahDistribusiExport.php`
+- [x] Buat `app/Http/Controllers/WilayahController.php`
+- [x] Registrasi 2 route wilayah di `api.php`
 
 ### Testing
-- [ ] Buat `tests/Feature/Wilayah/WilayahDistribusiTest.php`
+- [x] Buat `tests/Feature/Wilayah/WilayahDistribusiTest.php`
 
 ---
 

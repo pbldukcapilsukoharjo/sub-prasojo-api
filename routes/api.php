@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\V1\DistribusiWilayahController;
 use App\Http\Controllers\Api\V1\UlasanController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\WilayahController;
 
 Route::prefix('v1')->group(function () {
     Route::prefix('auth')->controller(AuthController::class)->group(function () {
@@ -135,13 +136,13 @@ Route::prefix('v1')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | Distribusi Wilayah
+    | Monitoring Wilayah
     |--------------------------------------------------------------------------
     */
-    Route::get(
-        '/distribusi-wilayah',
-        [DistribusiWilayahController::class, 'index']
-    );
+    Route::prefix('wilayah')->controller(WilayahController::class)->group(function () {
+        Route::get('/distribusi', 'distribusi');
+        Route::get('/export', 'export');
+    });
     
     /*
     |--------------------------------------------------------------------------
