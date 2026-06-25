@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\V1\AjuanController;
 use App\Http\Controllers\Api\V1\ProdukController;
 use App\Http\Controllers\Api\V1\ReviewController;
 use App\Http\Controllers\Api\V1\DistribusiWilayahController;
+use App\Http\Controllers\Api\V1\UlasanController; // Tambahkan import ini
 
 Route::prefix('v1')->group(function () {
 
@@ -87,6 +88,16 @@ Route::prefix('v1')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
+    | Ulasan (Tambahan)
+    |--------------------------------------------------------------------------
+    */
+    Route::get(
+        '/ulasan',
+        [UlasanController::class, 'index']
+    );
+
+    /*
+    |--------------------------------------------------------------------------
     | Distribusi Wilayah
     |--------------------------------------------------------------------------
     */
@@ -94,7 +105,8 @@ Route::prefix('v1')->group(function () {
         '/distribusi-wilayah',
         [DistribusiWilayahController::class, 'index']
     );
-      /*
+    
+    /*
     |--------------------------------------------------------------------------
     | SLA
     |--------------------------------------------------------------------------
