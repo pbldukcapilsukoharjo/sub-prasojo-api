@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginRequest;
@@ -9,7 +11,7 @@ use App\Services\PasetoService;
 use App\Http\Responses\ApiResponse;
 use Illuminate\Http\Request;
 
-class AuthController extends Controller
+final class AuthController extends Controller
 {
     protected AuthService $authService;
     protected PasetoService $pasetoService;

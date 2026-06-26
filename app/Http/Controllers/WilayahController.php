@@ -14,7 +14,7 @@ use Carbon\Carbon;
 use App\Exports\WilayahDistribusiExport;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
-class WilayahController extends Controller
+final class WilayahController extends Controller
 {
     protected WilayahService $wilayahService;
 

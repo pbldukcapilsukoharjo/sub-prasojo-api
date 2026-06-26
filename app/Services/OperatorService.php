@@ -12,7 +12,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
-class OperatorService
+final class OperatorService
 {
     /**
      * Get KPI for Operators.

@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Models\SubUser;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Hash;
 
-class UserService 
+final class UserService 
 {   
     public function getUser(string $userId) 
     {

@@ -10,7 +10,7 @@ use App\Models\Ajuan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 
-class SlaService
+final class SlaService
 {
     public function getKpi(SlaFilter $filter): array
     {

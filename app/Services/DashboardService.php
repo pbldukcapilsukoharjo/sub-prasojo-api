@@ -10,7 +10,7 @@ use App\Models\Ajuan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
-class DashboardService
+final class DashboardService
 {
     /**
      * Menghitung nilai tren persentase.

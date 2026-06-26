@@ -7,8 +7,6 @@ use App\Http\Controllers\Api\V1\DashboardController;
 use App\Http\Controllers\Api\V1\LembarKerjaController;
 use App\Http\Controllers\Api\V1\AjuanController;
 use App\Http\Controllers\Api\V1\ProdukController;
-use App\Http\Controllers\Api\V1\ReviewController;
-use App\Http\Controllers\Api\V1\DistribusiWilayahController;
 use App\Http\Controllers\Api\V1\UlasanController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
@@ -73,9 +71,9 @@ Route::prefix('v1')->group(function () {
     | Pengajuan (Master Table)
     |--------------------------------------------------------------------------
     */
-    Route::prefix('pengajuan')->controller(\App\Http\Controllers\PengajuanController::class)->group(function () {
-        Route::get('/', 'index');
-        Route::get('/export', 'export');
+    Route::prefix('pengajuan')->controller(AjuanController::class)->group(function () {
+        Route::get('/', 'masterIndex');
+        Route::get('/export', 'masterExport');
     });
 
     /*
@@ -107,21 +105,6 @@ Route::prefix('v1')->group(function () {
         '/produk/{produk_id}',
         [ProdukController::class, 'show']
     );
-
-    /*
-    |--------------------------------------------------------------------------
-    | Review / Ulasan
-    |--------------------------------------------------------------------------
-    */
-    // Route::get(
-    //     '/review',
-    //     [ReviewController::class, 'index']
-    // );
-
-    // Route::get(
-    //     '/review/{review_id}',
-    //     [ReviewController::class, 'show']
-    // );
 
     /*
     |--------------------------------------------------------------------------

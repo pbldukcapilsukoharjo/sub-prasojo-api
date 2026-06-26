@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Models\SubUser;
@@ -8,7 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\ValidationException;
 
-class AuthService
+final class AuthService
 {
     private PasetoService $pasetoService;
 

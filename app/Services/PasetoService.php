@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use ParagonIE\Paseto\Builder;
@@ -13,7 +15,7 @@ use ParagonIE\Paseto\Exception\PasetoException;
 use ParagonIE\Paseto\Exception\RuleViolation;
 use ParagonIE\Paseto\Rules\NotExpired;
 
-class PasetoService
+final class PasetoService
 {
     private SymmetricKey $key;
 

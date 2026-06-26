@@ -10,6 +10,7 @@ use App\Http\Requests\Ajuan\ShowAjuanRequest;
 use App\Http\Resources\Ajuan\AjuanCollection;
 use App\Http\Resources\Ajuan\AjuanDetailResource;
 use App\Services\AjuanService;
+use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Http\Responses\ApiResponse;
 
@@ -38,5 +39,16 @@ final class AjuanController extends Controller
         $data = $this->service->getDetail($ajuan_id);
 
         return ApiResponse::success('Berhasil mengambil detail ajuan', new AjuanDetailResource($data));
+    }
+
+    public function masterIndex(Request $request): JsonResponse
+    {
+        $paginator = $this->service->getMasterList($request->all());
+        return ApiResponse::paginated('Berhasil mengambil data pengajuan', $paginator);
+    }
+
+    public function masterExport(Request $request)
+    {
+        return $this->service->exportMaster($request->all());
     }
 }

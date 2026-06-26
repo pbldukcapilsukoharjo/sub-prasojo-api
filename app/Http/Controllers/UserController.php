@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Services\UserService;
@@ -7,7 +9,7 @@ use App\Http\Responses\ApiResponse;
 use App\Http\Requests\UpdateProfileRequest;
 use Illuminate\Http\Request;
 
-class UserController extends Controller
+final class UserController extends Controller
 {
     private UserService $userService;
 

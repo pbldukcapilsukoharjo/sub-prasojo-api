@@ -13,7 +13,7 @@ use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
 
-class SlaController extends Controller
+final class SlaController extends Controller
 {
     protected SlaService $slaService;
 
