@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Services\DistribusiWilayahService;
 use App\Http\Requests\DistribusiWilayah\DistribusiWilayahRequest;
-use App\Http\Resources\DistribusiWilayah\DistribusiWilayahResource;
+use App\Http\Resources\DistribusiWilayah\DistribusiWilayahItemResource;
 
 class DistribusiWilayahController extends Controller
 {
@@ -22,10 +22,11 @@ class DistribusiWilayahController extends Controller
         );
 
         return response()->json([
-            'success' => true,
+            'status' => true,
             'code' => 200,
             'message' => 'Distribusi wilayah berhasil ditemukan',
-            'data' => new DistribusiWilayahResource($data)
+            'data' => DistribusiWilayahItemResource::collection($data['list'])->resolve(),
+            'meta' => $data['meta']
         ]);
     }
 }

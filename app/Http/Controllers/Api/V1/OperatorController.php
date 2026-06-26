@@ -10,18 +10,16 @@ use App\Http\Responses\ApiResponse;
 use App\Services\OperatorService;
 use App\Exports\OperatorRankingExport;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Maatwebsite\Excel\Facades\Excel;
 
-class OperatorController extends Controller
+final class OperatorController extends Controller
 {
-    protected OperatorService $operatorService;
+    public function __construct(
+        private readonly OperatorService $operatorService
+    ) {}
 
-    public function __construct(OperatorService $operatorService)
-    {
-        $this->operatorService = $operatorService;
-    }
-
-    public function kpiGlobal(Request $request)
+    public function kpiGlobal(Request $request): JsonResponse
     {
         $filter = new OperatorFilter($request->all());
         $data = $this->operatorService->getKpiGlobal($filter);
@@ -29,7 +27,7 @@ class OperatorController extends Controller
         return ApiResponse::success('Berhasil', $data);
     }
 
-    public function ranking(Request $request)
+    public function ranking(Request $request): JsonResponse
     {
         $filter = new OperatorFilter($request->all());
         $perPage = (int) $request->input('per_page', 10);
@@ -53,7 +51,7 @@ class OperatorController extends Controller
         return ApiResponse::paginated('Berhasil', $paginator);
     }
 
-    public function detail(int $id_operator)
+    public function detail(int $id_operator): JsonResponse
     {
         try {
             $data = $this->operatorService->getDetail($id_operator);
@@ -63,7 +61,7 @@ class OperatorController extends Controller
         }
     }
 
-    public function exportRanking(Request $request)
+    public function exportRanking(Request $request): \Symfony\Component\HttpFoundation\BinaryFileResponse
     {
         $filter = new OperatorFilter($request->all());
         $date = date('Ymd_His');

@@ -10,18 +10,16 @@ use App\Http\Controllers\Controller;
 use App\Http\Responses\ApiResponse;
 use App\Services\UlasanService;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Maatwebsite\Excel\Facades\Excel;
 
-class UlasanController extends Controller
+final class UlasanController extends Controller
 {
-    protected UlasanService $ulasanService;
+    public function __construct(
+        private readonly UlasanService $ulasanService
+    ) {}
 
-    public function __construct(UlasanService $ulasanService)
-    {
-        $this->ulasanService = $ulasanService;
-    }
-
-    public function kpi(Request $request)
+    public function kpi(Request $request): JsonResponse
     {
         $filter = new UlasanFilter($request->all());
         $data = $this->ulasanService->getKpi($filter);
@@ -29,7 +27,7 @@ class UlasanController extends Controller
         return ApiResponse::success('Berhasil', $data);
     }
 
-    public function index(Request $request)
+    public function index(Request $request): JsonResponse
     {
         $filter = new UlasanFilter($request->all());
         $data = $this->ulasanService->getList($filter);
@@ -37,7 +35,7 @@ class UlasanController extends Controller
         return ApiResponse::paginated('Berhasil', $data);
     }
 
-    public function export(Request $request)
+    public function export(Request $request): \Symfony\Component\HttpFoundation\BinaryFileResponse
     {
         $filter = new UlasanFilter($request->all());
         $data = $this->ulasanService->getForExport($filter);

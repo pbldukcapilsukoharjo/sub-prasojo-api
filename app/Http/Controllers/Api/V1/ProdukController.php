@@ -11,6 +11,7 @@ use App\Http\Resources\Produk\ProdukCollection;
 use App\Http\Resources\Produk\ProdukDetailResource;
 use App\Services\ProdukService;
 use Illuminate\Http\JsonResponse;
+use App\Http\Responses\ApiResponse;
 
 final class ProdukController extends Controller
 {
@@ -25,11 +26,11 @@ final class ProdukController extends Controller
             $request->validated()
         );
 
-        return response()->json([
-            'success' => true,
+        return response()->json(array_merge([
+            'status' => true,
+            'code' => 200,
             'message' => 'Berhasil mengambil data produk',
-            'data' => new ProdukCollection($data),
-        ]);
+        ], (new ProdukCollection($data))->resolve()));
     }
 
     public function show(
@@ -38,10 +39,6 @@ final class ProdukController extends Controller
     ): JsonResponse {
         $data = $this->service->getDetail($produk_id);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Berhasil mengambil detail produk',
-            'data' => new ProdukDetailResource($data),
-        ]);
+        return ApiResponse::success('Berhasil mengambil detail produk', new ProdukDetailResource($data));
     }
 }

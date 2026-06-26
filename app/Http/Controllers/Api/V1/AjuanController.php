@@ -11,6 +11,7 @@ use App\Http\Resources\Ajuan\AjuanCollection;
 use App\Http\Resources\Ajuan\AjuanDetailResource;
 use App\Services\AjuanService;
 use Illuminate\Http\JsonResponse;
+use App\Http\Responses\ApiResponse;
 
 final class AjuanController extends Controller
 {
@@ -23,11 +24,11 @@ final class AjuanController extends Controller
             $request->validated()
         );
 
-        return response()->json([
-            'success' => true,
+        return response()->json(array_merge([
+            'status' => true,
+            'code' => 200,
             'message' => 'Berhasil mengambil data ajuan',
-            'data' => new AjuanCollection($data),
-        ]);
+        ], (new AjuanCollection($data))->resolve()));
     }
 
     public function show(
@@ -36,10 +37,6 @@ final class AjuanController extends Controller
     ): JsonResponse {
         $data = $this->service->getDetail($ajuan_id);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Berhasil mengambil detail ajuan',
-            'data' => new AjuanDetailResource($data),
-        ]);
+        return ApiResponse::success('Berhasil mengambil detail ajuan', new AjuanDetailResource($data));
     }
 }

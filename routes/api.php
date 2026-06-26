@@ -113,15 +113,15 @@ Route::prefix('v1')->group(function () {
     | Review / Ulasan
     |--------------------------------------------------------------------------
     */
-    Route::get(
-        '/review',
-        [ReviewController::class, 'index']
-    );
+    // Route::get(
+    //     '/review',
+    //     [ReviewController::class, 'index']
+    // );
 
-    Route::get(
-        '/review/{review_id}',
-        [ReviewController::class, 'show']
-    );
+    // Route::get(
+    //     '/review/{review_id}',
+    //     [ReviewController::class, 'show']
+    // );
 
     /*
     |--------------------------------------------------------------------------

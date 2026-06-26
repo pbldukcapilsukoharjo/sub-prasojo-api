@@ -62,10 +62,10 @@ final class User extends Authenticatable
     // Constants
     // ──────────────────────────────────────────────
 
-    public const string LEVEL_USER = 'user';
-    public const string LEVEL_PERANTARA = 'perantara';
+    public const LEVEL_USER = 'user';
+    public const LEVEL_PERANTARA = 'perantara';
 
-    public const array LEVELS = [
+    public const LEVELS = [
         self::LEVEL_USER,
         self::LEVEL_PERANTARA,
     ];

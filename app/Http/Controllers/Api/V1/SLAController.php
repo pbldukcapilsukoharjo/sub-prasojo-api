@@ -7,6 +7,7 @@ use App\Http\Resources\SLA\SLAResource;
 use App\Http\Requests\SLARequest;
 use App\Services\SLAService;
 use App\Filters\SLAFilter;
+use App\Http\Responses\ApiResponse;
 
 class SLAController extends Controller
 {
@@ -24,11 +25,6 @@ class SLAController extends Controller
 
         $data = $this->service->getAll($filters);
 
-        return response()->json([
-            'success' => true,
-            'code' => 200,
-            'message' => 'Berhasil mendapatkan data SLA',
-            'data' => new SLAResource($data)
-        ]);
+        return ApiResponse::success('Berhasil mendapatkan data SLA', new SLAResource($data));
     }
 }

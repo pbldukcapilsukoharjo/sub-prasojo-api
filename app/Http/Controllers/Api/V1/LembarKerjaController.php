@@ -11,6 +11,7 @@ use App\Http\Resources\LembarKerja\LembarKerjaDetailResource;
 use App\Http\Resources\LembarKerja\LembarKerjaListResource;
 use App\Services\LembarKerjaService;
 use Illuminate\Http\JsonResponse;
+use App\Http\Responses\ApiResponse;
 
 final class LembarKerjaController extends Controller
 {
@@ -27,12 +28,12 @@ final class LembarKerjaController extends Controller
         );
 
         return response()->json([
-            'success' => true,
+            'status' => true,
             'code' => 200,
             'message' => 'Berhasil mendapatkan lembar kerja',
             'data' => LembarKerjaListResource::collection(
                 collect($data->items())
-            ),
+            )->resolve(),
             'meta' => [
                 'page' => $data->currentPage(),
                 'per_page' => $data->perPage(),
@@ -51,13 +52,9 @@ final class LembarKerjaController extends Controller
             (int) $lk_id
         );
 
-        return response()->json([
-            'success' => true,
-            'code' => 200,
-            'message' => 'Berhasil mengambil detail lembar kerja',
-            'data' => new LembarKerjaDetailResource(
-                $data
-            ),
-        ]);
+        return ApiResponse::success(
+            'Berhasil mengambil detail lembar kerja',
+            new LembarKerjaDetailResource($data)
+        );
     }
 }
