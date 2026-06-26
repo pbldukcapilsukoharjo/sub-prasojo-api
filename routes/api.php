@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\V1\ProdukController;
 use App\Http\Controllers\Api\V1\ReviewController;
 use App\Http\Controllers\Api\V1\DistribusiWilayahController;
 use App\Http\Controllers\Api\V1\UlasanController; // Tambahkan import ini
+use App\Http\Controllers\Api\V1\PeringkatOperatorController;
 
 Route::prefix('v1')->group(function () {
 
@@ -115,4 +116,23 @@ Route::prefix('v1')->group(function () {
         '/sla',
         [SLAController::class, 'index']
     );
+        /*
+    |--------------------------------------------------------------------------
+    | Peringkat Operator
+    |--------------------------------------------------------------------------
+    */
+
+    Route::prefix('peringkat-operator')->group(function () {
+
+        Route::get(
+            '/',
+            [PeringkatOperatorController::class, 'index']
+        );
+
+        Route::get(
+            '/{op_id}',
+            [PeringkatOperatorController::class, 'show']
+        );
+
+    });
 });
