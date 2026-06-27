@@ -1,31 +1,38 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use App\Services\UlasanService;
-use App\Http\Requests\Ulasan\UlasanRequest;
+use App\Http\Requests\Ulasan\UlasanFilterRequest;
 use App\Http\Resources\Ulasan\UlasanResource;
+use App\Services\UlasanService;
+use Illuminate\Http\JsonResponse;
 
 class UlasanController extends Controller
 {
     public function __construct(
-        private UlasanService $service
-    ) {}
-
-    public function index(
-        UlasanRequest $request
+        private readonly UlasanService $service
     ) {
+    }
 
-        $data = $this->service->getAll(
+    /**
+     * Menampilkan daftar ulasan.
+     */
+    public function index(
+        UlasanFilterRequest $request
+    ): JsonResponse {
+
+        $result = $this->service->index(
             $request->validated()
         );
 
         return response()->json([
-            'success' => true,
+            'status' => true,
             'code' => 200,
-            'message' => 'Berhasil mendapatkan ulasan',
-            'data' => new UlasanResource($data)
+            'message' => 'Berhasil mendapatkan data ulasan.',
+            'data' => new UlasanResource($result),
         ]);
     }
 }

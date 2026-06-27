@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Resources\Ulasan;
 
 use Illuminate\Http\Request;
@@ -7,29 +9,66 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class UlasanResource extends JsonResource
 {
+    /**
+     * Transform the resource into an array.
+     */
     public function toArray(
         Request $request
     ): array {
 
+        $reviews = $this['reviews'];
+
         return [
-            'rata_rata_ulasan' =>
-                $this['rata_rata_ulasan'],
 
-            'total_ulasan' =>
-                $this['total_ulasan'],
+            /*
+            |--------------------------------------------------------------------------
+            | Summary
+            |--------------------------------------------------------------------------
+            */
+            'summary' => [
 
-            'total_rating' =>
-                $this['total_rating'],
+                'average_rating' =>
+                    $this['summary']['average_rating'],
 
-            'daftar_ulasan' => [
+                'total_review' =>
+                    $this['summary']['total_review'],
 
-                'list' =>
-                    UlasanItemResource::collection(
-                        $this['list']
-                    ),
+                'rating' =>
+                    $this['summary']['rating'],
+            ],
 
-                'meta' => $this['meta']
-            ]
+            /*
+            |--------------------------------------------------------------------------
+            | Reviews
+            |--------------------------------------------------------------------------
+            */
+            'reviews' => [
+
+                'list' => UlasanItemResource::collection(
+                    $reviews->items()
+                ),
+
+                'meta' => [
+
+                    'current_page' =>
+                        $reviews->currentPage(),
+
+                    'per_page' =>
+                        $reviews->perPage(),
+
+                    'total' =>
+                        $reviews->total(),
+
+                    'last_page' =>
+                        $reviews->lastPage(),
+
+                    'from' =>
+                        $reviews->firstItem(),
+
+                    'to' =>
+                        $reviews->lastItem(),
+                ],
+            ],
         ];
     }
 }

@@ -1,65 +1,92 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filters;
 
 use Illuminate\Database\Eloquent\Builder;
 
 class UlasanFilter
 {
+    /**
+     * Apply filter to query.
+     */
     public static function apply(
         Builder $query,
         array $filters
     ): Builder {
 
+        /*
+        |--------------------------------------------------------------------------
+        | Search
+        |--------------------------------------------------------------------------
+        */
         if (!empty($filters['search'])) {
 
-            $search = $filters['search'];
+            $search = trim($filters['search']);
 
-            $query->where(function ($q) use ($search) {
+            $query->where(function (Builder $builder) use ($search) {
 
-                $q->where(
+                $builder->where(
                     'review_content',
-                    'like',
+                    'LIKE',
                     "%{$search}%"
                 );
 
-                $q->orWhereHas('ajuan', function ($ajuan) use ($search) {
+                $builder->orWhereHas(
+                    'ajuan',
+                    function (Builder $ajuan) use ($search) {
 
-                    $ajuan->where(
-                        'ajuan_no_reg',
-                        'like',
-                        "%{$search}%"
-                    );
-                });
+                        $ajuan->where(
+                            'ajuan_no_reg',
+                            'LIKE',
+                            "%{$search}%"
+                        );
+                    }
+                );
             });
         }
 
+        /*
+        |--------------------------------------------------------------------------
+        | Rating
+        |--------------------------------------------------------------------------
+        */
         if (
-            !empty($filters['rating']) &&
+            isset($filters['rating']) &&
             $filters['rating'] !== 'all'
         ) {
+
             $query->where(
                 'review_rating',
                 (int) $filters['rating']
             );
         }
 
-        if (
-            !empty($filters['serviceType']) &&
-            $filters['serviceType'] !== 'all'
-        ) {
+        /*
+        |--------------------------------------------------------------------------
+        | Service Type
+        |--------------------------------------------------------------------------
+        */
+        if (!empty($filters['serviceType'])) {
 
-            $serviceType = $filters['serviceType'];
+            $query->whereHas(
+                'ajuan',
+                function (Builder $ajuan) use ($filters) {
 
-            $query->whereHas('ajuan', function ($q) use ($serviceType) {
-
-                $q->where(
-                    'ajuan_layanan_kode',
-                    $serviceType
-                );
-            });
+                    $ajuan->where(
+                        'ajuan_layanan_kode',
+                        $filters['serviceType']
+                    );
+                }
+            );
         }
 
+        /*
+        |--------------------------------------------------------------------------
+        | Date Range
+        |--------------------------------------------------------------------------
+        */
         if (
             !empty($filters['startDate']) &&
             !empty($filters['endDate'])
@@ -69,22 +96,37 @@ class UlasanFilter
                 'review_create_datetime',
                 [
                     $filters['startDate'] . ' 00:00:00',
-                    $filters['endDate'] . ' 23:59:59'
+                    $filters['endDate'] . ' 23:59:59',
                 ]
             );
         }
 
-        match ($filters['sortBy'] ?? 'newest') {
-            'oldest' => $query->orderBy(
-                'review_create_datetime',
-                'asc'
-            ),
+        /*
+        |--------------------------------------------------------------------------
+        | Sorting
+        |--------------------------------------------------------------------------
+        */
+        switch ($filters['sortBy'] ?? 'newest') {
 
-            default => $query->orderBy(
-                'review_create_datetime',
-                'desc'
-            )
-        };
+            case 'oldest':
+
+                $query->orderBy(
+                    'review_create_datetime',
+                    'asc'
+                );
+
+                break;
+
+            case 'newest':
+
+            default:
+
+                $query->orderByDesc(
+                    'review_create_datetime'
+                );
+
+                break;
+        }
 
         return $query;
     }

@@ -14,16 +14,12 @@ Route::prefix('v1')->group(function () {
     | Ulasan
     |--------------------------------------------------------------------------
     */
+
     Route::prefix('ulasan')->group(function () {
 
         Route::get(
             '/',
             [UlasanController::class, 'index']
-        );
-
-        Route::get(
-            '/{ulasan_id}',
-            [UlasanController::class, 'show']
         );
     });
 
@@ -32,16 +28,12 @@ Route::prefix('v1')->group(function () {
     | SLA
     |--------------------------------------------------------------------------
     */
+
     Route::prefix('sla')->group(function () {
 
         Route::get(
             '/',
             [SLAController::class, 'index']
-        );
-
-        Route::get(
-            '/{sla_id}',
-            [SLAController::class, 'show']
         );
     });
 
@@ -50,16 +42,12 @@ Route::prefix('v1')->group(function () {
     | Distribusi Wilayah
     |--------------------------------------------------------------------------
     */
+
     Route::prefix('distribusi-wilayah')->group(function () {
 
         Route::get(
             '/',
             [DistribusiWilayahController::class, 'index']
-        );
-
-        Route::get(
-            '/{wilayah_id}',
-            [DistribusiWilayahController::class, 'show']
         );
     });
 
@@ -68,16 +56,13 @@ Route::prefix('v1')->group(function () {
     | Peringkat Operator
     |--------------------------------------------------------------------------
     */
+
     Route::prefix('peringkat-operator')->group(function () {
 
         Route::get(
             '/',
             [PeringkatOperatorController::class, 'index']
         );
-
-        Route::get(
-            '/{op_id}',
-            [PeringkatOperatorController::class, 'show']
-        );
     });
+
 });
