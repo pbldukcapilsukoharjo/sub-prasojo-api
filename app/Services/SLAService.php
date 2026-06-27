@@ -1,146 +1,73 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
+use App\Filters\SLAFilter;
 use App\Models\Ajuan;
 use App\Models\Layanan;
 use Carbon\Carbon;
 
 class SLAService
 {
-    public function getAll(array $filters): array
+    /**
+     * Mendapatkan data SLA.
+     */
+    public function index(array $filters): array
     {
         $page = (int) ($filters['page'] ?? 1);
-        $perPage = 5;
-
-        $query = Ajuan::query();
+        $perPage = (int) ($filters['per_page'] ?? 5);
 
         /*
         |--------------------------------------------------------------------------
-        | Search
+        | Base Query
         |--------------------------------------------------------------------------
         */
-        if (!empty($filters['search'])) {
 
-            $search = $filters['search'];
+        $query = Ajuan::query()
+            ->with('layanan');
 
-            $query->where(function ($q) use ($search) {
-
-                $q->where('ajuan_no_reg', 'like', "%{$search}%")
-                    ->orWhere('ajuan_pelapor_nik', 'like', "%{$search}%")
-                    ->orWhere('ajuan_kecamatan_name', 'like', "%{$search}%");
-            });
-        }
+        SLAFilter::apply(
+            $query,
+            $filters
+        );
 
         /*
         |--------------------------------------------------------------------------
-        | District
+        | Ambil seluruh data sesuai filter
         |--------------------------------------------------------------------------
         */
-        if (!empty($filters['district'])) {
 
-            $query->where(
-                'ajuan_kecamatan_name',
-                $filters['district']
-            );
-        }
+        $ajuanCollection = (clone $query)->get();
 
         /*
         |--------------------------------------------------------------------------
-        | Date Range
+        | Hitung rata-rata waktu proses
         |--------------------------------------------------------------------------
         */
-        if (!empty($filters['startDate'])) {
 
-            $query->whereDate(
-                'ajuan_create_datetime',
-                '>=',
-                $filters['startDate']
-            );
-        }
+        $durations = $ajuanCollection->map(
+            function (Ajuan $ajuan): float {
 
-        if (!empty($filters['endDate'])) {
+                if (
+                    empty($ajuan->ajuan_create_datetime) ||
+                    empty($ajuan->ajuan_update_datetime)
+                ) {
+                    return 0;
+                }
 
-            $query->whereDate(
-                'ajuan_create_datetime',
-                '<=',
-                $filters['endDate']
-            );
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Period
-        |--------------------------------------------------------------------------
-        */
-        if (!empty($filters['period'])) {
-
-            switch ($filters['period']) {
-
-                case 'today':
-                    $query->whereDate(
-                        'ajuan_create_datetime',
-                        now()->toDateString()
-                    );
-                    break;
-
-                case 'this_week':
-                    $query->whereBetween(
-                        'ajuan_create_datetime',
-                        [
-                            now()->startOfWeek(),
-                            now()->endOfWeek()
-                        ]
-                    );
-                    break;
-
-                case 'this_month':
-                    $query->whereMonth(
-                        'ajuan_create_datetime',
-                        now()->month
-                    )->whereYear(
-                        'ajuan_create_datetime',
-                        now()->year
-                    );
-                    break;
-
-                case 'this_year':
-                    $query->whereYear(
-                        'ajuan_create_datetime',
-                        now()->year
-                    );
-                    break;
-            }
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Ambil Data
-        |--------------------------------------------------------------------------
-        */
-        $allAjuan = (clone $query)->get();
-
-        /*
-        |--------------------------------------------------------------------------
-        | Rata-rata waktu proses
-        |--------------------------------------------------------------------------
-        */
-        $durations = $allAjuan->map(function ($ajuan) {
-
-            if (
-                empty($ajuan->ajuan_create_datetime) ||
-                empty($ajuan->ajuan_update_datetime)
-            ) {
-                return 0;
-            }
-
-            return Carbon::parse($ajuan->ajuan_create_datetime)
-                ->diffInMinutes(
-                    Carbon::parse($ajuan->ajuan_update_datetime)
+                return Carbon::parse(
+                    $ajuan->ajuan_create_datetime
+                )->diffInMinutes(
+                    Carbon::parse(
+                        $ajuan->ajuan_update_datetime
+                    )
                 ) / 60;
-        });
+            }
+        );
 
-        $avgDuration = round(
+        $averageProcessTime = round(
             (float) ($durations->avg() ?? 0),
             1
         );
@@ -150,37 +77,47 @@ class SLAService
         | Target SLA
         |--------------------------------------------------------------------------
         */
+
         $targetSla = 6;
 
+        /*
+        |--------------------------------------------------------------------------
+        | Pencapaian SLA
+        |--------------------------------------------------------------------------
+        */
+
         $achievedCount = $durations
-            ->filter(fn($hour) => $hour <= $targetSla)
+            ->filter(
+                fn (float $hour): bool => $hour <= $targetSla
+            )
             ->count();
 
-        $slaPercentage = $allAjuan->count() > 0
+        $slaAchievement = $ajuanCollection->count() > 0
             ? round(
-                ($achievedCount / $allAjuan->count()) * 100
+                ($achievedCount / $ajuanCollection->count()) * 100
             )
             : 0;
 
         /*
         |--------------------------------------------------------------------------
-        | Detail Per Jenis Layanan
+        | Detail per layanan
         |--------------------------------------------------------------------------
         */
-        $list = [];
 
-        $list[] = [
+        $details = [];
+
+        $details[] = [
             'id' => 1,
             'jenis_layanan' => 'TOTAL AJUAN',
-            'jumlah_ajuan' => $allAjuan->count(),
-            'rata_rata_waktu' => $avgDuration
+            'jumlah_ajuan' => $ajuanCollection->count(),
+            'rata_rata_waktu' => $averageProcessTime,
         ];
 
         $layanans = Layanan::query()
             ->orderBy('layanan_pos')
             ->get();
-
-        foreach ($layanans as $index => $layanan) {
+            
+foreach ($layanans as $index => $layanan) {
 
             $layananAjuan = (clone $query)
                 ->where(
@@ -189,8 +126,8 @@ class SLAService
                 )
                 ->get();
 
-            $avg = $layananAjuan
-                ->map(function ($ajuan) {
+            $average = $layananAjuan
+                ->map(function (Ajuan $ajuan): float {
 
                     if (
                         empty($ajuan->ajuan_create_datetime) ||
@@ -209,16 +146,16 @@ class SLAService
                 })
                 ->avg();
 
-            $list[] = [
+            $details[] = [
                 'id' => $index + 2,
                 'jenis_layanan' => strtoupper(
                     $layanan->layanan_nama
                 ),
                 'jumlah_ajuan' => $layananAjuan->count(),
                 'rata_rata_waktu' => round(
-                    (float) ($avg ?? 0),
+                    (float) ($average ?? 0),
                     1
-                )
+                ),
             ];
         }
 
@@ -227,45 +164,71 @@ class SLAService
         | Sorting
         |--------------------------------------------------------------------------
         */
-        if (($filters['sortBy'] ?? 'newest') === 'oldest') {
 
-            $list = collect($list)
+        $details = collect($details);
+
+        match ($filters['sortBy'] ?? 'newest') {
+
+            'oldest' => $details = $details
                 ->sortBy('rata_rata_waktu')
-                ->values()
-                ->toArray();
-        } else {
+                ->values(),
 
-            $list = collect($list)
+            default => $details = $details
                 ->sortByDesc('rata_rata_waktu')
-                ->values()
-                ->toArray();
-        }
+                ->values(),
+        };
 
         /*
         |--------------------------------------------------------------------------
-        | Pagination Manual
+        | Manual Pagination
         |--------------------------------------------------------------------------
         */
-        $total = count($list);
 
-        $paginated = collect($list)
+        $total = $details->count();
+
+        $list = $details
             ->forPage($page, $perPage)
-            ->values()
-            ->toArray();
+            ->values();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Response
+        |--------------------------------------------------------------------------
+        */
 
         return [
-            'rata_rata_waktu_proses' => $avgDuration,
-            'pencapaian_sla' => $slaPercentage,
-            'target_sla' => $targetSla,
+
+            'rata_rata_waktu_proses' =>
+                $averageProcessTime,
+
+            'pencapaian_sla' =>
+                $slaAchievement,
+
+            'target_sla' =>
+                $targetSla,
+
             'daftar_rincian' => [
-                'list' => $paginated,
+
+                'list' =>
+                    $list,
+
                 'meta' => [
-                    'page' => $page,
-                    'per_page' => $perPage,
-                    'total' => $total,
-                    'total_page' => (int) ceil($total / $perPage),
-                ]
-            ]
+
+                    'page' =>
+                        $page,
+
+                    'per_page' =>
+                        $perPage,
+
+                    'total' =>
+                        $total,
+
+                    'total_page' =>
+                        (int) ceil(
+                            $total / $perPage
+                        ),
+                ],
+            ],
         ];
     }
 }

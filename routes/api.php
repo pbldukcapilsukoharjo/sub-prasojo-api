@@ -1,25 +1,31 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\Api\V1\UlasanController;
-use App\Http\Controllers\Api\V1\SLAController;
 use App\Http\Controllers\Api\V1\DistribusiWilayahController;
 use App\Http\Controllers\Api\V1\PeringkatOperatorController;
+use App\Http\Controllers\Api\V1\SLAController;
+use App\Http\Controllers\Api\V1\UlasanController;
 
-Route::prefix('v1')->group(function () {
+Route::prefix('v1')->group(function (): void {
 
     /*
     |--------------------------------------------------------------------------
     | Ulasan
     |--------------------------------------------------------------------------
     */
-
-    Route::prefix('ulasan')->group(function () {
+    Route::prefix('ulasan')->group(function (): void {
 
         Route::get(
             '/',
             [UlasanController::class, 'index']
+        );
+
+        Route::get(
+            '/{ulasan_id}',
+            [UlasanController::class, 'show']
         );
     });
 
@@ -28,12 +34,16 @@ Route::prefix('v1')->group(function () {
     | SLA
     |--------------------------------------------------------------------------
     */
-
-    Route::prefix('sla')->group(function () {
+    Route::prefix('sla')->group(function (): void {
 
         Route::get(
             '/',
             [SLAController::class, 'index']
+        );
+
+        Route::get(
+            '/{sla_id}',
+            [SLAController::class, 'show']
         );
     });
 
@@ -42,12 +52,16 @@ Route::prefix('v1')->group(function () {
     | Distribusi Wilayah
     |--------------------------------------------------------------------------
     */
-
-    Route::prefix('distribusi-wilayah')->group(function () {
+    Route::prefix('distribusi-wilayah')->group(function (): void {
 
         Route::get(
             '/',
             [DistribusiWilayahController::class, 'index']
+        );
+
+        Route::get(
+            '/{wilayah_id}',
+            [DistribusiWilayahController::class, 'show']
         );
     });
 
@@ -56,12 +70,16 @@ Route::prefix('v1')->group(function () {
     | Peringkat Operator
     |--------------------------------------------------------------------------
     */
-
-    Route::prefix('peringkat-operator')->group(function () {
+    Route::prefix('peringkat-operator')->group(function (): void {
 
         Route::get(
             '/',
             [PeringkatOperatorController::class, 'index']
+        );
+
+        Route::get(
+            '/{operator_id}',
+            [PeringkatOperatorController::class, 'show']
         );
     });
 

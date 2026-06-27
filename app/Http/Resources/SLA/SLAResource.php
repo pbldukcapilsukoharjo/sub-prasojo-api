@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Resources\SLA;
 
 use Illuminate\Http\Request;
@@ -7,8 +9,13 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class SLAResource extends JsonResource
 {
-    public function toArray(Request $request): array
-    {
+    /**
+     * Transform the resource into an array.
+     */
+    public function toArray(
+        Request $request
+    ): array {
+
         return [
 
             'rata_rata_waktu_proses' =>
@@ -22,12 +29,16 @@ class SLAResource extends JsonResource
 
             'daftar_rincian' => [
 
-                'list' => SLADetailResource::collection(
-                    collect($this['daftar_rincian']['list'])
-                ),
+                'list' =>
+                    SLADetailResource::collection(
+                        collect(
+                            $this['daftar_rincian']['list']
+                        )
+                    ),
 
-                'meta' => $this['daftar_rincian']['meta']
-            ]
+                'meta' =>
+                    $this['daftar_rincian']['meta'],
+            ],
         ];
     }
 }
