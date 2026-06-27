@@ -5,6 +5,18 @@
 
 ---
 
+## Keterangan Status Endpoint
+- 🟢 **[SAMA]**: Endpoint sama dengan desain awal di `api-1.json`
+- 🔵 **[UPDATED]**: Endpoint mengalami perubahan path atau struktur dari `api-1.json`
+- 🟡 **[BARU]**: Endpoint baru yang tidak ada di `api-1.json`
+- ❌ **[TIDAK DIPAKAI]**: Endpoint tidak lagi digunakan (deprecated) dan digantikan oleh endpoint lain (misalnya `/pengajuan`).
+- ✅ **[BERFUNGSI]**: Endpoint sudah selesai diimplementasi di sisi *backend* dan berfungsi normal.
+- 🚧 **[BELUM BERFUNGSI]**: Endpoint masih dalam tahap pengembangan atau *draft*.
+
+*(Saat ini seluruh endpoint yang aktif (tidak ditandai ❌) telah selesai diimplementasikan di sisi backend)*.
+
+---
+
 ## Standard Error Responses
 Untuk menghindari repetisi, seluruh API (kecuali Login) akan mengembalikan *error* **401 Unauthorized** jika token tidak dikirim atau tidak valid:
 ```json
@@ -32,7 +44,7 @@ Jika ada validasi parameter/body yang gagal, sistem akan selalu me-return **400 
 
 ## 1. Modul Auth & Profile
 
-### 1.1 Login
+### 1.1 Login 🟢 [SAMA] ✅ [BERFUNGSI]
 **Endpoint:** `POST /api/v1/auth/login`
 **Deskripsi:** Memverifikasi kredensial pengguna dan mengembalikan token akses.
 
@@ -65,7 +77,7 @@ Jika ada validasi parameter/body yang gagal, sistem akan selalu me-return **400 
 }
 ```
 
-### 1.2 Refresh Token
+### 1.2 Refresh Token 🟢 [SAMA] ✅ [BERFUNGSI]
 **Endpoint:** `POST /api/v1/auth/refresh`
 **Deskripsi:** Memperbarui akses token yang akan kedaluwarsa.
 **Headers:** `Authorization: Bearer {PASETO_TOKEN}`
@@ -83,7 +95,8 @@ Jika ada validasi parameter/body yang gagal, sistem akan selalu me-return **400 
 }
 ```
 
-### 1.3 Get Profile (Me)
+### 1.3 Get Profile (Me) 🔵 [UPDATED] ✅ [BERFUNGSI]
+*(Sebelumnya di `api-1.json`: `GET /api/v1/me`)*
 **Endpoint:** `GET /api/v1/auth/me`
 **Deskripsi:** Mengambil detail profil user yang sedang login.
 **Headers:** `Authorization: Bearer {PASETO_TOKEN}`
@@ -102,7 +115,7 @@ Jika ada validasi parameter/body yang gagal, sistem akan selalu me-return **400 
 }
 ```
 
-### 1.4 Update Profile
+### 1.4 Update Profile 🟡 [BARU] ✅ [BERFUNGSI]
 **Endpoint:** `PUT /api/v1/auth/profile`
 **Deskripsi:** Memperbarui data pengguna.
 **Headers:** `Authorization: Bearer {PASETO_TOKEN}`
@@ -123,7 +136,7 @@ Jika ada validasi parameter/body yang gagal, sistem akan selalu me-return **400 
 }
 ```
 
-### 1.5 Logout
+### 1.5 Logout 🟢 [SAMA] ✅ [BERFUNGSI]
 **Endpoint:** `POST /api/v1/auth/logout`
 **Deskripsi:** Menghancurkan sesi pengguna (Blacklist Token).
 **Headers:** `Authorization: Bearer {PASETO_TOKEN}`
@@ -138,9 +151,7 @@ Jika ada validasi parameter/body yang gagal, sistem akan selalu me-return **400 
 }
 ```
 
----
-
-### 1.6 Register
+### 1.6 Register 🟢 [SAMA] ✅ [BERFUNGSI]
 **Endpoint:** `POST /api/v1/auth/register`
 **Deskripsi:** Mendaftarkan pengguna baru ke sistem.
 
@@ -166,9 +177,35 @@ Jika ada validasi parameter/body yang gagal, sistem akan selalu me-return **400 
   }
 }
 ```
+
+### 1.7 Lupa Password 🟢 [SAMA] ✅ [BERFUNGSI]
+**Endpoint:** `POST /api/v1/auth/forgot-password`
+**Deskripsi:** Mengirimkan email untuk mengubah password.
+
+### 1.8 Reset Password 🟢 [SAMA] ✅ [BERFUNGSI]
+**Endpoint:** `POST /api/v1/auth/reset-password`
+**Deskripsi:** Mengubah password berdasarkan token yang diterima.
+
+### 1.9 Verifikasi Email (Notice) 🔵 [UPDATED] ✅ [BERFUNGSI]
+*(Sebelumnya di `api-1.json`: `GET /api/v1/auth/email/verify`)*
+**Endpoint:** `GET /api/v1/email/verify`
+**Deskripsi:** Middleware notifikasi jika email belum diverifikasi.
+
+### 1.10 Verifikasi Email (Action) 🔵 [UPDATED] ✅ [BERFUNGSI]
+*(Sebelumnya di `api-1.json`: `GET /api/v1/auth/email/verify/{id}/{hash}`)*
+**Endpoint:** `GET /api/v1/email/verify/{id}/{hash}`
+**Deskripsi:** URL yang di-klik pengguna untuk memverifikasi email.
+
+### 1.11 Resend Verifikasi Email 🔵 [UPDATED] ✅ [BERFUNGSI]
+*(Sebelumnya di `api-1.json`: `POST /api/v1/auth/email/resend`)*
+**Endpoint:** `POST /api/v1/email/resend`
+**Deskripsi:** Mengirim ulang email verifikasi.
+
+---
+
 ## 2. Modul Pengajuan (Ajuan, Lembar Kerja, Produk)
 
-### 2.1 List Pengajuan
+### 2.1 List Pengajuan Master 🟡 [BARU] ✅ [BERFUNGSI]
 **Endpoint:** `GET /api/v1/pengajuan`
 **Deskripsi:** Endpoint *master* untuk tabel pengajuan (mendukung paginasi). Meng-handle halaman Lembar Kerja, Produk, maupun Semua Ajuan.
 **Headers:** `Authorization: Bearer {PASETO_TOKEN}`
@@ -215,15 +252,40 @@ Jika ada validasi parameter/body yang gagal, sistem akan selalu me-return **400 
 }
 ```
 
-### 2.2 Export Excel Pengajuan
+### 2.2 Export Excel Pengajuan 🟡 [BARU] ✅ [BERFUNGSI]
 **Endpoint:** `GET /api/v1/pengajuan/export`
 **Deskripsi:** Mengunduh file `.xlsx`. Parameter sama persis dengan `GET /api/v1/pengajuan` (tanpa `page`). Mengembalikan tipe file statis langsung (`application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`).
+
+### 2.3 List Lembar Kerja ❌ [TIDAK DIPAKAI]
+**Endpoint:** `GET /api/v1/lembar-kerja`
+**Deskripsi:** Endpoint ini sudah tidak dipakai dan digantikan oleh endpoint master `/api/v1/pengajuan` (dengan query parameter `status_kategori=lembar_kerja`).
+
+### 2.4 Detail Lembar Kerja ❌ [TIDAK DIPAKAI]
+**Endpoint:** `GET /api/v1/lembar-kerja/{lk_id}`
+**Deskripsi:** Endpoint ini sudah tidak dipakai dan datanya digabung di `/api/v1/pengajuan`.
+
+### 2.5 List Ajuan ❌ [TIDAK DIPAKAI]
+**Endpoint:** `GET /api/v1/ajuan`
+**Deskripsi:** Endpoint ini sudah tidak dipakai dan digantikan oleh endpoint master `/api/v1/pengajuan` (dengan query parameter `status_kategori=all`).
+
+### 2.6 Detail Ajuan ❌ [TIDAK DIPAKAI]
+**Endpoint:** `GET /api/v1/ajuan/{ajuan_id}`
+**Deskripsi:** Endpoint ini sudah tidak dipakai dan datanya digabung di `/api/v1/pengajuan`.
+
+### 2.7 List Produk ❌ [TIDAK DIPAKAI]
+**Endpoint:** `GET /api/v1/produk`
+**Deskripsi:** Endpoint ini sudah tidak dipakai dan digantikan oleh endpoint master `/api/v1/pengajuan` (dengan query parameter `status_kategori=produk`).
+
+### 2.8 Detail Produk ❌ [TIDAK DIPAKAI]
+**Endpoint:** `GET /api/v1/produk/{produk_id}`
+**Deskripsi:** Endpoint ini sudah tidak dipakai dan datanya digabung di `/api/v1/pengajuan`.
 
 ---
 
 ## 3. Modul Dashboard
 
-### 3.1 Dashboard KPI
+### 3.1 Dashboard KPI 🔵 [UPDATED] ✅ [BERFUNGSI]
+*(Sebelumnya di `api-1.json`: digabung dalam `GET /api/v1/dashboard`)*
 **Endpoint:** `GET /api/v1/dashboard/kpi`
 **Deskripsi:** Mengambil 4 KPI utama. Mendukung rentang global filter.
 **Headers:** `Authorization: Bearer {PASETO_TOKEN}`
@@ -249,7 +311,7 @@ Jika ada validasi parameter/body yang gagal, sistem akan selalu me-return **400 
 }
 ```
 
-### 3.2 Dashboard Trend Chart
+### 3.2 Dashboard Trend Chart 🟡 [BARU] ✅ [BERFUNGSI]
 **Endpoint:** `GET /api/v1/dashboard/chart-trend`
 **Deskripsi:** Mengambil array pergerakan data untuk *Line Chart*.
 
@@ -266,7 +328,7 @@ Jika ada validasi parameter/body yang gagal, sistem akan selalu me-return **400 
 }
 ```
 
-### 3.3 Dashboard Top Wilayah
+### 3.3 Dashboard Top Wilayah 🟡 [BARU] ✅ [BERFUNGSI]
 **Endpoint:** `GET /api/v1/dashboard/top-wilayah`
 **Deskripsi:** Mengambil top 5 wilayah penyumbang ajuan terbanyak (*Bar chart*).
 
@@ -287,7 +349,7 @@ Jika ada validasi parameter/body yang gagal, sistem akan selalu me-return **400 
 
 ## 4. Modul Monitoring Operator
 
-### 4.1 Operator KPI Global
+### 4.1 Operator KPI Global 🟡 [BARU] ✅ [BERFUNGSI]
 **Endpoint:** `GET /api/v1/operator/kpi-global`
 **Query Params Khusus:** Filter standar, `id_kecamatan`. (Tidak ada `id_layanan`).
 
@@ -305,7 +367,8 @@ Jika ada validasi parameter/body yang gagal, sistem akan selalu me-return **400 
 }
 ```
 
-### 4.2 Ranking Operator
+### 4.2 Ranking Operator 🔵 [UPDATED] ✅ [BERFUNGSI]
+*(Sebelumnya di `api-1.json`: `GET /api/v1/dashboard/peringkat-operator`)*
 **Endpoint:** `GET /api/v1/operator/ranking`
 **Deskripsi:** Menampilkan urutan ranking kecepatan. Mendukung `search_nama` dan filter kecamatan.
 
@@ -333,35 +396,11 @@ Jika ada validasi parameter/body yang gagal, sistem akan selalu me-return **400 
 }
 ```
 
-### 4.3 Detail Operator
+### 4.3 Detail Operator ❌ [TIDAK DIPAKAI]
 **Endpoint:** `GET /api/v1/operator/{id_operator}/detail`
+**Deskripsi:** Endpoint ini sudah tidak dipakai dan data/riwayat kerja digantikan melalui pencarian di endpoint master `/api/v1/pengajuan`.
 
-**Response Sukses (200 OK):**
-```json
-{
-  "status": true,
-  "code": 200,
-  "message": "Berhasil",
-  "data": {
-    "profil": {
-      "nama": "Budi Santoso",
-      "total_dikerjakan": 1200,
-      "rata_rata_waktu_menit": 15
-    },
-    "riwayat_kerja": [
-      {
-        "no_reg": "REG-123",
-        "layanan": "KTP",
-        "waktu_mulai": "08:00:00",
-        "waktu_selesai": "08:10:00",
-        "durasi_menit": 10
-      }
-    ]
-  }
-}
-```
-
-### 4.4 Export Ranking Operator
+### 4.4 Export Ranking Operator 🟡 [BARU] ✅ [BERFUNGSI]
 **Endpoint:** `GET /api/v1/operator/export`
 **Deskripsi:** Mengekspor tabel urutan ranking operator dalam format Excel (`.xlsx`). Parameter query (seperti pencarian atau filter wilayah) sama dengan endpoint `GET /api/v1/operator/ranking` namun mengabaikan aturan paginasi.
 
@@ -369,7 +408,8 @@ Jika ada validasi parameter/body yang gagal, sistem akan selalu me-return **400 
 
 ## 5. Modul Monitoring Wilayah
 
-### 5.1 Distribusi Wilayah
+### 5.1 Distribusi Wilayah 🔵 [UPDATED] ✅ [BERFUNGSI]
+*(Sebelumnya di `api-1.json`: `GET /api/v1/dashboard/distribusi-wilayah`)*
 **Endpoint:** `GET /api/v1/wilayah/distribusi`
 **Deskripsi:** List volume per kecamatan. (Filter standar & `id_kecamatan` spesifik, *no search*, *no layanan*).
 
@@ -397,7 +437,7 @@ Jika ada validasi parameter/body yang gagal, sistem akan selalu me-return **400 
 }
 ```
 
-### 5.2 Export Distribusi Wilayah
+### 5.2 Export Distribusi Wilayah 🟡 [BARU] ✅ [BERFUNGSI]
 **Endpoint:** `GET /api/v1/wilayah/export`
 **Deskripsi:** Mengekspor tabel volume per kecamatan ke dalam file Excel (`.xlsx`). Semua parameter filter yang dikirimkan pada `GET /api/v1/wilayah/distribusi` akan berlaku untuk data yang diekspor.
 
@@ -405,7 +445,7 @@ Jika ada validasi parameter/body yang gagal, sistem akan selalu me-return **400 
 
 ## 6. Modul SLA Monitoring
 
-### 6.1 KPI SLA
+### 6.1 KPI SLA 🟡 [BARU] ✅ [BERFUNGSI]
 **Endpoint:** `GET /api/v1/sla/kpi`
 **Deskripsi:** Menampilkan rata-rata proses & rasio pencapaian SLA.
 
@@ -422,7 +462,8 @@ Jika ada validasi parameter/body yang gagal, sistem akan selalu me-return **400 
 }
 ```
 
-### 6.2 Tabel Komparasi Layanan
+### 6.2 Tabel Komparasi Layanan 🔵 [UPDATED] ✅ [BERFUNGSI]
+*(Sebelumnya di `api-1.json`: `GET /api/v1/dashboard/waktu-rata`)*
 **Endpoint:** `GET /api/v1/sla/layanan`
 
 **Response Sukses (200 OK):**
@@ -449,7 +490,7 @@ Jika ada validasi parameter/body yang gagal, sistem akan selalu me-return **400 
 }
 ```
 
-### 6.3 Export Tabel Komparasi Layanan
+### 6.3 Export Tabel Komparasi Layanan 🟡 [BARU] ✅ [BERFUNGSI]
 **Endpoint:** `GET /api/v1/sla/export`
 **Deskripsi:** Mengekspor data komparasi pemenuhan SLA layanan ke format file Excel (`.xlsx`). Parameter disesuaikan dengan yang aktif pada tabel data SLA.
 
@@ -457,7 +498,7 @@ Jika ada validasi parameter/body yang gagal, sistem akan selalu me-return **400 
 
 ## 7. Modul Monitoring Ulasan
 
-### 7.1 Ulasan KPI
+### 7.1 Ulasan KPI 🟡 [BARU] ✅ [BERFUNGSI]
 **Endpoint:** `GET /api/v1/ulasan/kpi`
 **Deskripsi:** Hero score ulasan dan hitungan per bintang. Filter standar + `id_layanan` + `rating`.
 
@@ -480,7 +521,8 @@ Jika ada validasi parameter/body yang gagal, sistem akan selalu me-return **400 
 }
 ```
 
-### 7.2 List Ulasan
+### 7.2 List Ulasan 🔵 [UPDATED] ✅ [BERFUNGSI]
+*(Sebelumnya di `api-1.json`: `GET /api/v1/dashboard/ulasan`)*
 **Endpoint:** `GET /api/v1/ulasan/list`
 
 **Response Sukses (200 OK):**
@@ -508,7 +550,7 @@ Jika ada validasi parameter/body yang gagal, sistem akan selalu me-return **400 
 }
 ```
 
-### 7.3 Export Ulasan
+### 7.3 Export Ulasan 🟡 [BARU] ✅ [BERFUNGSI]
 **Endpoint:** `GET /api/v1/ulasan/export`
 **Deskripsi:** Mengunduh data ulasan dalam format Excel (.xlsx). Mendukung filter rentang tanggal, layanan, dan rating.
 
