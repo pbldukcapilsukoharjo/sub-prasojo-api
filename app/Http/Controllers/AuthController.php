@@ -6,6 +6,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
+use App\Http\Requests\ResendRequest;
+use App\Http\Requests\ForgotPasswordRequest;
+use App\Http\Requests\ResetPasswordRequest;
 use App\Services\AuthService;
 use App\Services\PasetoService;
 use App\Http\Responses\ApiResponse;
@@ -103,6 +106,56 @@ final class AuthController extends Controller
             ])->cookie('refresh_token', $result['refresh_token'], 60 * 24 * 7, null, null, true, true);
         } catch (\Exception $e) {
             return ApiResponse::error('Refresh gagal', 400, ['error' => $e->getMessage()]);
+        }
+    }
+
+    public function verifyEmail(Request $request, $id, $hash)
+    {
+        try {
+            $hasValidSignature = $request->hasValidSignature();
+            $this->authService->verifyEmail($id, $hash, $hasValidSignature);
+
+            return ApiResponse::success('Email berhasil diverifikasi', [], 200);
+        } catch (\Exception $e) {
+            return ApiResponse::error('Gagal memverifikasi email', 400, ['error' => $e->getMessage()]);
+        }
+    }
+
+    public function resendVerification(ResendRequest $request)
+    {
+        try {
+            $this->authService->resendVerification($request->validated());
+
+            return ApiResponse::success('Email verifikasi berhasil dikirim ulang', [], 200);
+        } catch (\Exception $e) {
+            return ApiResponse::error('Gagal mengirim ulang email verifikasi', 400, ['error' => $e->getMessage()]);
+        }
+    }
+
+    public function verificationNotice()
+    {
+        return ApiResponse::error('Harap verifikasi email Anda terlebih dahulu.', 403);
+    }
+
+    public function forgotPassword(ForgotPasswordRequest $request)
+    {
+        try {
+            $this->authService->forgotPassword($request->validated());
+
+            return ApiResponse::success('Email reset password berhasil dikirim', [], 200);
+        } catch (\Exception $e) {
+            return ApiResponse::error('Gagal mengirim email reset password', 400, ['error' => $e->getMessage()]);
+        }
+    }
+
+    public function resetPassword(ResetPasswordRequest $request)
+    {
+        try {
+            $this->authService->resetPassword($request->validated());
+
+            return ApiResponse::success('Password berhasil direset', [], 200);
+        } catch (\Exception $e) {
+            return ApiResponse::error('Gagal mereset password', 400, ['error' => $e->getMessage()]);
         }
     }
 }

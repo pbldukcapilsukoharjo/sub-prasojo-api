@@ -18,11 +18,20 @@ Route::prefix('v1')->group(function () {
         Route::post('/login', 'login');
         Route::post('/logout', 'logout');
         Route::post('/refresh', 'refresh');
+        
+        Route::post('/forgot-password', 'forgotPassword')->middleware('throttle:3,1')->name('password.email');
+        Route::post('/reset-password', 'resetPassword')->name('password.update');
+    });
+
+    Route::prefix('email')->controller(AuthController::class)->group(function () {
+        Route::get('/verify', 'verificationNotice')->name('verification.notice');
+        Route::get('/verify/{id}/{hash}', 'verifyEmail')->middleware(['signed'])->name('verification.verify');
+        Route::post('/resend', 'resendVerification')->middleware(['throttle:6,1'])->name('verification.send');
     });
 
     Route::middleware('paseto.auth')->prefix('auth')->group(function () {
-        Route::get('/me', [UserController::class, 'getUser']);
-        Route::put('/profile', [UserController::class, 'updateProfile']);
+        Route::get('/me', [UserController::class, 'getUser'])->middleware('verified');
+        Route::put('/profile', [UserController::class, 'updateProfile'])->middleware('verified');
     });
 
     /*

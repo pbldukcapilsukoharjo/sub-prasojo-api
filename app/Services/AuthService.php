@@ -28,6 +28,10 @@ final class AuthService
                 'hashed_password' => Hash::make($validatedData['password']),
             ]);
 
+            event(new \Illuminate\Auth\Events\Registered($user));
+
+            \Illuminate\Support\Facades\RateLimiter::hit('resend-verification:' . $user->email, 180);
+
             return ['user' => $user];
         } catch (\Exception $e) {
             throw ValidationException::withMessages([
@@ -55,7 +59,7 @@ final class AuthService
             RefreshToken::create([
                 'sub_user_id' => $data->get('user_id'),
                 'jti' => $data->get('jti'),
-                'expired_at' => now()->addDays(7),
+                'expires_at' => now()->addDays(7),
                 'revoked' => false,
             ]);
         } catch (\Exception $e) {
@@ -87,7 +91,7 @@ final class AuthService
             RefreshToken::create([
                 'sub_user_id' => $user->id,
                 'jti' => $this->pasetoService->parseToken($newRefreshToken)->get('jti'),
-                'expired_at' => now()->addDays(7),
+                'expires_at' => now()->addDays(7),
             ]);
 
             return [
@@ -127,5 +131,86 @@ final class AuthService
                 'error' => ['Gagal logout: ' . $e->getMessage()],
             ]);
         }
+    }
+
+    public function verifyEmail(string $id, string $hash, bool $hasValidSignature)
+    {
+        $user = SubUser::findOrFail($id);
+
+        if (!hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
+            throw new \Exception('Invalid hash');
+        }
+
+        if (!$hasValidSignature) {
+            throw new \Exception('Invalid or expired url signature');
+        }
+
+        if ($user->hasVerifiedEmail()) {
+            throw new \Exception('Email sudah diverifikasi sebelumnya.');
+        }
+
+        if ($user->markEmailAsVerified()) {
+            event(new \Illuminate\Auth\Events\Verified($user));
+        }
+
+        return true;
+    }
+
+    public function resendVerification(array $validatedData)
+    {
+        $email = $validatedData['email'];
+        
+        if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts('resend-verification:' . $email, 1)) {
+            $seconds = \Illuminate\Support\Facades\RateLimiter::availableIn('resend-verification:' . $email);
+            throw new \Exception('Harap tunggu ' . $seconds . ' detik sebelum meminta email verifikasi lagi.');
+        }
+
+        $user = SubUser::where('email', $email)->first();
+        if (!$user) {
+            throw new \Exception('Pengguna tidak ditemukan.');
+        }
+
+        if ($user->hasVerifiedEmail()) {
+            throw new \Exception('Email sudah diverifikasi sebelumnya.');
+        }
+
+        $user->sendEmailVerificationNotification();
+
+        \Illuminate\Support\Facades\RateLimiter::hit('resend-verification:' . $email, 180);
+
+        return true;
+    }
+
+    public function forgotPassword(array $validatedData)
+    {
+        $status = \Illuminate\Support\Facades\Password::broker()->sendResetLink(
+            ['email' => $validatedData['email']]
+        );
+
+        if ($status !== \Illuminate\Support\Facades\Password::RESET_LINK_SENT) {
+            throw new \Exception(__($status));
+        }
+
+        return true;
+    }
+
+    public function resetPassword(array $validatedData)
+    {
+        $status = \Illuminate\Support\Facades\Password::broker()->reset(
+            $validatedData,
+            function ($user, $password) {
+                $user->forceFill([
+                    'hashed_password' => Hash::make($password)
+                ])->save();
+
+                event(new \Illuminate\Auth\Events\PasswordReset($user));
+            }
+        );
+
+        if ($status !== \Illuminate\Support\Facades\Password::PASSWORD_RESET) {
+            throw new \Exception(__($status));
+        }
+
+        return true;
     }
 }
