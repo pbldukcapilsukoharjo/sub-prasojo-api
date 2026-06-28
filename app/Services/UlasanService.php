@@ -81,10 +81,9 @@ final class UlasanService
         return $data;
     }
 
-    public function getForExport(UlasanFilter $filter)
+    public function getForExport()
     {
         $query = AjuanReview::query()->from('ajuan_review');
-        $query = $filter->apply($query);
 
         $data = $query->join('ajuan', 'ajuan.ajuan_id', '=', 'ajuan_review.review_ajuan_id')
             ->leftJoin('layanan', 'layanan.layanan_kode', '=', 'ajuan.ajuan_layanan_kode')

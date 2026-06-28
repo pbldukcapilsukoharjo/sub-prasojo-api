@@ -35,10 +35,9 @@ final class UlasanController extends Controller
         return ApiResponse::paginated('Berhasil', $data);
     }
 
-    public function export(UlasanRequest $request): \Symfony\Component\HttpFoundation\BinaryFileResponse
+    public function export(): \Symfony\Component\HttpFoundation\BinaryFileResponse
     {
-        $filter = new UlasanFilter($request->validated());
-        $data = $this->ulasanService->getForExport($filter);
+        $data = $this->ulasanService->getForExport();
 
         $filename = 'export_ulasan_' . date('Ymd_His') . '.xlsx';
 
