@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\DistribusiWilayahController;
+use App\Http\Controllers\Api\V1\PeringkatOperatorController;
 use App\Http\Controllers\Api\V1\UlasanController;
 use Illuminate\Support\Facades\Route;
 
@@ -15,12 +16,8 @@ Route::prefix('v1')->group(function (): void {
     Route::prefix('ulasan')
         ->controller(UlasanController::class)
         ->group(function (): void {
-
-            Route::get('/', 'index')
-                ->name('api.v1.ulasan.index');
-
-            Route::get('/kpi', 'kpi')
-                ->name('api.v1.ulasan.kpi');
+            Route::get('/', 'index')->name('api.v1.ulasan.index');
+            Route::get('/kpi', 'kpi')->name('api.v1.ulasan.kpi');
         });
 
     /*
@@ -32,11 +29,20 @@ Route::prefix('v1')->group(function (): void {
     Route::prefix('distribusi-wilayah')
         ->controller(DistribusiWilayahController::class)
         ->group(function (): void {
-
-            /**
-             * GET /api/v1/distribusi-wilayah
-             */
-            Route::get('/', 'index')
-                ->name('api.v1.distribusi-wilayah.index');
+            Route::get('/', 'index')->name('api.v1.distribusi-wilayah.index');
         });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Peringkat Operator
+    |--------------------------------------------------------------------------
+    */
+
+    Route::prefix('peringkat-operator')
+        ->controller(PeringkatOperatorController::class)
+        ->group(function (): void {
+            Route::get('/', 'index')->name('api.v1.peringkat-operator.index');
+            Route::get('/{operator_id}', 'show')->name('api.v1.peringkat-operator.show');
+        });
+
 });
