@@ -35,25 +35,23 @@ final class OperatorService
             $statusSelesai = "'" . implode("','", AjuanStatus::getStatusSelesai()) . "'";
 
             $kpi = $query->select(
-                DB::raw('COUNT(DISTINCT CASE WHEN admin.is_active = 1 THEN admin.id ELSE NULL END) as total_aktif'),
-                DB::raw('COUNT(ajuan.ajuan_id) as total_berkas_dikerjakan'),
+                DB::raw('COUNT(ajuan.ajuan_id) as total_ajuan'),
+                DB::raw("COUNT(CASE WHEN ajuan.ajuan_status IN ($statusSelesai) THEN 1 ELSE NULL END) as total_selesai"),
                 DB::raw("AVG(CASE WHEN ajuan.ajuan_status IN ($statusSelesai) THEN TIMESTAMPDIFF(MINUTE, ajuan.ajuan_create_datetime, ajuan.ajuan_update_datetime) ELSE NULL END) as rata_rata_waktu_menit")
             )->first();
 
+            $totalAjuan = (int) ($kpi->total_ajuan ?? 0);
+            $totalSelesai = (int) ($kpi->total_selesai ?? 0);
             $rataRataMenit = (float) ($kpi->rata_rata_waktu_menit ?? 0);
             
-            $jam = floor($rataRataMenit / 60);
-            $menit = round($rataRataMenit % 60);
-            $text = "";
-            if ($jam > 0) $text .= $jam . " Jam ";
-            $text .= $menit . " Menit";
-            if (trim($text) === "0 Menit") $text = "0 Menit";
-            $text .= "/Berkas";
+            $tingkatSelesai = $totalAjuan > 0 ? round(($totalSelesai / $totalAjuan) * 100, 1) : 0;
+            $rataRataDurasi = round($rataRataMenit, 1);
 
             return [
-                'total_aktif' => (int) ($kpi->total_aktif ?? 0),
-                'total_berkas_dikerjakan' => (int) ($kpi->total_berkas_dikerjakan ?? 0),
-                'rata_rata_kecepatan_text' => trim($text),
+                'total_ajuan' => $totalAjuan,
+                'total_selesai' => $totalSelesai,
+                'tingkat_selesai' => $tingkatSelesai,
+                'rata_rata_durasi' => $rataRataDurasi,
             ];
         });
     }
