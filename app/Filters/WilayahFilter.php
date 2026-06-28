@@ -23,6 +23,12 @@ final class WilayahFilter extends BaseFilter
 
     protected function applySearch(Builder $query): void
     {
-        // No search functionality for this endpoint
+        if (!empty($this->request['search'])) {
+            $search = strtolower($this->request['search']);
+            $query->where(function ($q) use ($search) {
+                $q->whereRaw('LOWER(ajuan_kecamatan_name) LIKE ?', ["%{$search}%"])
+                  ->orWhereRaw('LOWER(ajuan_desa_name) LIKE ?', ["%{$search}%"]);
+            });
+        }
     }
 }

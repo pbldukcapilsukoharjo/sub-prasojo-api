@@ -111,7 +111,14 @@ final class SLAService
         ];
 
         // -- KODE AMRU (Optimasi: Ambil semua layanan, lalu fetch agregat 1x query untuk menghindari N+1) -- //
-        $layanans = Layanan::query()->orderBy('layanan_pos')->get();
+        $layanansQuery = Layanan::query()->orderBy('layanan_pos');
+        
+        if (!empty($filters['search'])) {
+            $search = strtolower($filters['search']);
+            $layanansQuery->whereRaw('LOWER(layanan_nama) LIKE ?', ["%{$search}%"]);
+        }
+
+        $layanans = $layanansQuery->get();
         
         $agregatLayanan = (clone $query)->whereIn('ajuan_status', $statusSelesai)
             ->select(
