@@ -131,11 +131,21 @@ final class DashboardService
             $query = $filter->apply($query);
 
             $statusSelesai = "'" . implode("','", AjuanStatus::getStatusSelesai()) . "'";
+            $statusDitolak = "'" . implode("','", AjuanStatus::getStatusDitolak()) . "'";
+            $statusBelumDiverifikasi = "'" . AjuanStatus::BELUM_DIVERIFIKASI . "'";
+            $statusDiverifikasi = "'" . AjuanStatus::DIVERIFIKASI . "'";
+            $statusDiproses = "'" . AjuanStatus::DIPROSES . "'";
+            $statusDisetujui = "'" . AjuanStatus::DISETUJUI . "'";
 
             $data = $query->select(
                 DB::raw('DATE(ajuan_create_datetime) as tanggal'),
                 DB::raw('COUNT(ajuan_id) as total_ajuan'),
-                DB::raw("SUM(CASE WHEN ajuan_status IN ($statusSelesai) THEN 1 ELSE 0 END) as selesai")
+                DB::raw("SUM(CASE WHEN ajuan_status = $statusBelumDiverifikasi THEN 1 ELSE 0 END) as belum_diverifikasi"),
+                DB::raw("SUM(CASE WHEN ajuan_status = $statusDiverifikasi THEN 1 ELSE 0 END) as diverifikasi"),
+                DB::raw("SUM(CASE WHEN ajuan_status IN ($statusDitolak) THEN 1 ELSE 0 END) as ditolak"),
+                DB::raw("SUM(CASE WHEN ajuan_status = $statusDiproses THEN 1 ELSE 0 END) as diproses"),
+                DB::raw("SUM(CASE WHEN ajuan_status IN ($statusSelesai) THEN 1 ELSE 0 END) as selesai"),
+                DB::raw("SUM(CASE WHEN ajuan_status = $statusDisetujui THEN 1 ELSE 0 END) as disetujui")
             )
             ->groupBy(DB::raw('DATE(ajuan_create_datetime)'))
             ->orderBy('tanggal', 'asc')
