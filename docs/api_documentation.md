@@ -500,7 +500,17 @@ Jika ada validasi parameter/body yang gagal, sistem akan selalu me-return **400 
 
 ### 7.1 Ulasan KPI 🟡 [BARU] ✅ [BERFUNGSI]
 **Endpoint:** `GET /api/v1/ulasan/kpi`
-**Deskripsi:** Hero score ulasan dan hitungan per bintang. Filter standar + `id_layanan` + `rating`.
+**Deskripsi:** Hero score ulasan dan hitungan per bintang.
+
+**Query Parameters:**
+| Parameter | Tipe | Wajib | Keterangan |
+| :--- | :--- | :--- | :--- |
+| `start_date` | `string` | Tidak | Format `dd-mm-yyyy`. Filter tanggal mulai review. |
+| `end_date` | `string` | Tidak | Format `dd-mm-yyyy`. Filter tanggal akhir review. |
+| `layanan_kode` | `string` | Tidak | Filter berdasarkan jenis/layanan. |
+| `rating` | `integer` | Tidak | Filter bintang rating (1-5). |
+| `search` | `string` | Tidak | Pencarian berdasarkan isi komentar atau nomor registrasi. |
+| `sort_by` | `string` | Tidak | Field untuk sorting (e.g., `newest`, `oldest`, `rating_asc`, `rating_desc`). |
 
 **Response Sukses (200 OK):**
 ```json
@@ -523,7 +533,19 @@ Jika ada validasi parameter/body yang gagal, sistem akan selalu me-return **400 
 
 ### 7.2 List Ulasan 🔵 [UPDATED] ✅ [BERFUNGSI]
 *(Sebelumnya di `api-1.json`: `GET /api/v1/dashboard/ulasan`)*
-**Endpoint:** `GET /api/v1/ulasan/list`
+**Endpoint:** `GET /api/v1/ulasan`
+**Deskripsi:** List data ulasan yang dikirim oleh masyarakat beserta detail pengajuannya.
+
+**Query Parameters:**
+| Parameter | Tipe | Wajib | Keterangan |
+| :--- | :--- | :--- | :--- |
+| `start_date` | `string` | Tidak | Format `dd-mm-yyyy`. Filter tanggal mulai review. |
+| `end_date` | `string` | Tidak | Format `dd-mm-yyyy`. Filter tanggal akhir review. |
+| `layanan_kode` | `string` | Tidak | Filter berdasarkan jenis/layanan. |
+| `rating` | `integer` | Tidak | Filter bintang rating (1-5). |
+| `search` | `string` | Tidak | Pencarian berdasarkan isi komentar atau nomor registrasi. |
+| `sort_by` | `string` | Tidak | Field untuk sorting (e.g., `newest`, `oldest`, `rating_asc`, `rating_desc`). |
+| `page` | `integer` | Tidak | Halaman paginasi (default: 1). |
 
 **Response Sukses (200 OK):**
 ```json
@@ -552,7 +574,17 @@ Jika ada validasi parameter/body yang gagal, sistem akan selalu me-return **400 
 
 ### 7.3 Export Ulasan 🟡 [BARU] ✅ [BERFUNGSI]
 **Endpoint:** `GET /api/v1/ulasan/export`
-**Deskripsi:** Mengunduh data ulasan dalam format Excel (.xlsx). Mendukung filter rentang tanggal, layanan, dan rating.
+**Deskripsi:** Mengunduh data ulasan dalam format Excel (.xlsx).
+
+**Query Parameters:**
+| Parameter | Tipe | Wajib | Keterangan |
+| :--- | :--- | :--- | :--- |
+| `start_date` | `string` | Tidak | Format `dd-mm-yyyy`. Filter tanggal mulai review. |
+| `end_date` | `string` | Tidak | Format `dd-mm-yyyy`. Filter tanggal akhir review. |
+| `layanan_kode` | `string` | Tidak | Filter berdasarkan jenis/layanan. |
+| `rating` | `integer` | Tidak | Filter bintang rating (1-5). |
+| `search` | `string` | Tidak | Pencarian berdasarkan isi komentar atau nomor registrasi. |
+| `sort_by` | `string` | Tidak | Field untuk sorting (e.g., `newest`, `oldest`, `rating_asc`, `rating_desc`). |
 
 **Response Sukses (200 OK):**
 Header response akan mengatur *Content-Type* dan *Content-Disposition* untuk pengunduhan file.

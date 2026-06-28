@@ -60,6 +60,8 @@ final class UlasanService
             )
             ->paginate($perPage);
 
+        // --- KODE MILIK FALAH ---
+        /*
         $data->getCollection()->transform(function ($item) {
             return [
                 'id_review' => $item->id_review,
@@ -70,6 +72,11 @@ final class UlasanService
                 'komentar' => $item->komentar,
             ];
         });
+        */
+
+        // --- POLESAN/TAMBAHAN DARI AMRU ---
+        // Menggunakan Resource agar struktur respons terpusat dan mudah di-maintain.
+        $data->getCollection()->transform(fn($item) => (new \App\Http\Resources\Ulasan\UlasanItemResource($item))->resolve());
 
         return $data;
     }
@@ -91,6 +98,8 @@ final class UlasanService
             )
             ->get();
 
+        // --- KODE MILIK FALAH ---
+        /*
         return $data->map(function ($item) {
             return [
                 'id_review' => $item->id_review,
@@ -101,5 +110,10 @@ final class UlasanService
                 'komentar' => $item->komentar,
             ];
         });
+        */
+
+        // --- POLESAN/TAMBAHAN DARI AMRU ---
+        // Menggunakan Resource agar struktur respons konsisten dengan pagination
+        return $data->map(fn($item) => (new \App\Http\Resources\Ulasan\UlasanItemResource($item))->resolve());
     }
 }

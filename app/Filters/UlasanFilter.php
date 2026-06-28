@@ -14,9 +14,9 @@ final class UlasanFilter extends BaseFilter
     {
         parent::apply($query);
 
-        if (!empty($this->request['id_layanan'])) {
+        if (!empty($this->request['layanan_kode'])) {
             $query->whereHas('ajuan', function ($q) {
-                $q->where('ajuan_layanan_kode', $this->request['id_layanan']);
+                $q->where('ajuan_layanan_kode', $this->request['layanan_kode']);
             });
         }
 
@@ -37,6 +37,29 @@ final class UlasanFilter extends BaseFilter
                       $q2->where('ajuan_no_reg', 'like', "%{$search}%");
                   });
             });
+        }
+    }
+
+    protected function applySorting(Builder $query): void
+    {
+        if (!empty($this->request['sort_by'])) {
+            switch ($this->request['sort_by']) {
+                case 'newest':
+                    $query->orderBy($this->dateColumn, 'desc');
+                    break;
+                case 'oldest':
+                    $query->orderBy($this->dateColumn, 'asc');
+                    break;
+                case 'rating_asc':
+                    $query->orderBy('review_rating', 'asc');
+                    break;
+                case 'rating_desc':
+                    $query->orderBy('review_rating', 'desc');
+                    break;
+            }
+        } else {
+            // Default sorting
+            $query->orderBy($this->dateColumn, 'desc');
         }
     }
 }

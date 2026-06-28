@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\Api\V1\OperatorController;
+use App\Http\Controllers\Api\V1\PeringkatOperatorController;
 use App\Http\Controllers\Api\V1\DashboardController;
 use App\Http\Controllers\Api\V1\LembarKerjaController;
 use App\Http\Controllers\Api\V1\AjuanController;
@@ -36,16 +36,15 @@ Route::prefix('v1')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | Operator
+    | Peringkat Operator
     |--------------------------------------------------------------------------
     */
-    Route::prefix('operator')->controller(OperatorController::class)->group(function () {
-        Route::get('/kpi-global', 'kpiGlobal');
-        Route::get('/peringkat', 'peringkat');
-        Route::get('/export', 'exportRanking');
-        Route::get('/{id}/kpi', 'kpi');
-        Route::get('/{id}/riwayat', 'riwayat');
-    });
+    Route::prefix('peringkat-operator')
+        ->controller(PeringkatOperatorController::class)
+        ->group(function (): void {
+            Route::get('/', 'index')->name('api.v1.peringkat-operator.index');
+            Route::get('/{operator_id}', 'show')->name('api.v1.peringkat-operator.show');
+        });
 
     /*
     |--------------------------------------------------------------------------
@@ -123,7 +122,7 @@ Route::prefix('v1')->group(function () {
     */
     Route::prefix('ulasan')->controller(UlasanController::class)->group(function () {
         Route::get('/kpi', 'kpi');
-        Route::get('/list', 'index');
+        Route::get('/', 'index');
         Route::get('/export', 'export');
     });
 
