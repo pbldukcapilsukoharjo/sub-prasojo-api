@@ -131,7 +131,7 @@ Route::prefix('v1')->group(function () {
     | Monitoring Wilayah
     |--------------------------------------------------------------------------
     */
-    Route::prefix('wilayah')->controller(WilayahController::class)->group(function () {
+    Route::prefix('wilayah')->controller(\App\Http\Controllers\Api\V1\WilayahController::class)->group(function () {
         Route::get('/distribusi', 'distribusi');
         Route::get('/export', 'export');
     });
@@ -141,9 +141,9 @@ Route::prefix('v1')->group(function () {
     | SLA
     |--------------------------------------------------------------------------
     */
-    Route::prefix('sla')->controller(\App\Http\Controllers\SlaController::class)->group(function () {
+    Route::prefix('sla')->controller(\App\Http\Controllers\Api\V1\SLAController::class)->group(function () {
+        Route::get('/', 'index');
         Route::get('/kpi', 'kpi');
-        Route::get('/layanan', 'layanan');
         Route::get('/export', 'export');
     });
 });
