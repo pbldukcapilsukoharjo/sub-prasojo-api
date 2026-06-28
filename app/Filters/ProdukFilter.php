@@ -49,22 +49,22 @@ final class ProdukFilter
             )
 
             ->when(
-                !empty($filters['startDate']),
+                !empty($filters['start_date']),
                 fn (Builder $q) =>
                     $q->whereDate(
                         'prod_create_datetime',
                         '>=',
-                        $filters['startDate']
+                        $filters['start_date']
                     )
             )
 
             ->when(
-                !empty($filters['endDate']),
+                !empty($filters['end_date']),
                 fn (Builder $q) =>
                     $q->whereDate(
                         'prod_create_datetime',
                         '<=',
-                        $filters['endDate']
+                        $filters['end_date']
                     )
             );
     }

@@ -54,22 +54,22 @@ final class AjuanFilter
             )
 
             ->when(
-                !empty($filters['startDate']),
+                !empty($filters['start_date']),
                 fn (Builder $q) =>
                     $q->whereDate(
                         'ajuan_create_datetime',
                         '>=',
-                        $filters['startDate']
+                        $filters['start_date']
                     )
             )
 
             ->when(
-                !empty($filters['endDate']),
+                !empty($filters['end_date']),
                 fn (Builder $q) =>
                     $q->whereDate(
                         'ajuan_create_datetime',
                         '<=',
-                        $filters['endDate']
+                        $filters['end_date']
                     )
             );
     }

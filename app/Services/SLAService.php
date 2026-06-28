@@ -151,8 +151,8 @@ final class SLAService
         $detailsCollection = collect($details);
 
         match ($filters['sort_by'] ?? 'newest') {
-            'oldest' => $detailsCollection = $detailsCollection->sortBy('rata_rata_waktu')->values(),
-            default => $detailsCollection = $detailsCollection->sortByDesc('rata_rata_waktu')->values(),
+            'oldest' => $detailsCollection = $detailsCollection->sort_by('rata_rata_waktu')->values(),
+            default => $detailsCollection = $detailsCollection->sort_byDesc('rata_rata_waktu')->values(),
         };
 
         $total = $detailsCollection->count();

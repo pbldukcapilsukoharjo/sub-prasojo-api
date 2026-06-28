@@ -73,12 +73,12 @@ class PeringkatOperatorFilter
         | Date Range
         |--------------------------------------------------------------------------
         */
-        if (!empty($filters['startDate']) && !empty($filters['endDate'])) {
+        if (!empty($filters['start_date']) && !empty($filters['end_date'])) {
             $query->whereBetween(
                 $dateColumn,
                 [
-                    $filters['startDate'] . ' 00:00:00',
-                    $filters['endDate'] . ' 23:59:59',
+                    $filters['start_date'] . ' 00:00:00',
+                    $filters['end_date'] . ' 23:59:59',
                 ]
             );
         }

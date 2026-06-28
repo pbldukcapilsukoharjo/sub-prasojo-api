@@ -20,9 +20,9 @@ final class IndexProdukRequest extends FormRequest
             'search' => ['nullable', 'string'],
             'district' => ['nullable', 'string'],
             'period' => ['nullable', 'string'],
-            'sortBy' => ['nullable', 'string'],
-            'startDate' => ['nullable', 'date'],
-            'endDate' => ['nullable', 'date'],
+            'sort_by' => ['nullable', 'string'],
+            'start_date' => ['nullable', 'date'],
+            'end_date' => ['nullable', 'date'],
             'status' => ['nullable', 'string'],
         ];
     }

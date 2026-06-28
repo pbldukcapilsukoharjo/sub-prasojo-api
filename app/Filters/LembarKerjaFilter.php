@@ -62,22 +62,22 @@ final class LembarKerjaFilter
         );
 
         $query->when(
-            !empty($filters['startDate']),
+            !empty($filters['start_date']),
             fn (Builder $q)
                 => $q->whereDate(
                     'lk_create_datetime',
                     '>=',
-                    $filters['startDate']
+                    $filters['start_date']
                 )
         );
 
         $query->when(
-            !empty($filters['endDate']),
+            !empty($filters['end_date']),
             fn (Builder $q)
                 => $q->whereDate(
                     'lk_create_datetime',
                     '<=',
-                    $filters['endDate']
+                    $filters['end_date']
                 )
         );
 

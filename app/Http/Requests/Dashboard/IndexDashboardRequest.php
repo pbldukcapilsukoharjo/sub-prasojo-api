@@ -16,11 +16,11 @@ final class IndexDashboardRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'serviceType' => ['nullable', 'string'],
+            'service_type' => ['nullable', 'string'],
             'district' => ['nullable', 'string'],
             'period' => ['nullable', 'string'],
-            'startDate' => ['nullable', 'date'],
-            'endDate' => ['nullable', 'date'],
+            'start_date' => ['nullable', 'date'],
+            'end_date' => ['nullable', 'date'],
         ];
     }
 }

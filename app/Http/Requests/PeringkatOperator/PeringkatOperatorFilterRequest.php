@@ -44,20 +44,20 @@ final class PeringkatOperatorFilterRequest extends FormRequest
                 'in:today,this_week,this_month,this_year',
             ],
 
-            'sortBy' => [
+            'sort_by' => [
                 'nullable',
                 'in:newest,oldest',
             ],
 
-            'startDate' => [
+            'start_date' => [
                 'nullable',
                 'date',
             ],
 
-            'endDate' => [
+            'end_date' => [
                 'nullable',
                 'date',
-                'after_or_equal:startDate',
+                'after_or_equal:start_date',
             ],
 
             'operator' => [

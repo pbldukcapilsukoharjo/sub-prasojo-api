@@ -29,10 +29,10 @@ final class LembarKerjaService
             $filters
         );
 
-        $sortBy = $filters['sortBy']
+        $sort_by = $filters['sort_by']
             ?? 'newest';
 
-        if ($sortBy === 'oldest') {
+        if ($sort_by === 'oldest') {
 
             $query->orderBy(
                 'lk_create_datetime',

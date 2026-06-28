@@ -67,8 +67,8 @@ final class PeringkatOperatorService
         PeringkatOperatorFilter::apply($rankingQuery, $filters);
 
         // KODE MILIK FALAH: Sorting berdasarkan jumlah ajuan (terbanyak/tersedikit)
-        $sortBy = $filters['sortBy'] ?? 'newest';
-        $sortDirection = $sortBy === 'oldest' ? 'asc' : 'desc';
+        $sort_by = $filters['sort_by'] ?? 'newest';
+        $sortDirection = $sort_by === 'oldest' ? 'asc' : 'desc';
 
         $rankingQuery->select(
             'admin.id',

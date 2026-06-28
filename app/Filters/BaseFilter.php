@@ -27,9 +27,9 @@ abstract class BaseFilter
     protected function applyDateFilters(Builder $query): void
     {
         if (!empty($this->request['start_date']) && !empty($this->request['end_date'])) {
-            $startDate = Carbon::createFromFormat('d-m-Y', $this->request['start_date'])->startOfDay();
-            $endDate = Carbon::createFromFormat('d-m-Y', $this->request['end_date'])->endOfDay();
-            $query->whereBetween($this->dateColumn, [$startDate, $endDate]);
+            $start_date = Carbon::createFromFormat('d-m-Y', $this->request['start_date'])->startOfDay();
+            $end_date = Carbon::createFromFormat('d-m-Y', $this->request['end_date'])->endOfDay();
+            $query->whereBetween($this->dateColumn, [$start_date, $end_date]);
         } elseif (!empty($this->request['periode_bulan'])) {
             $month = (int)$this->request['periode_bulan'];
             $query->whereMonth($this->dateColumn, $month)
