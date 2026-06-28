@@ -12,66 +12,83 @@ final class AjuanFilter
         Builder $query,
         array $filters
     ): Builder {
-        return $query
+        $query->when(
+            !empty($filters['search']),
+            function (Builder $q) use ($filters): void {
+                $q->where(function (Builder $query) use ($filters): void {
+                    $query
+                        ->where('ajuan_no_reg', 'like', "%{$filters['search']}%")
+                        ->orWhere('ajuan_pelapor_nik', 'like', "%{$filters['search']}%");
+                });
+            }
+        );
 
-            ->when(
-                !empty($filters['search']),
-                function (Builder $q) use ($filters): void {
-                    $q->where(function (Builder $query) use ($filters): void {
-                        $query
-                            ->where('ajuan_no_reg', 'like', "%{$filters['search']}%")
-                            ->orWhere('ajuan_layanan_kode', 'like', "%{$filters['search']}%")
-                            ->orWhere('ajuan_kecamatan_name', 'like', "%{$filters['search']}%");
-                    });
+        $kecamatan = $filters['kecamatan'] ?? $filters['district'] ?? null;
+        $query->when(
+            !empty($kecamatan),
+            fn (Builder $q) =>
+                $q->where('ajuan_kecamatan_code', $kecamatan)
+                  ->orWhere('ajuan_kecamatan_name', $kecamatan)
+        );
+
+        $query->when(
+            !empty($filters['status']),
+            fn (Builder $q) =>
+                $q->where('ajuan_status', $filters['status'])
+        );
+
+        $query->when(
+            !empty($filters['layanan']),
+            fn (Builder $q) =>
+                $q->where('ajuan_layanan_kode', $filters['layanan'])
+        );
+
+        $pelapor = $filters['pelapor'] ?? $filters['reporter'] ?? null;
+        $query->when(
+            !empty($pelapor),
+            function (Builder $q) use ($pelapor) {
+                $pelaporLower = strtolower($pelapor);
+                if ($pelaporLower === 'online') {
+                    $q->where('ajuan_is_online', 1);
+                } elseif ($pelaporLower === 'offline') {
+                    $q->where('ajuan_is_online', 0);
+                } elseif ($pelaporLower === 'mandiri') {
+                    $q->where('ajuan_is_mandiri', 1);
+                } elseif ($pelaporLower === 'operator') {
+                    $q->where('ajuan_is_mandiri', 0);
+                } else {
+                    $q->where('ajuan_pelapor_role_name', 'like', "%{$pelapor}%");
                 }
-            )
+            }
+        );
 
-            ->when(
-                !empty($filters['district']),
-                fn (Builder $q) =>
-                    $q->where(
-                        'ajuan_kecamatan_name',
-                        $filters['district']
-                    )
-            )
+        $query->when(
+            !empty($filters['start_date']),
+            fn (Builder $q) =>
+                $q->whereDate('ajuan_create_datetime', '>=', $filters['start_date'])
+        );
 
-            ->when(
-                !empty($filters['status']),
-                fn (Builder $q) =>
-                    $q->where(
-                        'ajuan_status',
-                        $filters['status']
-                    )
-            )
+        $query->when(
+            !empty($filters['end_date']),
+            fn (Builder $q) =>
+                $q->whereDate('ajuan_create_datetime', '<=', $filters['end_date'])
+        );
 
-            ->when(
-                !empty($filters['reporter']),
-                fn (Builder $q) =>
-                    $q->where(
-                        'ajuan_pelapor_role_name',
-                        $filters['reporter']
-                    )
-            )
+        $query->when(
+            !empty($filters['periode']),
+            fn (Builder $q) =>
+                $q->whereMonth('ajuan_create_datetime', $filters['periode'])
+                  ->whereYear('ajuan_create_datetime', now()->year)
+        );
 
-            ->when(
-                !empty($filters['start_date']),
-                fn (Builder $q) =>
-                    $q->whereDate(
-                        'ajuan_create_datetime',
-                        '>=',
-                        $filters['start_date']
-                    )
-            )
+        $sort = strtolower($filters['sort'] ?? $filters['sort_by'] ?? 'terbaru');
+        if ($sort === 'terlama' || $sort === 'oldest') {
+            $query->orderBy('ajuan_create_datetime', 'asc');
+        } else {
+            $query->orderBy('ajuan_create_datetime', 'desc');
+        }
 
-            ->when(
-                !empty($filters['end_date']),
-                fn (Builder $q) =>
-                    $q->whereDate(
-                        'ajuan_create_datetime',
-                        '<=',
-                        $filters['end_date']
-                    )
-            );
+        return $query;
     }
 
     public function applyMaster(Builder $query, array $filters): Builder

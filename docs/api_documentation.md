@@ -205,80 +205,39 @@ Jika ada validasi parameter/body yang gagal, sistem akan selalu me-return **400 
 
 ## 2. Modul Pengajuan (Ajuan, Lembar Kerja, Produk)
 
-### 2.1 List Pengajuan Master 🟡 [BARU] ✅ [BERFUNGSI]
-**Endpoint:** `GET /api/v1/pengajuan`
-**Deskripsi:** Endpoint *master* untuk tabel pengajuan (mendukung paginasi). Meng-handle halaman Lembar Kerja, Produk, maupun Semua Ajuan.
+### 2.1 List Lembar Kerja 🔵 [UPDATED] ✅ [BERFUNGSI]
+**Endpoint:** `GET /api/v1/pengajuan/lembar-kerja`
+**Deskripsi:** Menampilkan list pengajuan untuk halaman lembar kerja.
 **Headers:** `Authorization: Bearer {PASETO_TOKEN}`
 
-**Query Parameters:**
+### 2.2 List Ajuan 🔵 [UPDATED] ✅ [BERFUNGSI]
+**Endpoint:** `GET /api/v1/pengajuan/ajuan`
+**Deskripsi:** Menampilkan list pengajuan untuk halaman ajuan.
+**Headers:** `Authorization: Bearer {PASETO_TOKEN}`
+
+### 2.3 List Produk 🔵 [UPDATED] ✅ [BERFUNGSI]
+**Endpoint:** `GET /api/v1/pengajuan/produk`
+**Deskripsi:** Menampilkan list pengajuan untuk halaman produk, dilengkapi `nama_identitas_produk`.
+**Headers:** `Authorization: Bearer {PASETO_TOKEN}`
+
+### 2.4 Detail Timeline Pengajuan 🟡 [BARU] ✅ [BERFUNGSI]
+**Endpoint:** `GET /api/v1/pengajuan/{ajuan_id}/detail`
+**Deskripsi:** Menampilkan detail timeline status dari sebuah pengajuan.
+**Headers:** `Authorization: Bearer {PASETO_TOKEN}`
+
+*Catatan: Semua endpoint list (2.1 - 2.3) mendukung Query Parameters berikut:*
 | Parameter | Tipe | Wajib | Keterangan |
 | :--- | :--- | :--- | :--- |
-| `status_kategori` | `string` | Ya | Pilihan: `lembar_kerja`, `produk`, `all` |
-| `periode_bulan` | `integer` | Tidak | Bulan (1-12). Default: tahun berjalan |
-| `start_date` | `string` | Tidak | Rentang khusus (dd-mm-yyyy) |
-| `end_date` | `string` | Tidak | Rentang khusus (dd-mm-yyyy) |
-| `search_no_reg` | `string` | Tidak | Pencarian berdasarkan No. Registrasi |
-| `pelapor` | `string` | Tidak | Jalur pelaporan (e.g., online, mandiri, dll) |
-| `id_kecamatan` | `integer` | Tidak | Filter wilayah spesifik |
-| `id_layanan` | `integer` | Tidak | Filter layanan spesifik |
-| `status` | `string` | Tidak | Memfilter status spesifik `ajuan_status` |
-| `sort_by` | `string` | Tidak | Nama kolom pengurutan |
-| `sort_dir` | `string` | Tidak | `asc` atau `desc` |
-| `page` | `integer` | Tidak | Halaman paginasi |
-
-**Response Sukses (200 OK):**
-```json
-{
-  "status": true,
-  "code": 200,
-  "message": "Berhasil mengambil data pengajuan",
-  "data": [
-      {
-        "id": 123,
-        "no_reg": "REG-20240101-001",
-        "layanan": "KTP-el",
-        "kecamatan": "Klojen",
-        "pelapor": "Pemohon (Online)",
-        "status": "MENUNGGU",
-        "created_at": "2024-01-01 08:00:00"
-      }
-  ],
-  "meta": {
-    "page": 1,
-    "per_page": 10,
-    "total": 145,
-    "total_page": 15
-  }
-}
-```
-
-### 2.2 Export Excel Pengajuan 🟡 [BARU] ✅ [BERFUNGSI]
-**Endpoint:** `GET /api/v1/pengajuan/export`
-**Deskripsi:** Mengunduh file `.xlsx`. Parameter sama persis dengan `GET /api/v1/pengajuan` (tanpa `page`). Mengembalikan tipe file statis langsung (`application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`).
-
-### 2.3 List Lembar Kerja ❌ [TIDAK DIPAKAI]
-**Endpoint:** `GET /api/v1/lembar-kerja`
-**Deskripsi:** Endpoint ini sudah tidak dipakai dan digantikan oleh endpoint master `/api/v1/pengajuan` (dengan query parameter `status_kategori=lembar_kerja`).
-
-### 2.4 Detail Lembar Kerja ❌ [TIDAK DIPAKAI]
-**Endpoint:** `GET /api/v1/lembar-kerja/{lk_id}`
-**Deskripsi:** Endpoint ini sudah tidak dipakai dan datanya digabung di `/api/v1/pengajuan`.
-
-### 2.5 List Ajuan ❌ [TIDAK DIPAKAI]
-**Endpoint:** `GET /api/v1/ajuan`
-**Deskripsi:** Endpoint ini sudah tidak dipakai dan digantikan oleh endpoint master `/api/v1/pengajuan` (dengan query parameter `status_kategori=all`).
-
-### 2.6 Detail Ajuan ❌ [TIDAK DIPAKAI]
-**Endpoint:** `GET /api/v1/ajuan/{ajuan_id}`
-**Deskripsi:** Endpoint ini sudah tidak dipakai dan datanya digabung di `/api/v1/pengajuan`.
-
-### 2.7 List Produk ❌ [TIDAK DIPAKAI]
-**Endpoint:** `GET /api/v1/produk`
-**Deskripsi:** Endpoint ini sudah tidak dipakai dan digantikan oleh endpoint master `/api/v1/pengajuan` (dengan query parameter `status_kategori=produk`).
-
-### 2.8 Detail Produk ❌ [TIDAK DIPAKAI]
-**Endpoint:** `GET /api/v1/produk/{produk_id}`
-**Deskripsi:** Endpoint ini sudah tidak dipakai dan datanya digabung di `/api/v1/pengajuan`.
+| `search` | `string` | Tidak | Pencarian cepat (no reg / NIK pelapor / layanan / kecamatan) |
+| `kecamatan` | `string` | Tidak | Filter kode kecamatan |
+| `pelapor` | `string` | Tidak | Filter nama peran pelapor (online, offline, mandiri, operator, dll) |
+| `start_date` | `string` | Tidak | Tanggal awal (format `dd-mm-yyyy`) |
+| `end_date` | `string` | Tidak | Tanggal akhir (format `dd-mm-yyyy`) |
+| `periode` | `integer` | Tidak | Filter periode berdasarkan bulan (1-12) |
+| `layanan` | `string` | Tidak | Filter kode layanan (untuk filter tab bar) |
+| `sort` | `string` | Tidak | Urutan data (`terbaru` atau `terlama`) |
+| `per_page` | `integer` | Tidak | Jumlah data per halaman paginasi (default 10) |
+| `page` | `integer` | Tidak | Nomor halaman paginasi |
 
 ---
 

@@ -19,11 +19,16 @@ final class IndexProdukRequest extends FormRequest
             'page' => ['nullable', 'integer'],
             'search' => ['nullable', 'string'],
             'district' => ['nullable', 'string'],
+            'kecamatan' => ['nullable', 'string'],
             'period' => ['nullable', 'string'],
+            'periode' => ['nullable', 'integer'],
             'sort_by' => ['nullable', 'string'],
+            'sort' => ['nullable', 'string'],
             'start_date' => ['nullable', 'date'],
             'end_date' => ['nullable', 'date'],
             'status' => ['nullable', 'string'],
+            'layanan' => ['nullable', 'string'],
+            'nama_identitas_produk' => ['nullable', 'string'],
         ];
     }
 }
