@@ -27,35 +27,48 @@ final class OperatorController extends Controller
         return ApiResponse::success('Berhasil', $data);
     }
 
-    public function ranking(Request $request): JsonResponse
+    public function peringkat(Request $request): JsonResponse
     {
         $filter = new OperatorFilter($request->all());
-        $perPage = (int) $request->input('per_page', 10);
+        $perPage = (int) $request->input('limit', 10);
         
         $paginator = $this->operatorService->getRanking($filter, $perPage);
 
         $mappedData = collect($paginator->items())->map(function ($item, $key) use ($paginator) {
             $index = ($paginator->currentPage() - 1) * $paginator->perPage() + $key + 1;
             return [
+                'id' => $item->id_operator,
                 'peringkat' => $index,
-                'id_operator' => $item->id_operator,
-                'nama' => $item->nama,
-                'total_berkas' => (int) $item->total_berkas,
+                'operator' => $item->nama,
+                'desa' => $item->desa ?? '-',
+                'kecamatan' => collect(explode('|', $item->kecamatan_nama))->first() ?? '-',
+                'jumlah_ajuan' => (int) $item->total_berkas,
+                // keep rata_rata_waktu_menit if needed by frontend but openapi only specifies the above
                 'rata_rata_waktu_menit' => round((float) $item->rata_rata_waktu_menit, 2),
             ];
         })->toArray();
 
-        // Using setCollection to override the items inside the paginator before returning
         $paginator->setCollection(collect($mappedData));
 
         return ApiResponse::paginated('Berhasil', $paginator);
     }
 
-    public function detail(int $id_operator): JsonResponse
+    public function kpi(int $id, Request $request): JsonResponse
     {
         try {
-            $data = $this->operatorService->getDetail($id_operator);
-            return ApiResponse::success('Berhasil', $data);
+            $data = $this->operatorService->getDetailKpi($id, $request->all());
+            return ApiResponse::success('Detail operator berhasil ditemukan', $data);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return ApiResponse::error('Operator tidak ditemukan', 404);
+        }
+    }
+
+    public function riwayat(int $id, Request $request): JsonResponse
+    {
+        try {
+            $perPage = (int) $request->input('limit', 10);
+            $paginator = $this->operatorService->getDetailRiwayat($id, $request->all(), $perPage);
+            return ApiResponse::paginated('Riwayat operator berhasil ditemukan', $paginator);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return ApiResponse::error('Operator tidak ditemukan', 404);
         }

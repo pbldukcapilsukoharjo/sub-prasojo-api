@@ -89,54 +89,125 @@ final class OperatorService
         $query->select(
             'admin.id as id_operator',
             'admin.fullname as nama',
+            'admin.kelurahan_name as desa',
+            'admin.kecamatan_name as kecamatan_nama',
             DB::raw('COUNT(ajuan.ajuan_id) as total_berkas'),
             DB::raw("AVG(CASE WHEN ajuan.ajuan_status IN ($statusSelesai) THEN TIMESTAMPDIFF(MINUTE, ajuan.ajuan_create_datetime, ajuan.ajuan_update_datetime) ELSE NULL END) as rata_rata_waktu_menit")
         )
-        ->groupBy('admin.id', 'admin.fullname')
+        ->groupBy('admin.id', 'admin.fullname', 'admin.kelurahan_name', 'admin.kecamatan_name')
         ->orderByRaw("AVG(CASE WHEN ajuan.ajuan_status IN ($statusSelesai) THEN TIMESTAMPDIFF(MINUTE, ajuan.ajuan_create_datetime, ajuan.ajuan_update_datetime) ELSE NULL END) ASC");
 
         return $query;
     }
 
     /**
-     * Get Operator Detail.
+     * Get KPI for a specific operator.
      *
      * @param int $idOperator
+     * @param array $requestParams
      * @return array
      */
-    public function getDetail(int $idOperator): array
+    public function getDetailKpi(int $idOperator, array $requestParams): array
     {
         $admin = Admin::where('level', Admin::LEVEL_OPERATOR)->findOrFail($idOperator);
         $statusSelesai = "'" . implode("','", AjuanStatus::getStatusSelesai()) . "'";
 
-        $kpi = Ajuan::where('ajuan_pelapor_id', $idOperator)
-            ->select(
-                DB::raw('COUNT(ajuan_id) as total_dikerjakan'),
-                DB::raw("AVG(CASE WHEN ajuan_status IN ($statusSelesai) THEN TIMESTAMPDIFF(MINUTE, ajuan_create_datetime, ajuan_update_datetime) ELSE NULL END) as rata_rata_waktu_menit")
-            )->first();
+        $query = Ajuan::where('ajuan_pelapor_id', $idOperator);
 
-        $riwayat = Ajuan::where('ajuan_pelapor_id', $idOperator)
-            ->whereIn('ajuan_status', AjuanStatus::getStatusSelesai())
-            ->orderByDesc('ajuan_create_datetime')
-            ->limit(50)
-            ->get()
-            ->map(function ($ajuan) {
-                return [
-                    'no_reg' => $ajuan->ajuan_no_reg,
-                    'layanan' => $ajuan->ajuan_layanan_kode,
-                    'waktu_mulai' => $ajuan->ajuan_create_datetime ? $ajuan->ajuan_create_datetime->format('H:i:s') : null,
-                    'waktu_selesai' => $ajuan->ajuan_update_datetime ? $ajuan->ajuan_update_datetime->format('H:i:s') : null,
-                    'durasi_menit' => $ajuan->ajuan_create_datetime && $ajuan->ajuan_update_datetime ? $ajuan->ajuan_create_datetime->diffInMinutes($ajuan->ajuan_update_datetime) : 0,
-                ];
-            });
+        if (!empty($requestParams['tahun'])) {
+            $query->whereYear('ajuan_create_datetime', $requestParams['tahun']);
+        }
+        if (!empty($requestParams['periode_bulan'])) {
+            $query->whereMonth('ajuan_create_datetime', $requestParams['periode_bulan']);
+        }
+        if (!empty($requestParams['id_layanan'])) {
+            $query->where('ajuan_layanan_kode', $requestParams['id_layanan']);
+        }
+
+        $kpi = (clone $query)->select(
+            DB::raw('COUNT(ajuan_id) as total_ajuan'),
+            DB::raw("SUM(CASE WHEN ajuan_status IN ($statusSelesai) THEN 1 ELSE 0 END) as total_selesai")
+        )->first();
+
+        $totalAjuan = (int) ($kpi->total_ajuan ?? 0);
+        $totalSelesai = (int) ($kpi->total_selesai ?? 0);
+        $tingkatSelesai = $totalAjuan > 0 ? (int) round(($totalSelesai / $totalAjuan) * 100) : 0;
+
+        $chartData = [
+            'Jan' => 0, 'Feb' => 0, 'Mar' => 0, 'Apr' => 0, 'Mei' => 0, 'Jun' => 0,
+            'Jul' => 0, 'Agu' => 0, 'Sep' => 0, 'Okt' => 0, 'Nov' => 0, 'Des' => 0
+        ];
+        
+        $monthsMap = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+
+        $chartQuery = (clone $query)->select(
+            DB::raw('MONTH(ajuan_create_datetime) as bulan'),
+            DB::raw('COUNT(ajuan_id) as total')
+        )->groupBy('bulan')->get();
+
+        foreach ($chartQuery as $item) {
+            if ($item->bulan >= 1 && $item->bulan <= 12) {
+                $chartData[$monthsMap[$item->bulan - 1]] = (int) $item->total;
+            }
+        }
 
         return [
-            'profil' => [
-                'nama' => $admin->fullname,
-                'total_dikerjakan' => (int) ($kpi->total_dikerjakan ?? 0),
-                'rata_rata_waktu_menit' => round((float) ($kpi->rata_rata_waktu_menit ?? 0), 2),
-            ],
-            'riwayat_kerja' => $riwayat->toArray()
+            'id' => $admin->id,
+            'nama' => $admin->fullname,
+            'total_ajuan' => $totalAjuan,
+            'total_selesai' => $totalSelesai,
+            'tingkat_selesai' => $tingkatSelesai,
+            'layanan_perbulan' => $chartData
         ];
+    }
+
+    /**
+     * Get Riwayat for a specific operator.
+     *
+     * @param int $idOperator
+     * @param array $requestParams
+     * @param int $perPage
+     * @return LengthAwarePaginator
+     */
+    public function getDetailRiwayat(int $idOperator, array $requestParams, int $perPage = 10): LengthAwarePaginator
+    {
+        Admin::where('level', Admin::LEVEL_OPERATOR)->findOrFail($idOperator);
+        
+        $query = Ajuan::where('ajuan_pelapor_id', $idOperator)->with('pelapor');
+
+        if (!empty($requestParams['tahun'])) {
+            $query->whereYear('ajuan_create_datetime', $requestParams['tahun']);
+        }
+        if (!empty($requestParams['periode_bulan'])) {
+            $query->whereMonth('ajuan_create_datetime', $requestParams['periode_bulan']);
+        }
+        if (!empty($requestParams['id_layanan'])) {
+            $query->where('ajuan_layanan_kode', $requestParams['id_layanan']);
+        }
+        if (!empty($requestParams['search'])) {
+            $search = $requestParams['search'];
+            $query->where('ajuan_no_reg', 'like', "%{$search}%");
+        }
+
+        $query->orderByDesc('ajuan_create_datetime');
+
+        $paginator = $query->paginate($perPage);
+        
+        $mappedData = collect($paginator->items())->map(function ($ajuan) {
+            return [
+                'id' => $ajuan->ajuan_id,
+                'no_regis' => $ajuan->ajuan_no_reg,
+                'pemohon' => $ajuan->pelapor ? $ajuan->pelapor->fullname : '-',
+                'kode_ajuan' => $ajuan->ajuan_layanan_kode,
+                'desa' => $ajuan->ajuan_kelurahan_name ?? '-',
+                'tanggal' => $ajuan->ajuan_create_datetime ? $ajuan->ajuan_create_datetime->format('d-m-Y') : '-',
+                'waktu' => $ajuan->ajuan_create_datetime ? $ajuan->ajuan_create_datetime->format('H:i') : '-',
+                'status' => $ajuan->ajuan_status,
+            ];
+        })->toArray();
+
+        $paginator->setCollection(collect($mappedData));
+
+        return $paginator;
     }
 }

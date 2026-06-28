@@ -41,9 +41,10 @@ Route::prefix('v1')->group(function () {
     */
     Route::prefix('operator')->controller(OperatorController::class)->group(function () {
         Route::get('/kpi-global', 'kpiGlobal');
-        Route::get('/ranking', 'ranking');
+        Route::get('/peringkat', 'peringkat');
         Route::get('/export', 'exportRanking');
-        Route::get('/{id_operator}/detail', 'detail');
+        Route::get('/{id}/kpi', 'kpi');
+        Route::get('/{id}/riwayat', 'riwayat');
     });
 
     /*
