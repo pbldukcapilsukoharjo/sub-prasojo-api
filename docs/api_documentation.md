@@ -341,6 +341,33 @@ Jika ada validasi parameter/body yang gagal, sistem akan selalu me-return **400 
 **Deskripsi:** Menampilkan detail timeline status dari sebuah pengajuan.
 **Headers:** `Authorization: Bearer {PASETO_TOKEN}`
 
+**Response Sukses (200 OK):**
+```json
+{
+  "status": true,
+  "code": 200,
+  "message": "Berhasil",
+  "data": {
+    "ajuan_id": 1,
+    "no_reg": "REG-12345",
+    "status_saat_ini": "DIPROSES",
+    "timeline": [
+      {
+        "status": "MENUNGGU",
+        "note": "Pengajuan baru masuk",
+        "datetime": "2024-01-01 10:00:00"
+      },
+      {
+        "status": "DIPROSES",
+        "note": "Berkas sedang diverifikasi oleh petugas",
+        "datetime": "2024-01-02 11:30:00"
+      }
+    ]
+  }
+}
+```
+
+
 *Catatan: Semua endpoint list (2.1 - 2.3) mendukung Query Parameters berikut:*
 | Parameter | Tipe | Wajib | Keterangan |
 | :--- | :--- | :--- | :--- |
