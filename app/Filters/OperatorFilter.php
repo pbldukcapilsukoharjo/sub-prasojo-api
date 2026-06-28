@@ -26,8 +26,13 @@ final class OperatorFilter extends BaseFilter
 
     protected function applySearch(Builder $query): void
     {
-        if (!empty($this->request['search_nama'])) {
-            $query->where('admin.fullname', 'like', '%' . $this->request['search_nama'] . '%');
+        if (!empty($this->request['search'])) {
+            $searchTerm = '%' . $this->request['search'] . '%';
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('admin.fullname', 'like', $searchTerm)
+                  ->orWhere('admin.kelurahan_name', 'like', $searchTerm)
+                  ->orWhere('admin.kecamatan_name', 'like', $searchTerm);
+            });
         }
     }
 }
