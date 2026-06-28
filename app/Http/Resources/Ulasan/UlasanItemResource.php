@@ -7,10 +7,10 @@ namespace App\Http\Resources\Ulasan;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class UlasanItemResource extends JsonResource
+final class UlasanItemResource extends JsonResource
 {
     /**
-     * Transform the resource into an array.
+     * @return array<string,mixed>
      */
     public function toArray(
         Request $request
@@ -24,15 +24,17 @@ class UlasanItemResource extends JsonResource
 
             'layanan' => $this->ajuan?->layanan?->layanan_nama,
 
-            'nomor_registrasi' => $this->ajuan?->ajuan_no_reg,
-
             'rating' => (int) $this->review_rating,
 
-            'ulasan' => $this->review_content,
+            'ulasan' => $this->review_content ?? '',
 
-            'tanggal' => $this->review_create_datetime?->format('d-m-Y'),
+            'tanggal' => optional(
+                $this->review_create_datetime
+            )->format('d-m-Y'),
 
-            'waktu' => $this->review_create_datetime?->format('H:i'),
+            'waktu' => optional(
+                $this->review_create_datetime
+            )->format('H:i'),
         ];
     }
 }

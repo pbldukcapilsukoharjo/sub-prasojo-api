@@ -6,17 +6,23 @@ namespace App\Services;
 
 use App\Filters\UlasanFilter;
 use App\Models\AjuanReview;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
 
-class UlasanService
+final class UlasanService
 {
     /**
-     * Mendapatkan seluruh data ulasan.
+     * Jumlah data per halaman.
+     */
+    private const int PER_PAGE = 10;
+
+    /**
+     * Daftar ulasan.
+     *
+     * @param array<string,mixed> $filters
+     * @return array<string,mixed>
      */
     public function index(array $filters): array
     {
-        $perPage = (int) ($filters['per_page'] ?? 10);
-
         $query = AjuanReview::query()
             ->with([
                 'ajuan.layanan',
@@ -27,41 +33,64 @@ class UlasanService
             $filters
         );
 
-        $pagination = $query->paginate(
-            $perPage,
+        $reviews = (clone $query)->paginate(
+            self::PER_PAGE,
             ['*'],
             'page',
-            $filters['page'] ?? 1
+            (int) ($filters['page'] ?? 1)
         );
 
         return [
-            'summary' => $this->getSummary(),
-            'reviews' => $pagination,
+            'summary' => $this->summary(clone $query),
+            'reviews' => $reviews,
         ];
     }
 
     /**
-     * Ringkasan ulasan.
+     * KPI Ulasan.
+     *
+     * @param array<string,mixed> $filters
+     * @return array<string,mixed>
      */
-    private function getSummary(): array
+    public function kpi(array $filters = []): array
     {
+        $query = AjuanReview::query();
+
+        UlasanFilter::apply(
+            $query,
+            $filters
+        );
+
+        return $this->summary($query);
+    }
+
+    /**
+     * Ringkasan ulasan.
+     *
+     * @return array<string,mixed>
+     */
+    private function summary(
+        Builder $query
+    ): array {
+
         $average = round(
-            (float) AjuanReview::avg('review_rating'),
+            (float) (clone $query)->reorder()->avg('review_rating'),
             1
         );
 
-        $totalReview = AjuanReview::count();
+        $totalReview = (clone $query)
+            ->reorder()
+            ->count();
 
-        $rating = AjuanReview::query()
-            ->selectRaw('review_rating, COUNT(*) as total')
+        $rating = (clone $query)
+            ->reorder()
+            ->selectRaw('review_rating, COUNT(*) AS total')
             ->groupBy('review_rating')
             ->pluck('total', 'review_rating');
 
         return [
             'average_rating' => $average,
-
             'total_review' => $totalReview,
-
             'rating' => [
                 1 => (int) ($rating[1] ?? 0),
                 2 => (int) ($rating[2] ?? 0),

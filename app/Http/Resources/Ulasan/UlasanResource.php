@@ -7,42 +7,40 @@ namespace App\Http\Resources\Ulasan;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class UlasanResource extends JsonResource
+final class UlasanResource extends JsonResource
 {
     /**
-     * Transform the resource into an array.
+     * @return array<string,mixed>
      */
     public function toArray(
         Request $request
     ): array {
 
-        $reviews = $this['reviews'];
+        $summary = $this->resource['summary'];
+
+        $reviews = $this->resource['reviews'];
 
         return [
 
-            /*
-            |--------------------------------------------------------------------------
-            | Summary
-            |--------------------------------------------------------------------------
-            */
-            'summary' => [
+            'rata_rata_ulasan' => (float) $summary['average_rating'],
 
-                'average_rating' =>
-                    $this['summary']['average_rating'],
+            'total_ulasan' => (int) $summary['total_review'],
 
-                'total_review' =>
-                    $this['summary']['total_review'],
+            'total_rating' => [
 
-                'rating' =>
-                    $this['summary']['rating'],
+                '1' => $summary['rating'][1],
+
+                '2' => $summary['rating'][2],
+
+                '3' => $summary['rating'][3],
+
+                '4' => $summary['rating'][4],
+
+                '5' => $summary['rating'][5],
+
             ],
 
-            /*
-            |--------------------------------------------------------------------------
-            | Reviews
-            |--------------------------------------------------------------------------
-            */
-            'reviews' => [
+            'daftar_ulasan' => [
 
                 'list' => UlasanItemResource::collection(
                     $reviews->items()
@@ -50,23 +48,14 @@ class UlasanResource extends JsonResource
 
                 'meta' => [
 
-                    'current_page' =>
-                        $reviews->currentPage(),
+                    'page' => $reviews->currentPage(),
 
-                    'per_page' =>
-                        $reviews->perPage(),
+                    'per_page' => $reviews->perPage(),
 
-                    'total' =>
-                        $reviews->total(),
+                    'total' => $reviews->total(),
 
-                    'last_page' =>
-                        $reviews->lastPage(),
+                    'total_page' => $reviews->lastPage(),
 
-                    'from' =>
-                        $reviews->firstItem(),
-
-                    'to' =>
-                        $reviews->lastItem(),
                 ],
             ],
         ];

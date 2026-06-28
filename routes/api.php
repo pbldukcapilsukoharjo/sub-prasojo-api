@@ -1,86 +1,38 @@
 <?php
 
-declare(strict_types=1);
-
+use App\Http\Controllers\Api\V1\UlasanController;
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\Api\V1\DistribusiWilayahController;
-use App\Http\Controllers\Api\V1\PeringkatOperatorController;
-use App\Http\Controllers\Api\V1\SLAController;
-use App\Http\Controllers\Api\V1\UlasanController;
+Route::prefix('v1')
+    ->group(function (): void {
 
-Route::prefix('v1')->group(function (): void {
+        Route::prefix('ulasan')
+            ->controller(UlasanController::class)
+            ->group(function (): void {
 
-    /*
-    |--------------------------------------------------------------------------
-    | Ulasan
-    |--------------------------------------------------------------------------
-    */
-    Route::prefix('ulasan')->group(function (): void {
+                /**
+                 * GET /api/v1/ulasan
+                 */
+                Route::get(
+                    '/',
+                    'index'
+                )->name('api.v1.ulasan.index');
 
-        Route::get(
-            '/',
-            [UlasanController::class, 'index']
-        );
+                /**
+                 * GET /api/v1/ulasan/kpi
+                 */
+                Route::get(
+                    '/kpi',
+                    'kpi'
+                )->name('api.v1.ulasan.kpi');
 
-        Route::get(
-            '/{ulasan_id}',
-            [UlasanController::class, 'show']
-        );
+                /**
+                 * GET /api/v1/ulasan/export
+                 * Belum diimplementasikan.
+                 */
+                // Route::get(
+                //     '/export',
+                //     'export'
+                // )->name('api.v1.ulasan.export');
+            });
     });
-
-    /*
-    |--------------------------------------------------------------------------
-    | SLA
-    |--------------------------------------------------------------------------
-    */
-    Route::prefix('sla')->group(function (): void {
-
-        Route::get(
-            '/',
-            [SLAController::class, 'index']
-        );
-
-        Route::get(
-            '/{sla_id}',
-            [SLAController::class, 'show']
-        );
-    });
-
-    /*
-    |--------------------------------------------------------------------------
-    | Distribusi Wilayah
-    |--------------------------------------------------------------------------
-    */
-    Route::prefix('distribusi-wilayah')->group(function (): void {
-
-        Route::get(
-            '/',
-            [DistribusiWilayahController::class, 'index']
-        );
-
-        Route::get(
-            '/{wilayah_id}',
-            [DistribusiWilayahController::class, 'show']
-        );
-    });
-
-    /*
-    |--------------------------------------------------------------------------
-    | Peringkat Operator
-    |--------------------------------------------------------------------------
-    */
-    Route::prefix('peringkat-operator')->group(function (): void {
-
-        Route::get(
-            '/',
-            [PeringkatOperatorController::class, 'index']
-        );
-
-        Route::get(
-            '/{operator_id}',
-            [PeringkatOperatorController::class, 'show']
-        );
-    });
-
-});
