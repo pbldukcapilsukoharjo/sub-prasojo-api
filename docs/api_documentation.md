@@ -210,15 +210,131 @@ Jika ada validasi parameter/body yang gagal, sistem akan selalu me-return **400 
 **Deskripsi:** Menampilkan list pengajuan untuk halaman lembar kerja.
 **Headers:** `Authorization: Bearer {PASETO_TOKEN}`
 
+**Response Sukses (200 OK):**
+```json
+{
+  "status": true,
+  "code": 200,
+  "message": "Berhasil mengambil data",
+  "data": [
+    {
+      "ajuan_id": 1,
+      "ajuan_no_reg": "REG-12345",
+      "ajuan_create_datetime": "2024-01-01 10:00:00",
+      "ajuan_status": "DIPROSES",
+      "ajuan_pelapor_role_name": "Online",
+      "ajuan_is_online": 1,
+      "kecamatan": {
+         "kecamatan_id": 1,
+         "kecamatan_name": "Klojen"
+      },
+      "layanan": {
+         "layanan_id": 1,
+         "layanan_name": "KTP Elektronik"
+      },
+      "pelapor": {
+         "user_id": 1,
+         "user_nik": "3573010000000001",
+         "user_nama_lengkap": "Budi Santoso"
+      }
+    }
+  ],
+  "meta": {
+    "page": 1,
+    "per_page": 10,
+    "total": 100,
+    "total_page": 10
+  },
+  "chart_status": [
+    {"status": "DIPROSES", "total": 50},
+    {"status": "DITERIMA", "total": 50}
+  ],
+  "chart_layanan": [
+    {"layanan": "KTP Elektronik", "total": 100}
+  ]
+}
+```
+
 ### 2.2 List Ajuan 🔵 [UPDATED] ✅ [BERFUNGSI]
 **Endpoint:** `GET /api/v1/pengajuan/ajuan`
 **Deskripsi:** Menampilkan list pengajuan untuk halaman ajuan.
 **Headers:** `Authorization: Bearer {PASETO_TOKEN}`
 
+**Response Sukses (200 OK):**
+```json
+{
+  "status": true,
+  "code": 200,
+  "message": "Berhasil mengambil data",
+  "data": [
+    {
+      "ajuan_id": 1,
+      "ajuan_no_reg": "REG-12345",
+      "ajuan_create_datetime": "2024-01-01 10:00:00",
+      "ajuan_status": "MENUNGGU",
+      "ajuan_pelapor_role_name": "Online",
+      "ajuan_is_online": 1,
+      "kecamatan": {
+         "kecamatan_id": 1,
+         "kecamatan_name": "Klojen"
+      },
+      "layanan": {
+         "layanan_id": 1,
+         "layanan_name": "KTP Elektronik"
+      },
+      "pelapor": {
+         "user_id": 1,
+         "user_nik": "3573010000000001",
+         "user_nama_lengkap": "Budi Santoso"
+      }
+    }
+  ],
+  "meta": {
+    "page": 1,
+    "per_page": 10,
+    "total": 100,
+    "total_page": 10
+  }
+}
+```
+
 ### 2.3 List Produk 🔵 [UPDATED] ✅ [BERFUNGSI]
 **Endpoint:** `GET /api/v1/pengajuan/produk`
 **Deskripsi:** Menampilkan list pengajuan untuk halaman produk, dilengkapi `nama_identitas_produk`.
 **Headers:** `Authorization: Bearer {PASETO_TOKEN}`
+
+**Response Sukses (200 OK):**
+```json
+{
+  "status": true,
+  "code": 200,
+  "message": "Berhasil mengambil data",
+  "data": [
+    {
+      "ajuan_id": 1,
+      "ajuan_no_reg": "REG-12345",
+      "ajuan_create_datetime": "2024-01-01 10:00:00",
+      "ajuan_status": "SELESAI",
+      "ajuan_is_online": 1,
+      "nama_identitas_produk": "Kartu Keluarga a.n Budi",
+      "kecamatan": {
+         "kecamatan_id": 1,
+         "kecamatan_name": "Klojen"
+      },
+      "layanan": {
+         "layanan_id": 1,
+         "layanan_name": "KTP Elektronik"
+      }
+    }
+  ],
+  "meta": {
+    "page": 1,
+    "per_page": 10,
+    "total": 100,
+    "total_page": 10
+  }
+}
+```
 
 ### 2.4 Detail Timeline Pengajuan 🟡 [BARU] ✅ [BERFUNGSI]
 **Endpoint:** `GET /api/v1/pengajuan/{ajuan_id}/detail`
@@ -230,11 +346,12 @@ Jika ada validasi parameter/body yang gagal, sistem akan selalu me-return **400 
 | :--- | :--- | :--- | :--- |
 | `search` | `string` | Tidak | Pencarian cepat (no reg / NIK pelapor / layanan / kecamatan) |
 | `kecamatan` | `string` | Tidak | Filter kode kecamatan |
-| `pelapor` | `string` | Tidak | Filter nama peran pelapor (online, offline, mandiri, operator, dll) |
-| `start_date` | `string` | Tidak | Tanggal awal (format `dd-mm-yyyy`) |
-| `end_date` | `string` | Tidak | Tanggal akhir (format `dd-mm-yyyy`) |
+| `pelapor` | `string` | Tidak | Filter nama peran pelapor (hanya untuk Ajuan & Lembar Kerja) |
+| `start_date` | `string` | Tidak | Tanggal awal (format `dd-mm-yyyy`) (hanya untuk Ajuan & Lembar Kerja) |
+| `end_date` | `string` | Tidak | Tanggal akhir (format `dd-mm-yyyy`) (hanya untuk Ajuan & Lembar Kerja) |
 | `periode` | `integer` | Tidak | Filter periode berdasarkan bulan (1-12) |
 | `layanan` | `string` | Tidak | Filter kode layanan (untuk filter tab bar) |
+| `nama_identitas_produk` | `string` | Tidak | Filter berdasarkan nama identitas produk (HANYA untuk Produk) |
 | `sort` | `string` | Tidak | Urutan data (`terbaru` atau `terlama`) |
 | `per_page` | `integer` | Tidak | Jumlah data per halaman paginasi (default 10) |
 | `page` | `integer` | Tidak | Nomor halaman paginasi |
