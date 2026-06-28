@@ -25,6 +25,7 @@ class UpdateProfileRequest extends FormRequest
         $userId = $this->attributes->get('auth_user_id');
 
         return [
+            'fullname' => ['nullable', 'string', 'max:255'],
             'email' => [
                 'nullable',
                 'email',

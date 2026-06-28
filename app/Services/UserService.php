@@ -30,6 +30,10 @@ final class UserService
             ]);
         }
 
+        if (isset($data['fullname'])) {
+            $user->fullname = $data['fullname'];
+        }
+
         if (isset($data['email'])) {
             $user->email = $data['email'];
         }
