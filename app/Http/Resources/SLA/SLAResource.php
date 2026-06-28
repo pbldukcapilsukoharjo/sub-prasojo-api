@@ -27,6 +27,9 @@ class SLAResource extends JsonResource
             'target_sla' =>
                 $this['target_sla'],
 
+            'jumlah_ajuan' =>
+                $this['jumlah_ajuan'],
+
             'daftar_rincian' => [
 
                 'list' =>

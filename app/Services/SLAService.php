@@ -27,7 +27,8 @@ final class SLAService
             $query = $filter->apply($query);
 
             $statusSelesai = AjuanStatus::getStatusSelesai();
-            $targetSlaMenit = config('sla.default_jam', 6) * 60; // 360 menit
+            $targetSlaJam = config('sla.default_jam', 6);
+            $targetSlaMenit = $targetSlaJam * 60; // 360 menit
 
             $kpiGlobal = (clone $query)->whereIn('ajuan_status', $statusSelesai)
                 ->select(
@@ -57,6 +58,8 @@ final class SLAService
             return [
                 'rata_rata_global_text' => $slaText,
                 'capaian_sla_persen' => $capaianPersen,
+                'target_sla' => $targetSlaJam,
+                'jumlah_ajuan' => $totalAjuan,
             ];
         });
     }
@@ -152,6 +155,7 @@ final class SLAService
             'rata_rata_waktu_proses' => $averageProcessTime,
             'pencapaian_sla' => $slaAchievement,
             'target_sla' => $targetSlaJam,
+            'jumlah_ajuan' => $totalAjuan,
             'daftar_rincian' => [
                 'list' => $list->toArray(),
                 'meta' => [
