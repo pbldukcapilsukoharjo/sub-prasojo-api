@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Resources\DistribusiWilayah;
 
 use Illuminate\Http\Request;
@@ -7,8 +9,13 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class DistribusiWilayahResource extends JsonResource
 {
-    public function toArray(Request $request): array
-    {
+    /**
+     * Transform the resource into an array.
+     */
+    public function toArray(
+        Request $request
+    ): array {
+
         return [
 
             'total_kecamatan' =>
@@ -24,12 +31,16 @@ class DistribusiWilayahResource extends JsonResource
 
                 'list' =>
                     DistribusiWilayahItemResource::collection(
-                        collect($this['list'])
+                        collect(
+                            $this['daftar_ajuan']['list']
+                        )
                     ),
 
                 'meta' =>
-                    $this['meta']
-            ]
+                    $this['daftar_ajuan']['meta'],
+
+            ],
+
         ];
     }
 }

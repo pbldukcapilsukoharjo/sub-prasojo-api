@@ -1,186 +1,243 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
-use App\Models\Ajuan;
 use App\Filters\DistribusiWilayahFilter;
+use App\Models\Ajuan;
 
 class DistribusiWilayahService
 {
-    public function getAll(array $filters): array
-    {
+    /**
+     * Mendapatkan data distribusi wilayah.
+     */
+    public function index(
+        array $filters
+    ): array {
+
         $page = (int) ($filters['page'] ?? 1);
-        $perPage = 5;
+
+        $perPage = (int) ($filters['per_page'] ?? 5);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Base Query
+        |--------------------------------------------------------------------------
+        */
 
         $query = Ajuan::query();
 
-        $query = (new DistribusiWilayahFilter())
-            ->apply($query, $filters);
+        DistribusiWilayahFilter::apply(
+            $query,
+            $filters
+        );
 
-        $totalKecamatan = (clone $query)
-            ->distinct()
-            ->count('ajuan_kecamatan_name');
+        /*
+        |--------------------------------------------------------------------------
+        | Ambil seluruh data
+        |--------------------------------------------------------------------------
+        */
 
-        $totalAjuanDokumen = (clone $query)->count();
+        $ajuans = (clone $query)->get();
 
-        $grouped = (clone $query)
-            ->selectRaw("
-                MIN(ajuan_id) as id,
+        /*
+        |--------------------------------------------------------------------------
+        | Ringkasan
+        |--------------------------------------------------------------------------
+        */
 
-                ajuan_kelurahan_name as desa,
-                ajuan_kecamatan_name as kecamatan,
-
-                COUNT(*) as total_ajuan,
-
-                SUM(
-                    CASE
-                        WHEN ajuan_layanan_kode = 'KTP'
-                        THEN 1
-                        ELSE 0
-                    END
-                ) as ktp_el,
-
-                SUM(
-                    CASE
-                        WHEN ajuan_layanan_kode = 'KIA'
-                        THEN 1
-                        ELSE 0
-                    END
-                ) as kia,
-
-                SUM(
-                    CASE
-                        WHEN ajuan_layanan_kode = 'AKL'
-                        THEN 1
-                        ELSE 0
-                    END
-                ) as akta_kelahiran,
-
-                SUM(
-                    CASE
-                        WHEN ajuan_layanan_kode = 'AKM'
-                        THEN 1
-                        ELSE 0
-                    END
-                ) as akta_kematian,
-
-                SUM(
-                    CASE
-                        WHEN ajuan_layanan_kode = 'PND'
-                        THEN 1
-                        ELSE 0
-                    END
-                ) as perpindahan,
-
-                SUM(
-                    CASE
-                        WHEN ajuan_layanan_kode = 'DTG'
-                        THEN 1
-                        ELSE 0
-                    END
-                ) as kedatangan,
-
-                SUM(
-                    CASE
-                        WHEN ajuan_layanan_kode = 'UPD'
-                        THEN 1
-                        ELSE 0
-                    END
-                ) as update_data,
-
-                SUM(
-                    CASE
-                        WHEN ajuan_layanan_kode = 'RKJ'
-                        THEN 1
-                        ELSE 0
-                    END
-                ) as rekam_jemput_bola
-            ")
-            ->groupBy(
-                'ajuan_kelurahan_name',
-                'ajuan_kecamatan_name'
-            );
-
-        $totalData = (clone $grouped)
-            ->get()
+        $totalKecamatan = $ajuans
+            ->pluck('ajuan_kecamatan_name')
+            ->filter()
+            ->unique()
             ->count();
 
-        $list = $grouped
-            ->forPage($page, $perPage)
-            ->get()
-            ->map(function ($item) {
+        $totalAjuanDokumen = $ajuans->count();
 
-                return [
+        $rataRataAjuan = $totalKecamatan > 0
+            ? round(
+                $totalAjuanDokumen / $totalKecamatan
+            )
+            : 0;
 
-                    'id' => (int) $item->id,
+        /*
+        |--------------------------------------------------------------------------
+        | Group berdasarkan Desa + Kecamatan
+        |--------------------------------------------------------------------------
+        */
 
-                    'desa' => $item->desa,
+        $grouped = $ajuans->groupBy(
+            function (Ajuan $ajuan): string {
 
-                    'kecamatan' => $item->kecamatan,
+                return implode('|', [
 
-                    'total_ajuan' =>
-                        (int) $item->total_ajuan,
+                    $ajuan->ajuan_kelurahan_name,
 
-                    'ktp_el' =>
-                        (int) $item->ktp_el,
+                    $ajuan->ajuan_kecamatan_name,
 
-                    'kia' =>
-                        (int) $item->kia,
+                ]);
+            }
+        );
 
-                    'akta_kelahiran' =>
-                        (int) $item->akta_kelahiran,
+        $list = [];
 
-                    'akta_kematian' =>
-                        (int) $item->akta_kematian,
+        $id = 1;
+        foreach ($grouped as $items) {
 
-                    'perpindahan' =>
-                        (int) $item->perpindahan,
+            /** @var Ajuan $first */
+            $first = $items->first();
 
-                    'kedatangan' =>
-                        (int) $item->kedatangan,
+            $list[] = [
 
-                    'update_data' =>
-                        (int) $item->update_data,
+                'id' => $id++,
 
-                    'rekam_jemput_bola' =>
-                        (int) $item->rekam_jemput_bola,
-                ];
-            })
+                'desa' =>
+                    $first->ajuan_kelurahan_name,
+
+                'kecamatan' =>
+                    $first->ajuan_kecamatan_name,
+
+                'total_ajuan' =>
+                    $items->count(),
+
+                'ktp-el' =>
+                    $items->where(
+                        'ajuan_layanan_kode',
+                        'KTP'
+                    )->count(),
+
+                'kia' =>
+                    $items->where(
+                        'ajuan_layanan_kode',
+                        'KIA'
+                    )->count(),
+
+                'akta_kelahiran' =>
+                    $items->where(
+                        'ajuan_layanan_kode',
+                        'AKL'
+                    )->count(),
+
+                'akta_kematian' =>
+                    $items->where(
+                        'ajuan_layanan_kode',
+                        'AKM'
+                    )->count(),
+
+                'perpindahan' =>
+                    $items->where(
+                        'ajuan_layanan_kode',
+                        'PND'
+                    )->count(),
+
+                'kedatangan' =>
+                    $items->where(
+                        'ajuan_layanan_kode',
+                        'DTG'
+                    )->count(),
+
+                'update_data' =>
+                    $items->where(
+                        'ajuan_layanan_kode',
+                        'UPD'
+                    )->count(),
+
+                'rekam_jemput_bola' =>
+                    $items->where(
+                        'ajuan_layanan_kode',
+                        'RKJ'
+                    )->count(),
+
+            ];
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Collection
+        |--------------------------------------------------------------------------
+        */
+
+        $list = collect($list);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Sorting
+        |--------------------------------------------------------------------------
+        */
+
+        match ($filters['sortBy'] ?? 'newest') {
+
+            'oldest' =>
+
+                $list = $list
+                    ->sortBy('total_ajuan')
+                    ->values(),
+
+            default =>
+
+                $list = $list
+                    ->sortByDesc('total_ajuan')
+                    ->values(),
+        };
+
+        /*
+        |--------------------------------------------------------------------------
+        | Manual Pagination
+        |--------------------------------------------------------------------------
+        */
+
+        $total = $list->count();
+
+        $paginated = $list
+            ->forPage(
+                $page,
+                $perPage
+            )
             ->values();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Response
+        |--------------------------------------------------------------------------
+        */
 
         return [
 
             'total_kecamatan' =>
-                (int) $totalKecamatan,
+                $totalKecamatan,
 
             'total_ajuan_dokumen' =>
-                (int) $totalAjuanDokumen,
+                $totalAjuanDokumen,
 
             'rata_rata_ajuan' =>
-                $totalKecamatan > 0
-                    ? (int) round(
-                        $totalAjuanDokumen / $totalKecamatan
-                    )
-                    : 0,
+                $rataRataAjuan,
 
-            'list' => $list,
+            'daftar_ajuan' => [
 
-            'meta' => [
+                'list' =>
+                    $paginated,
 
-                'page' =>
-                    $page,
+                'meta' => [
 
-                'per_page' =>
-                    $perPage,
+                    'page' =>
+                        $page,
 
-                'total' =>
-                    (int) $totalData,
+                    'per_page' =>
+                        $perPage,
 
-                'total_page' =>
-                    (int) ceil(
-                        $totalData / $perPage
-                    ),
+                    'total' =>
+                        $total,
+
+                    'total_page' =>
+                        (int) ceil(
+                            $total / $perPage
+                        ),
+
+                ],
+
             ],
+
         ];
     }
 }
