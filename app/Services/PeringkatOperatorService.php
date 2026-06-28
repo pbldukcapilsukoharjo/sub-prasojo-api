@@ -2,541 +2,416 @@
 
 namespace App\Services;
 
-use App\Filters\PeringkatOperatorFilter;
 use App\Models\Admin;
-use App\Models\Ajuan;
-use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+use App\Filters\PeringkatOperatorFilter;
 
 class PeringkatOperatorService
 {
-    const PER_PAGE = 5;
-
-    /**
-     * List Peringkat Operator
-     */
-    public function getAll(array $filters): array
+    public function index(array $filters): array
     {
-        $page = $filters['page'] ?? 1;
-
-        /*
-        |--------------------------------------------------------------------------
-        | Card Statistik
-        |--------------------------------------------------------------------------
-        */
-
-        $totalLayanan = Ajuan::count();
-
-        /*
-        |--------------------------------------------------------------------------
-        | Tingkat selesai
-        |--------------------------------------------------------------------------
-        */
-
-        $totalSelesai = Ajuan::whereIn(
-            'ajuan_status',
-            [
-                'SELESAI',
-                'DITERIMA',
-                'SELESAI_VERIFIKASI'
-            ]
-        )->count();
-
-        $tingkatLayanan = $totalLayanan > 0
-            ? round(($totalSelesai / $totalLayanan) * 100, 1)
-            : 0;
-
-        /*
-        |--------------------------------------------------------------------------
-        | Durasi rata-rata
-        |--------------------------------------------------------------------------
-        |
-        | sementara dihitung dari create-update.
-        | nanti bisa diganti memakai log status.
-        |
-        */
-
-        $rataDurasi = round(
-
-            Ajuan::selectRaw("
-                AVG(
-                    TIMESTAMPDIFF(
-                        MINUTE,
-                        ajuan_create_datetime,
-                        ajuan_update_datetime
-                    )
-                ) as avg_duration
-            ")
-            ->value('avg_duration') ?? 0,
-
-            1
-
-        );
-
-        /*
-        |--------------------------------------------------------------------------
-        | Query Operator
-        |--------------------------------------------------------------------------
-        */
+        $perPage = 5;
 
         $query = Admin::query()
-
-            ->select([
-
-                'id',
-
-                'fullname',
-
-                'kelurahan_name',
-
-                'kecamatan_name',
-
-                'create_datetime'
-
+            ->with([
+                'logAjuanStatuses.ajuan'
             ])
-
-            ->where('level', 'operator');
+            ->where('level', Admin::LEVEL_OPERATOR);
 
         /*
         |--------------------------------------------------------------------------
         | Filter
         |--------------------------------------------------------------------------
         */
-
-        $query = PeringkatOperatorFilter::apply(
+        PeringkatOperatorFilter::apply(
             $query,
             $filters
         );
 
         /*
         |--------------------------------------------------------------------------
-        | Jumlah Ajuan
+        | Ambil seluruh operator
         |--------------------------------------------------------------------------
         */
+        $operators = $query->get();
 
-        $query->selectSub(
+        /*
+        |--------------------------------------------------------------------------
+        | Ringkasan Dashboard
+        |--------------------------------------------------------------------------
+        */
+        $totalLayanan = 0;
 
-            Ajuan::selectRaw('COUNT(*)')
+        $totalDurasi = 0;
 
-                ->whereColumn(
-                    'ajuan.ajuan_pelapor_id',
-                    'admin.id'
-                ),
+        $totalSelesai = 0;
 
-            'total_ajuan'
+        $totalSemuaAjuan = 0;
 
-        );
+        foreach ($operators as $operator) {
+
+            $logs = $operator->logAjuanStatuses;
+
+            $totalLayanan += $logs->count();
+
+            foreach ($logs as $log) {
+
+                if (!$log->ajuan) {
+                    continue;
+                }
+
+                $ajuan = $log->ajuan;
+
+                /*
+                |--------------------------------------------------------------------------
+                | Hitung durasi proses
+                |--------------------------------------------------------------------------
+                */
+                if (
+                    $ajuan->ajuan_create_datetime &&
+                    $log->log_create_datetime
+                ) {
+
+                    $durasi = Carbon::parse(
+                        $ajuan->ajuan_create_datetime
+                    )->diffInMinutes(
+                        Carbon::parse(
+                            $log->log_create_datetime
+                        )
+                    ) / 60;
+
+                    $totalDurasi += $durasi;
+                }
+
+                /*
+                |--------------------------------------------------------------------------
+                | Hitung tingkat selesai
+                |--------------------------------------------------------------------------
+                */
+                $totalSemuaAjuan++;
+
+                if (
+                    strtoupper($log->log_status) === 'SELESAI'
+                ) {
+                    $totalSelesai++;
+                }
+            }
+        }
+
+        $rataRataDurasi =
+            $totalLayanan > 0
+                ? round(
+                    $totalDurasi / $totalLayanan,
+                    1
+                )
+                : 0;
+
+        $tingkatSelesai =
+            $totalSemuaAjuan > 0
+                ? round(
+                    ($totalSelesai / $totalSemuaAjuan) * 100,
+                    1
+                )
+                : 0;
+
+        /*
+        |--------------------------------------------------------------------------
+        | Ranking Operator
+        |--------------------------------------------------------------------------
+        */
+        $ranking = [];
+
+        foreach ($operators as $operator) {
+
+            $jumlahAjuan = $operator
+                ->logAjuanStatuses
+                ->count();
+
+            $desa = '-';
+
+            $kecamatan = '-';
+
+            $logPertama = $operator
+                ->logAjuanStatuses
+                ->first();
+
+            if (
+                $logPertama &&
+                $logPertama->ajuan
+            ) {
+
+                $desa =
+                    $logPertama
+                        ->ajuan
+                        ->ajuan_kelurahan_name
+                    ?? '-';
+
+                $kecamatan =
+                    $logPertama
+                        ->ajuan
+                        ->ajuan_kecamatan_name
+                    ?? '-';
+            }
+
+            $ranking[] = [
+
+                'id' =>
+                    $operator->id,
+
+                'operator' =>
+                    $operator->fullname,
+
+                'desa' =>
+                    $desa,
+
+                'kecamatan' =>
+                    $kecamatan,
+
+                'jumlah_ajuan' =>
+                    $jumlahAjuan,
+            ];
+        }
 
         /*
         |--------------------------------------------------------------------------
         | Sorting Ranking
         |--------------------------------------------------------------------------
         */
+        $ranking = collect($ranking);
 
-        $query->orderByDesc('total_ajuan');
+        if (
+            ($filters['sortBy'] ?? 'newest')
+            === 'oldest'
+        ) {
+
+            $ranking = $ranking
+                ->sortBy('jumlah_ajuan')
+                ->values();
+
+        } else {
+
+            $ranking = $ranking
+                ->sortByDesc('jumlah_ajuan')
+                ->values();
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Nomor Peringkat
+        |--------------------------------------------------------------------------
+        */
+        $ranking = $ranking
+            ->values()
+            ->map(function (
+                $item,
+                $index
+            ) {
+
+                $item['peringkat'] =
+                    $index + 1;
+
+                return $item;
+            });
 
         /*
         |--------------------------------------------------------------------------
         | Pagination
         |--------------------------------------------------------------------------
         */
-
-        $operators = $query->paginate(
-            self::PER_PAGE,
-            ['*'],
-            'page',
-            $page
+        $page = (int) (
+            $filters['page'] ?? 1
         );
 
-        /*
-        |--------------------------------------------------------------------------
-        | Ranking
-        |--------------------------------------------------------------------------
-        */
+        $total =
+            $ranking->count();
 
-        $rank = ($operators->currentPage() - 1)
-            * self::PER_PAGE;
-
-        $list = [];
-
-        foreach ($operators as $operator) {
-
-            $rank++;
-
-            $list[] = [
-
-                'id' => $operator->id,
-
-                'peringkat' => $rank,
-
-                'operator' => $operator->fullname,
-
-                'desa' => $operator->kelurahan_name,
-
-                'kecamatan' => $operator->kecamatan_name,
-
-                'jumlah_ajuan' => (int) $operator->total_ajuan
-
-            ];
-        }
+        $list = $ranking
+            ->forPage(
+                $page,
+                $perPage
+            )
+            ->values();
 
         /*
         |--------------------------------------------------------------------------
-        | Response
+        | Return List
         |--------------------------------------------------------------------------
         */
-
         return [
 
-            'total_layanan' => (int) $totalLayanan,
+            'total_layanan' => $totalLayanan,
 
-            'rata_rata_durasi' => (float) $rataDurasi,
+            'rata_rata_durasi' => $rataRataDurasi,
 
-            'tingkat_layanan' => (float) $tingkatLayanan,
+            'tingkat_selesai' => $tingkatSelesai,
 
-            'list' => $list,
+            'peringkat_operator' => [
 
-            'meta' => [
+                'list' => $list,
 
-                'page' => $operators->currentPage(),
+                'meta' => [
 
-                'per_page' => $operators->perPage(),
+                    'page' => $page,
 
-                'total' => $operators->total(),
+                    'per_page' => $perPage,
 
-                'total_page' => $operators->lastPage()
+                    'total' => $total,
 
+                    'total_page' => (int) ceil(
+                        $total / $perPage
+                    )
+                ]
             ]
-
         ];
     }
-    /**
-     * Detail Operator
-     */
-    public function detail(int $id): array
-    {
+
+    /*
+    |--------------------------------------------------------------------------
+    | Detail Operator
+    |--------------------------------------------------------------------------
+    */
+
+    public function show(
+        int $operatorId
+    ): array {
+
         $operator = Admin::query()
-            ->select([
-                'id',
-                'fullname',
-                'username',
-                'kelurahan_name',
-                'kecamatan_name'
+            ->with([
+                'logAjuanStatuses.ajuan.pelapor'
             ])
-            ->findOrFail($id);
-
-        /*
-        |--------------------------------------------------------------------------
-        | Total Ajuan
-        |--------------------------------------------------------------------------
-        */
-
-        $totalAjuan = Ajuan::where(
-            'ajuan_pelapor_id',
-            $operator->id
-        )->count();
-
-        /*
-        |--------------------------------------------------------------------------
-        | Total Selesai
-        |--------------------------------------------------------------------------
-        */
-
-        $totalSelesai = Ajuan::where(
-            'ajuan_pelapor_id',
-            $operator->id
-        )
-        ->whereIn(
-            'ajuan_status',
-            [
-                'SELESAI',
-                'DITERIMA',
-                'SELESAI_VERIFIKASI'
-            ]
-        )
-        ->count();
-
-        /*
-        |--------------------------------------------------------------------------
-        | Persentase Penyelesaian
-        |--------------------------------------------------------------------------
-        */
-
-        $tingkatSelesai = 0;
-
-        if ($totalAjuan > 0) {
-
-            $tingkatSelesai = round(
-
-                ($totalSelesai / $totalAjuan) * 100,
-
-                1
-
-            );
-
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Grafik Bulanan
-        |--------------------------------------------------------------------------
-        */
-
-        $layananPerBulan = $this->getMonthlyService(
-            $operator->id
-        );
-
-        /*
-        |--------------------------------------------------------------------------
-        | Riwayat
-        |--------------------------------------------------------------------------
-        */
-
-        $riwayat = $this->getHistory(
-            $operator->id
-        );
-
-        /*
-        |--------------------------------------------------------------------------
-        | Response
-        |--------------------------------------------------------------------------
-        */
-
-        return [
-
-            'id' => $operator->id,
-
-            'nama' => $operator->fullname,
-
-            'total_ajuan' => (int) $totalAjuan,
-
-            'total_selesai' => (int) $totalSelesai,
-
-            'tingkat_selesai' => (float) $tingkatSelesai,
-
-            'layanan_perbulan' => $layananPerBulan,
-
-            'riwayat_layanan' => $riwayat
-
-        ];
-    }
-    /**
-     * Grafik layanan per bulan
-     */
-    private function getMonthlyService(int $operatorId): array
-    {
-        $months = [
-            1 => 'Jan',
-            2 => 'Feb',
-            3 => 'Mar',
-            4 => 'Apr',
-            5 => 'Mei',
-            6 => 'Jun',
-            7 => 'Jul',
-            8 => 'Agu',
-            9 => 'Sep',
-            10 => 'Okt',
-            11 => 'Nov',
-            12 => 'Des'
-        ];
-
-        $result = [];
-
-        foreach ($months as $month => $name) {
-
-            $result[$name] = Ajuan::query()
-
-                ->where('ajuan_pelapor_id', $operatorId)
-
-                ->whereMonth(
-                    'ajuan_create_datetime',
-                    $month
-                )
-
-                ->whereYear(
-                    'ajuan_create_datetime',
-                    now()->year
-                )
-
-                ->count();
-
-        }
-
-        return $result;
-    }
-
-    /**
-     * Riwayat layanan operator
-     */
-    private function getHistory(int $operatorId): array
-    {
-        $rows = Ajuan::query()
-
-            ->select([
-
-                'ajuan_id',
-
-                'ajuan_no_reg',
-
-                'ajuan_layanan_kode',
-
-                'ajuan_kelurahan_name',
-
-                'ajuan_status',
-
-                'ajuan_create_datetime',
-
-                'ajuan_data_ajuan'
-
-            ])
-
             ->where(
-                'ajuan_pelapor_id',
-                $operatorId
+                'level',
+                Admin::LEVEL_OPERATOR
             )
+            ->findOrFail($operatorId);
 
-            ->orderByDesc(
-                'ajuan_create_datetime'
+        $logs = $operator->logAjuanStatuses;
+
+        $totalAjuan = $logs->count();
+
+        $totalSelesai = $logs
+            ->where(
+                'log_status',
+                'SELESAI'
             )
+            ->count();
 
-            ->limit(20)
-
-            ->get();
-
-        $history = [];
-
-        foreach ($rows as $row) {
-
-            /*
-            |--------------------------------------------------------------------------
-            | Nama Pemohon
-            |--------------------------------------------------------------------------
-            |
-            | disimpan dalam JSON ajuan_data_ajuan
-            |
-            */
-
-            $pemohon = '-';
-
-                $data = $row->ajuan_data_ajuan;
-
-                if (is_string($data)) {
-                    $data = json_decode($data, true);
-                }
-
-                if (is_array($data)) {
-
-                    $pemohon =
-                        $data['nama']
-                        ?? $data['nama_lengkap']
-                        ?? $data['full_name']
-                        ?? '-';
-
-                }
-            $history[] = [
-
-                'id' => $row->ajuan_id,
-
-                'no_regis' => $row->ajuan_no_reg,
-
-                'pemohon' => $pemohon,
-
-                'kode_ajuan' => $row->ajuan_layanan_kode,
-
-                'desa' => $row->ajuan_kelurahan_name,
-
-                'tanggal' => optional(
-                    $row->ajuan_create_datetime
-                )->format('d-m-Y'),
-
-                'waktu' => optional(
-                    $row->ajuan_create_datetime
-                )->format('H:i'),
-
-                'status' => strtoupper(
-                    $row->ajuan_status
+        $tingkatSelesai =
+            $totalAjuan > 0
+                ? round(
+                    ($totalSelesai / $totalAjuan) * 100
                 )
+                : 0;
 
+        /*
+        |--------------------------------------------------------------------------
+        | Layanan per Bulan
+        |--------------------------------------------------------------------------
+        */
+
+        $bulan = [
+            'Jan' => 0,
+            'Feb' => 0,
+            'Mar' => 0,
+            'Apr' => 0,
+            'Mei' => 0,
+            'Jun' => 0,
+            'Jul' => 0,
+            'Agu' => 0,
+            'Sep' => 0,
+            'Okt' => 0,
+            'Nov' => 0,
+            'Des' => 0,
+        ];
+
+        foreach ($logs as $log) {
+
+            if (!$log->log_create_datetime) {
+                continue;
+            }
+
+            $index = Carbon::parse(
+                $log->log_create_datetime
+            )->month;
+
+            $keys = array_keys($bulan);
+
+            $bulan[
+                $keys[$index - 1]
+            ]++;
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Riwayat Layanan
+        |--------------------------------------------------------------------------
+        */
+
+        $riwayat = [];
+
+        foreach ($logs as $log) {
+
+            if (!$log->ajuan) {
+                continue;
+            }
+
+            $ajuan = $log->ajuan;
+
+            $riwayat[] = [
+
+                'id' => $log->log_id,
+
+                'no_regis' =>
+                    $ajuan->ajuan_no_reg,
+
+                'pemohon' =>
+                    $ajuan->pelapor?->fullname,
+
+                'kode_ajuan' =>
+                    $ajuan->ajuan_layanan_kode,
+
+                'desa' =>
+                    $ajuan->ajuan_kelurahan_name,
+
+                'tanggal' =>
+                    optional(
+                        $log->log_create_datetime
+                    )->format('d-m-Y'),
+
+                'waktu' =>
+                    optional(
+                        $log->log_create_datetime
+                    )->format('H:i'),
+
+                'status' =>
+                    $log->log_status,
             ];
-
         }
 
-        return $history;
-    }
-
-        /**
-     * Menghitung tingkat penyelesaian (%)
-     */
-    private function calculateCompletionRate(
-        int $totalAjuan,
-        int $totalSelesai
-    ): float {
-
-        if ($totalAjuan <= 0) {
-            return 0;
-        }
-
-        return round(
-            ($totalSelesai / $totalAjuan) * 100,
-            1
-        );
-    }
-
-    /**
-     * Format tanggal menjadi dd-mm-yyyy
-     */
-    private function formatDate($datetime): ?string
-    {
-        if (empty($datetime)) {
-            return null;
-        }
-
-        return \Carbon\Carbon::parse($datetime)
-            ->format('d-m-Y');
-    }
-
-    /**
-     * Format waktu menjadi HH:mm
-     */
-    private function formatTime($datetime): ?string
-    {
-        if (empty($datetime)) {
-            return null;
-        }
-
-        return \Carbon\Carbon::parse($datetime)
-            ->format('H:i');
-    }
-
-    /**
-     * Normalisasi status agar konsisten
-     */
-    private function formatStatus(?string $status): string
-    {
-        if (empty($status)) {
-            return '-';
-        }
-
-        return strtoupper(trim($status));
-    }
-
-    /**
-     * Nama bulan Indonesia
-     */
-    private function getMonthNames(): array
-    {
         return [
-            1 => 'Jan',
-            2 => 'Feb',
-            3 => 'Mar',
-            4 => 'Apr',
-            5 => 'Mei',
-            6 => 'Jun',
-            7 => 'Jul',
-            8 => 'Agu',
-            9 => 'Sep',
-            10 => 'Okt',
-            11 => 'Nov',
-            12 => 'Des',
+
+            'id' =>
+                $operator->id,
+
+            'nama' =>
+                $operator->fullname,
+
+            'total_ajuan' =>
+                $totalAjuan,
+
+            'total_selesai' =>
+                $totalSelesai,
+
+            'tingkat_selesai' =>
+                $tingkatSelesai,
+
+            'layanan_perbulan' =>
+                $bulan,
+
+            'riwayat_layanan' =>
+                collect($riwayat)
+                    ->sortByDesc('tanggal')
+                    ->values(),
         ];
     }
 }

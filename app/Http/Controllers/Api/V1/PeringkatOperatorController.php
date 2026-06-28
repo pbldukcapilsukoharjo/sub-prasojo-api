@@ -3,11 +3,10 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\PeringkatOperator\PeringkatOperatorRequest;
-use App\Http\Requests\PeringkatOperator\DetailPeringkatOperatorRequest;
+use App\Services\PeringkatOperatorService;
+use App\Http\Requests\PeringkatOperator\PeringkatOperatorFilterRequest;
 use App\Http\Resources\PeringkatOperator\PeringkatOperatorResource;
 use App\Http\Resources\PeringkatOperator\DetailPeringkatOperatorResource;
-use App\Services\PeringkatOperatorService;
 
 class PeringkatOperatorController extends Controller
 {
@@ -16,11 +15,12 @@ class PeringkatOperatorController extends Controller
     ) {}
 
     /**
-     * GET /api/v1/peringkat-operator
+     * List Peringkat Operator
      */
-    public function index(PeringkatOperatorRequest $request)
-    {
-        $result = $this->service->getAll(
+    public function index(
+        PeringkatOperatorFilterRequest $request
+    ) {
+        $data = $this->service->index(
             $request->validated()
         );
 
@@ -28,25 +28,25 @@ class PeringkatOperatorController extends Controller
             'success' => true,
             'code' => 200,
             'message' => 'Berhasil mendapatkan data operator',
-            'data' => new PeringkatOperatorResource($result)
+            'data' => new PeringkatOperatorResource($data),
         ]);
     }
 
     /**
-     * GET /api/v1/peringkat-operator/{op_id}
+     * Detail Operator
      */
     public function show(
-        DetailPeringkatOperatorRequest $request,
         int $op_id
     ) {
-
-        $result = $this->service->detail($op_id);
+        $data = $this->service->show(
+            $op_id
+        );
 
         return response()->json([
             'success' => true,
             'code' => 200,
             'message' => 'Detail operator berhasil ditemukan',
-            'data' => new DetailPeringkatOperatorResource($result)
+            'data' => new DetailPeringkatOperatorResource($data),
         ]);
     }
 }

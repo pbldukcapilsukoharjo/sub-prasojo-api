@@ -1,97 +1,166 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filters;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 
 class PeringkatOperatorFilter
 {
+    /**
+     * Apply filter to query.
+     */
     public static function apply(
         Builder $query,
         array $filters
     ): Builder {
 
+        /*
+        |--------------------------------------------------------------------------
+        | Search
+        |--------------------------------------------------------------------------
+        */
         if (!empty($filters['search'])) {
 
             $search = $filters['search'];
 
-            $query->where(function ($q) use ($search) {
+            $query->where(function (Builder $builder) use ($search) {
 
-                $q->where('username', 'like', "%{$search}%")
-                    ->orWhere('fullname', 'like', "%{$search}%");
-
+                $builder
+                    ->where(
+                        'fullname',
+                        'like',
+                        "%{$search}%"
+                    )
+                    ->orWhere(
+                        'username',
+                        'like',
+                        "%{$search}%"
+                    );
             });
-
         }
 
+        /*
+        |--------------------------------------------------------------------------
+        | Filter Operator
+        |--------------------------------------------------------------------------
+        */
+        if (!empty($filters['operator'])) {
+
+            $query->where(
+                'id',
+                $filters['operator']
+            );
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Filter Kecamatan
+        |--------------------------------------------------------------------------
+        */
         if (!empty($filters['district'])) {
 
             $query->where(
                 'kecamatan_name',
                 $filters['district']
             );
-
         }
 
-        if (!empty($filters['operator'])) {
+        /*
+        |--------------------------------------------------------------------------
+        | Date Range
+        |--------------------------------------------------------------------------
+        */
+        if (
+            !empty($filters['startDate']) &&
+            !empty($filters['endDate'])
+        ) {
 
-            $query->where(
-                'fullname',
-                $filters['operator']
-            );
-
-        }
-
-        if (!empty($filters['startDate'])) {
-
-            $query->whereDate(
+            $query->whereBetween(
                 'create_datetime',
-                '>=',
-                $filters['startDate']
+                [
+                    $filters['startDate'] . ' 00:00:00',
+                    $filters['endDate'] . ' 23:59:59',
+                ]
             );
-
         }
 
-        if (!empty($filters['endDate'])) {
+        /*
+        |--------------------------------------------------------------------------
+        | Period
+        |--------------------------------------------------------------------------
+        */
+        if (!empty($filters['period'])) {
 
-            $query->whereDate(
-                'create_datetime',
-                '<=',
-                $filters['endDate']
-            );
+            switch ($filters['period']) {
 
+                case 'today':
+
+                    $query->whereDate(
+                        'create_datetime',
+                        Carbon::today()
+                    );
+
+                    break;
+
+                case 'this_week':
+
+                    $query->whereBetween(
+                        'create_datetime',
+                        [
+                            Carbon::now()->startOfWeek(),
+                            Carbon::now()->endOfWeek(),
+                        ]
+                    );
+
+                    break;
+
+                case 'this_month':
+
+                    $query->whereMonth(
+                        'create_datetime',
+                        Carbon::now()->month
+                    )->whereYear(
+                        'create_datetime',
+                        Carbon::now()->year
+                    );
+
+                    break;
+
+                case 'this_year':
+
+                    $query->whereYear(
+                        'create_datetime',
+                        Carbon::now()->year
+                    );
+
+                    break;
+            }
         }
 
-        switch ($filters['sortBy'] ?? 'newest') {
+        /*
+        |--------------------------------------------------------------------------
+        | Sorting
+        |--------------------------------------------------------------------------
+        */
+        match ($filters['sortBy'] ?? 'newest') {
 
-            case 'oldest':
+            'oldest' =>
+
                 $query->orderBy(
                     'create_datetime',
                     'asc'
-                );
-                break;
+                ),
 
-            case 'highest':
-                $query->orderBy(
-                    'total_ajuan',
-                    'desc'
-                );
-                break;
+            default =>
 
-            case 'lowest':
-                $query->orderBy(
-                    'total_ajuan',
-                    'asc'
-                );
-                break;
-
-            default:
                 $query->orderBy(
                     'create_datetime',
                     'desc'
-                );
-
-        }
+                ),
+        };
 
         return $query;
     }
