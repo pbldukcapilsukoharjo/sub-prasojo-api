@@ -1,38 +1,42 @@
 <?php
 
+use App\Http\Controllers\Api\V1\DistribusiWilayahController;
 use App\Http\Controllers\Api\V1\UlasanController;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('v1')
-    ->group(function (): void {
+Route::prefix('v1')->group(function (): void {
 
-        Route::prefix('ulasan')
-            ->controller(UlasanController::class)
-            ->group(function (): void {
+    /*
+    |--------------------------------------------------------------------------
+    | Ulasan
+    |--------------------------------------------------------------------------
+    */
 
-                /**
-                 * GET /api/v1/ulasan
-                 */
-                Route::get(
-                    '/',
-                    'index'
-                )->name('api.v1.ulasan.index');
+    Route::prefix('ulasan')
+        ->controller(UlasanController::class)
+        ->group(function (): void {
 
-                /**
-                 * GET /api/v1/ulasan/kpi
-                 */
-                Route::get(
-                    '/kpi',
-                    'kpi'
-                )->name('api.v1.ulasan.kpi');
+            Route::get('/', 'index')
+                ->name('api.v1.ulasan.index');
 
-                /**
-                 * GET /api/v1/ulasan/export
-                 * Belum diimplementasikan.
-                 */
-                // Route::get(
-                //     '/export',
-                //     'export'
-                // )->name('api.v1.ulasan.export');
-            });
-    });
+            Route::get('/kpi', 'kpi')
+                ->name('api.v1.ulasan.kpi');
+        });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Distribusi Wilayah
+    |--------------------------------------------------------------------------
+    */
+
+    Route::prefix('distribusi-wilayah')
+        ->controller(DistribusiWilayahController::class)
+        ->group(function (): void {
+
+            /**
+             * GET /api/v1/distribusi-wilayah
+             */
+            Route::get('/', 'index')
+                ->name('api.v1.distribusi-wilayah.index');
+        });
+});
