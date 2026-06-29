@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('refresh_tokens', function (Blueprint $table) {
-            $table->id('id')->primary();
+            $table->id('id');
             $table->foreignUuid('sub_user_id')->constrained()->cascadeOnDelete();
             $table->string('jti')->unique();
             $table->timestamp('expires_at');

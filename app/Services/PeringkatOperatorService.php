@@ -11,7 +11,7 @@ use App\Filters\PeringkatOperatorFilter;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Pagination\LengthAwarePaginator;
 
-final class PeringkatOperatorService
+class PeringkatOperatorService
 {
     /**
      * @param array $filters

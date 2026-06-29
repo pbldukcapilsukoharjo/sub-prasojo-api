@@ -11,20 +11,24 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (app()->environment('testing')) {
+        if (app()->environment('testing') || config('database.default') === 'sqlite' || config('app.env') === 'testing') {
             return;
         }
 
-        Schema::connection('mysql_prasojo')->table('ajuan', function (Blueprint $table) {
-            $table->index('ajuan_status', 'idx_ajuan_status');
-            $table->index('ajuan_create_datetime', 'idx_ajuan_create_dt');
-            $table->index('ajuan_update_datetime', 'idx_ajuan_update_dt');
-            $table->index('ajuan_no_reg', 'idx_ajuan_no_reg');
-            $table->index('ajuan_kecamatan_code', 'idx_ajuan_kec_code');
-            $table->index('ajuan_is_online', 'idx_ajuan_is_online');
-            $table->index('ajuan_pelapor_role_name', 'idx_ajuan_pelapor_role');
-            $table->index('ajuan_pelapor_id', 'idx_ajuan_pelapor_id');
-        });
+        try {
+            Schema::connection('mysql_prasojo')->table('ajuan', function (Blueprint $table) {
+                $table->index('ajuan_status', 'idx_ajuan_status');
+                $table->index('ajuan_create_datetime', 'idx_ajuan_create_dt');
+                $table->index('ajuan_update_datetime', 'idx_ajuan_update_dt');
+                $table->index('ajuan_no_reg', 'idx_ajuan_no_reg');
+                $table->index('ajuan_kecamatan_code', 'idx_ajuan_kec_code');
+                $table->index('ajuan_is_online', 'idx_ajuan_is_online');
+                $table->index('ajuan_pelapor_role_name', 'idx_ajuan_pelapor_role');
+                $table->index('ajuan_pelapor_id', 'idx_ajuan_pelapor_id');
+            });
+        } catch (\Exception $e) {
+            // Ignore if indexes already exist
+        }
     }
 
     /**
@@ -32,7 +36,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        if (app()->environment('testing')) {
+        if (app()->environment('testing') || config('database.default') === 'sqlite' || config('app.env') === 'testing') {
             return;
         }
 

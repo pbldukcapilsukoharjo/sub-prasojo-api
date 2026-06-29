@@ -14,7 +14,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
-final class PengajuanService
+class PengajuanService
 {
     public function getAjuanList(array $filters): LengthAwarePaginator
     {

@@ -11,7 +11,7 @@ use App\Models\Layanan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 
-final class SLAService
+class SLAService
 {
     /**
      * KPI Global SLA
@@ -178,7 +178,7 @@ final class SLAService
     /**
      * -- TAMBAHAN AMRU (Untuk Endpoint Export) --
      */
-    public function export(array $filters): array
+    public function export(array $filters): \Illuminate\Support\Collection
     {
         // Export mengambil semua data layanan tanpa paginasi 
         // dengan format data yang disesuaikan export.
@@ -229,6 +229,6 @@ final class SLAService
                 'aktual_rata_rata' => trim($aktualText),
                 'status_sla' => $statusSla,
             ];
-        })->toArray();
+        })->values();
     }
 }

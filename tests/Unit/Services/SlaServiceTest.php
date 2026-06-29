@@ -19,10 +19,9 @@ class SlaServiceTest extends TestCase
                 'capaian_sla_persen' => 85.5,
             ]);
 
-        $filter = new SlaFilter([]);
         $service = new SlaService();
 
-        $result = $service->getKpi($filter);
+        $result = $service->getKpi([]);
 
         $this->assertEquals('2 Jam 30 Menit', $result['rata_rata_global_text']);
         $this->assertEquals(85.5, $result['capaian_sla_persen']);

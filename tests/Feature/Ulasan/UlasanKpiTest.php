@@ -104,7 +104,7 @@ class UlasanKpiTest extends TestCase
         $user = $this->createAuthUser();
         $token = $this->getAuthToken($user);
         
-        $response = $this->getJson('/api/v1/ulasan/list', [
+        $response = $this->getJson('/api/v1/ulasan', [
             'Authorization' => "Bearer $token"
         ]);
 

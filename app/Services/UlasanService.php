@@ -9,7 +9,7 @@ use App\Models\AjuanReview;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
-final class UlasanService
+class UlasanService
 {
     public function getKpi(UlasanFilter $filter): array
     {

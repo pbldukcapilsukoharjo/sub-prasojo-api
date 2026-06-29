@@ -28,6 +28,7 @@ class ProfileTest extends TestCase
             'id' => Str::uuid(),
             'fullname' => 'Test User',
             'email' => 'testprofile@example.com',
+            'verified_at' => now(),
             'hashed_password' => Hash::make('password123'),
         ]);
 
@@ -52,6 +53,7 @@ class ProfileTest extends TestCase
             'id' => Str::uuid(),
             'fullname' => 'Test User',
             'email' => 'old@example.com',
+            'verified_at' => now(),
             'hashed_password' => Hash::make('password123'),
         ]);
 

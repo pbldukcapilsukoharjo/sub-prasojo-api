@@ -10,7 +10,7 @@ use App\Models\Ajuan;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 
-final class WilayahService
+class WilayahService
 {
     /**
      * Get Distribusi Wilayah with Pagination.
