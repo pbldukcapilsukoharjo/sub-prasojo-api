@@ -28,6 +28,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 final class LogAjuanStatus extends Model
 {
+    protected $connection = 'mysql_prasojo';
+
     protected $table = 'log_ajuan_status';
 
     protected $primaryKey = 'log_id';

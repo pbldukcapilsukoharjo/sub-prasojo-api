@@ -30,6 +30,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 final class LogProdukStatus extends Model
 {
+    protected $connection = 'mysql_prasojo';
+
     protected $table = 'log_produk_status';
 
     protected $primaryKey = 'log_id';

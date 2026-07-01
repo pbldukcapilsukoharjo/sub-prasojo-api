@@ -74,6 +74,8 @@ final class User extends Authenticatable
     // Table Configuration
     // ──────────────────────────────────────────────
 
+    protected $connection = 'mysql_prasojo';
+
     protected $table = 'user';
 
     protected $primaryKey = 'id';
