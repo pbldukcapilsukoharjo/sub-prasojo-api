@@ -45,6 +45,7 @@ class PengajuanService
         
         // 1. Chart Status (Donut Chart)
         $chartStatus = (clone $baseChartQuery)
+            ->reorder()
             ->select('lk_status as label', DB::raw('count(*) as count'))
             ->groupBy('lk_status')
             ->get()
@@ -59,6 +60,7 @@ class PengajuanService
 
         // 2. Chart Layanan (Bar Chart)
         $chartLayanan = (clone $baseChartQuery)
+            ->reorder()
             ->join('layanan', 'lembar_kerja.lk_layanan_kode', '=', 'layanan.layanan_kode')
             ->select('layanan.layanan_nama as label', DB::raw('count(lembar_kerja.lk_id) as count'))
             ->groupBy('layanan.layanan_kode', 'layanan.layanan_nama')
