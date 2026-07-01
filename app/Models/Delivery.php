@@ -37,6 +37,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 final class Delivery extends Model
 {
+    protected $connection = 'mysql_prasojo';
+
     // ──────────────────────────────────────────────
     // Constants
     // ──────────────────────────────────────────────

@@ -25,6 +25,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 final class Announcement extends Model
 {
+    protected $connection = 'mysql_prasojo';
+
     // ──────────────────────────────────────────────
     // Constants
     // ──────────────────────────────────────────────

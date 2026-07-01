@@ -26,6 +26,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 final class UserRegisterVerifyData extends Model
 {
+    protected $connection = 'mysql_prasojo';
+
     // ──────────────────────────────────────────────
     // Constants
     // ──────────────────────────────────────────────

@@ -16,6 +16,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 final class Config extends Model
 {
+    protected $connection = 'mysql_prasojo';
+
     protected $table = 'config';
 
     protected $primaryKey = 'config_id';

@@ -14,6 +14,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 final class JenisAjuan extends Model
 {
+    protected $connection = 'mysql_prasojo';
+
     protected $table = 'jenis_ajuan';
 
     protected $primaryKey = 'ja_id';

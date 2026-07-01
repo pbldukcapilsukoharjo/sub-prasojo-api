@@ -24,6 +24,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 final class MasterDataDukung extends Model
 {
+    protected $connection = 'mysql_prasojo';
+
     protected $table = 'master_data_dukung';
 
     protected $primaryKey = 'mdadu_id';

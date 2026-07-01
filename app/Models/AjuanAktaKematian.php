@@ -28,6 +28,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 final class AjuanAktaKematian extends Model
 {
+    protected $connection = 'mysql_prasojo';
+
     protected $table = 'ajuan_akta_kematian';
 
     protected $primaryKey = 'ajakem_id';

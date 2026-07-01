@@ -24,6 +24,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 final class AjuanKtpel extends Model
 {
+    protected $connection = 'mysql_prasojo';
+
     protected $table = 'ajuan_ktpel';
 
     protected $primaryKey = 'ajktpel_id';

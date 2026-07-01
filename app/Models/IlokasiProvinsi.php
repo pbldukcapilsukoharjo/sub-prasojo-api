@@ -20,6 +20,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 final class IlokasiProvinsi extends Model
 {
+    protected $connection = 'mysql_prasojo';
+
     protected $table = 'ilokasi_provinsi';
 
     protected $primaryKey = 'provinsi_id';

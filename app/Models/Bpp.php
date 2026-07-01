@@ -50,6 +50,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 final class Bpp extends Model
 {
+    protected $connection = 'mysql_prasojo';
+
     // ──────────────────────────────────────────────
     // Constants
     // ──────────────────────────────────────────────

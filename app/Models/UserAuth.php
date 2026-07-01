@@ -22,6 +22,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 final class UserAuth extends Model
 {
+    protected $connection = 'mysql_prasojo';
+
     protected $table = 'user_auth';
 
     protected $primaryKey = 'auth_id';

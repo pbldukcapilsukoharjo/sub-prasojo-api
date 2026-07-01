@@ -23,6 +23,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 final class Site extends Model
 {
+    protected $connection = 'mysql_prasojo';
+
     // ──────────────────────────────────────────────
     // Constants
     // ──────────────────────────────────────────────

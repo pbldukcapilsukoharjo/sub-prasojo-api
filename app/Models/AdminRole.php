@@ -18,6 +18,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 final class AdminRole extends Model
 {
+    protected $connection = 'mysql_prasojo';
+
     protected $table = 'admin_role';
 
     protected $primaryKey = 'admin_role_id';
