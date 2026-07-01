@@ -26,6 +26,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 final class BppTempatPemakaman extends Model
 {
+    protected $connection = 'mysql_prasojo';
+
     protected $table = 'bpp_tempat_pemakaman';
 
     protected $primaryKey = 'bpptp_id';

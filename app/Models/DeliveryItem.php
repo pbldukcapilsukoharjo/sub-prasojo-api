@@ -30,6 +30,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 final class DeliveryItem extends Model
 {
+    protected $connection = 'mysql_prasojo';
+
     protected $table = 'delivery_item';
 
     protected $primaryKey = 'delivery_item_id';

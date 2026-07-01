@@ -24,6 +24,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 final class AjuanDatang extends Model
 {
+    protected $connection = 'mysql_prasojo';
+
     protected $table = 'ajuan_datang';
 
     protected $primaryKey = 'ajd_id';

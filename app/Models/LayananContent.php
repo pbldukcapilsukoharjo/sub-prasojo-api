@@ -31,6 +31,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 final class LayananContent extends Model
 {
+    protected $connection = 'mysql_prasojo';
+
     // ──────────────────────────────────────────────
     // Constants
     // ──────────────────────────────────────────────

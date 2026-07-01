@@ -19,6 +19,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 final class DeliveryProses extends Model
 {
+    protected $connection = 'mysql_prasojo';
+
     protected $table = 'delivery_proses';
 
     protected $primaryKey = 'delivery_proses_id';

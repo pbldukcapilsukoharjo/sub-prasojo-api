@@ -25,6 +25,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 final class IlokasiKecamatan extends Model
 {
+    protected $connection = 'mysql_prasojo';
+
     protected $table = 'ilokasi_kecamatan';
 
     protected $primaryKey = 'kecamatan_id';

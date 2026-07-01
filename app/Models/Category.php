@@ -26,6 +26,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 final class Category extends Model
 {
+    protected $connection = 'mysql_prasojo';
+
     // ──────────────────────────────────────────────
     // Constants
     // ──────────────────────────────────────────────

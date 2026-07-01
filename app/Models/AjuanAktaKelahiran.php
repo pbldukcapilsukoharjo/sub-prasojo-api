@@ -30,6 +30,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 final class AjuanAktaKelahiran extends Model
 {
+    protected $connection = 'mysql_prasojo';
+
     public const string JENIS_KELAMIN_LAKI = 'LAKI-LAKI';
     public const string JENIS_KELAMIN_PEREMPUAN = 'PEREMPUAN';
 
