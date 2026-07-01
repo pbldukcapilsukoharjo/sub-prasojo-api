@@ -13,6 +13,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 final class LembarKerja extends Model
 {
+    protected $connection = 'mysql_prasojo';
+
     protected $table = 'lembar_kerja';
 
     protected $primaryKey = 'lk_id';

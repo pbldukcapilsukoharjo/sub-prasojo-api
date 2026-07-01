@@ -31,6 +31,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 final class Layanan extends Model
 {
+    protected $connection = 'mysql_prasojo';
+
     protected $table = 'layanan';
 
     protected $primaryKey = 'layanan_id';

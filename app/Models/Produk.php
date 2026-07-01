@@ -46,6 +46,8 @@ final class Produk extends Model
     // Table Configuration
     // ──────────────────────────────────────────────
 
+    protected $connection = 'mysql_prasojo';
+
     protected $table = 'produk';
 
     protected $primaryKey = 'prod_id';
