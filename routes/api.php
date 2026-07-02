@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\Api\V1\PeringkatOperatorController;
+use App\Http\Controllers\Api\V1\OperatorController;
 use App\Http\Controllers\Api\V1\DashboardController;
 use App\Http\Controllers\Api\V1\PengajuanController;
 use App\Http\Controllers\Api\V1\UlasanController;
@@ -37,11 +37,15 @@ Route::prefix('v1')->group(function () {
     | Peringkat Operator
     |--------------------------------------------------------------------------
     */
-    Route::prefix('peringkat-operator')
-        ->controller(PeringkatOperatorController::class)
+    Route::prefix('operator')
+        ->controller(OperatorController::class)
         ->group(function (): void {
-            Route::get('/', 'index')->name('api.v1.peringkat-operator.index');
-            Route::get('/{operator_id}', 'show')->name('api.v1.peringkat-operator.show');
+            Route::get('/kpi-global', 'kpiGlobal')->name('api.v1.operator.kpi-global');
+            Route::get('/export', 'export')->name('api.v1.operator.export');
+            Route::get('/peringkat', 'peringkat')->name('api.v1.operator.peringkat');
+            Route::get('/ranking', 'peringkat')->name('api.v1.operator.ranking');
+            Route::get('/{id}/kpi', 'kpi')->name('api.v1.operator.kpi');
+            Route::get('/{id}/riwayat', 'riwayat')->name('api.v1.operator.riwayat');
         });
 
     /*
@@ -61,6 +65,7 @@ Route::prefix('v1')->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::prefix('pengajuan')->controller(PengajuanController::class)->group(function () {
+        Route::get('/export', 'export')->name('api.v1.pengajuan.export');
         Route::get('/lembar-kerja', 'getLembarKerja');
         Route::get('/ajuan', 'getAjuan');
         Route::get('/produk', 'getProduk');
@@ -95,6 +100,7 @@ Route::prefix('v1')->group(function () {
     */
     Route::prefix('sla')->controller(\App\Http\Controllers\Api\V1\SLAController::class)->group(function () {
         Route::get('/', 'index');
+        Route::get('/layanan', 'index');
         Route::get('/kpi', 'kpi');
         Route::get('/export', 'export');
     });

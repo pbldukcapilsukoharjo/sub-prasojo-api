@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Requests\PeringkatOperator;
+namespace App\Http\Requests\Operator;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-final class PeringkatOperatorFilterRequest extends FormRequest
+final class OperatorFilterRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized.
@@ -22,49 +22,52 @@ final class PeringkatOperatorFilterRequest extends FormRequest
     public function rules(): array
     {
         return [
-
             'page' => [
                 'nullable',
                 'integer',
                 'min:1',
             ],
-
+            'limit' => [
+                'nullable',
+                'integer',
+                'min:1',
+            ],
             'search' => [
                 'nullable',
                 'string',
             ],
-
-            'district' => [
+            'id_kecamatan' => [
+                'nullable',
+            ],
+            'periode_bulan' => [
+                'nullable',
+                'integer',
+                'between:1,12',
+            ],
+            'sort' => [
+                'nullable',
+                'string',
+                'in:newest,oldest',
+            ],
+            'start_date' => [
+                'nullable',
+                'string', // Bisa berupa string format dd-mm-yyyy
+            ],
+            'end_date' => [
                 'nullable',
                 'string',
             ],
-
-            'period' => [
-                'nullable',
-                'in:today,this_week,this_month,this_year',
-            ],
-
-            'sort_by' => [
-                'nullable',
-                'in:newest,oldest',
-            ],
-
-            'start_date' => [
-                'nullable',
-                'date',
-            ],
-
-            'end_date' => [
-                'nullable',
-                'date',
-                'after_or_equal:start_date',
-            ],
-
-            'operator' => [
+            'id_operator' => [
                 'nullable',
                 'integer',
             ],
-
+            'tahun' => [
+                'nullable',
+                'integer',
+            ],
+            'id_layanan' => [
+                'nullable',
+            ],
         ];
     }
 }
