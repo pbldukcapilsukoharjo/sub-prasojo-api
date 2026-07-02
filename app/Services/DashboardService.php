@@ -6,7 +6,7 @@ namespace App\Services;
 
 use App\Enums\AjuanStatus;
 use App\Filters\DashboardFilter;
-use App\Models\Ajuan;
+use App\Models\Prasojo\Ajuan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 

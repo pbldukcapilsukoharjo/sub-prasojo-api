@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Filters\UlasanFilter;
-use App\Models\AjuanReview;
+use App\Models\Prasojo\AjuanReview;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 

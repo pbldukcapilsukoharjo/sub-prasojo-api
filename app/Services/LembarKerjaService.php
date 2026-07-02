@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Filters\LembarKerjaFilter;
-use App\Models\LembarKerja;
+use App\Models\Prasojo\LembarKerja;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 final class LembarKerjaService
