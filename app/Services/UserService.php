@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Models\SubUser;
+use App\Models\Monitoring\SubUser;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Hash;
 

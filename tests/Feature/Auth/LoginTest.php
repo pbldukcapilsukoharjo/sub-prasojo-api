@@ -4,7 +4,7 @@ namespace Tests\Feature\Auth;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use App\Models\SubUser;
+use App\Models\Monitoring\SubUser;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 

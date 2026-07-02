@@ -6,7 +6,7 @@ namespace App\Services;
 
 use App\Enums\AjuanStatus;
 use App\Filters\WilayahFilter;
-use App\Models\Ajuan;
+use App\Models\Prasojo\Ajuan;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 

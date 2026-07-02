@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use App\Http\Requests\Ajuan\IndexAjuanRequest;
 use App\Http\Requests\LembarKerja\IndexLembarKerjaRequest;
 use App\Http\Requests\Produk\IndexProdukRequest;
+use App\Http\Requests\Pengajuan\ExportPengajuanRequest;
 use App\Http\Responses\ApiResponse;
 
 final class PengajuanController extends Controller
@@ -49,5 +50,10 @@ final class PengajuanController extends Controller
     {
         $data = $this->service->getDetailTimeline($ajuan_id);
         return ApiResponse::success('Berhasil mengambil detail timeline pengajuan', $data);
+    }
+
+    public function export(ExportPengajuanRequest $request): \Symfony\Component\HttpFoundation\BinaryFileResponse
+    {
+        return $this->service->exportExcel($request->validated());
     }
 }

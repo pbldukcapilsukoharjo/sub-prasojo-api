@@ -29,4 +29,10 @@ final class SlaFilter extends BaseFilter
     {
         // Search spesifik tidak didefinisikan untuk SLA
     }
+
+    protected function applySorting(Builder $query): void
+    {
+        // SLA sorting is handled manually in SLAService on the collection level,
+        // so we don't apply sorting to the database query builder to avoid SQL errors.
+    }
 }

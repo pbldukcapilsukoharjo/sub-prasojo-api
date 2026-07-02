@@ -6,8 +6,8 @@ namespace App\Services;
 
 use App\Enums\AjuanStatus;
 use App\Filters\SlaFilter;
-use App\Models\Ajuan;
-use App\Models\Layanan;
+use App\Models\Prasojo\Ajuan;
+use App\Models\Prasojo\Layanan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 
@@ -151,8 +151,8 @@ class SLAService
         $detailsCollection = collect($details);
 
         match ($filters['sort_by'] ?? 'newest') {
-            'oldest' => $detailsCollection = $detailsCollection->sort_by('rata_rata_waktu')->values(),
-            default => $detailsCollection = $detailsCollection->sort_byDesc('rata_rata_waktu')->values(),
+            'oldest' => $detailsCollection = $detailsCollection->sortBy('rata_rata_waktu')->values(),
+            default => $detailsCollection = $detailsCollection->sortByDesc('rata_rata_waktu')->values(),
         };
 
         $total = $detailsCollection->count();

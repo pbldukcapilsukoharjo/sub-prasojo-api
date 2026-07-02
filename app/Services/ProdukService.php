@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Filters\ProdukFilter;
-use App\Models\Produk;
+use App\Models\Prasojo\Produk;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 final class ProdukService

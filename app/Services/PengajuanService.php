@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Models\Ajuan;
-use App\Models\LembarKerja;
-use App\Models\Produk;
+use App\Models\Prasojo\Ajuan;
+use App\Models\Prasojo\LembarKerja;
+use App\Models\Prasojo\Produk;
 use App\Filters\AjuanFilter;
 use App\Filters\LembarKerjaFilter;
 use App\Filters\ProdukFilter;
@@ -199,5 +199,19 @@ class PengajuanService
             'status' => $ajuan->ajuan_status,
             'created_at' => $ajuan->ajuan_create_datetime ? $ajuan->ajuan_create_datetime->format('Y-m-d H:i:s') : null,
         ];
+    }
+
+    /**
+     * Export master pengajuan to Excel.
+     */
+    public function exportExcel(array $filters): \Symfony\Component\HttpFoundation\BinaryFileResponse
+    {
+        $query = Ajuan::query()->with(['pelapor', 'layanan']);
+        
+        $filter = new AjuanFilter();
+        $query = $filter->applyMaster($query, $filters);
+
+        $filename = 'export_pengajuan_' . date('Ymd_His') . '.xlsx';
+        return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\PengajuanExport($query), $filename);
     }
 }
