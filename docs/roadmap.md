@@ -1,6 +1,6 @@
 # Roadmap Pengembangan Backend API
 **Proyek:** Sistem Monitoring Layanan Disdukcapil (Dashboard Eksekutif)  
-**Stack:** Laravel 12 · PHP 8.2+ · PASETO Auth · MariaDB · Redis  
+**Stack:** Laravel 12 · PHP 8.4+ · PASETO Auth · MariaDB · Redis  
 **Tanggal Disusun:** 24 Juni 2026  
 **Referensi:** [PRD.md](./PRD.md) · [database_schema.md](./database_schema.md) · [api_documentation.md](./api_documentation.md)
 

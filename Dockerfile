@@ -1,5 +1,5 @@
 # Multi-stage build for Laravel
-FROM php:8.2-fpm as base
+FROM php:8.4-fpm as base
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -29,7 +29,7 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
 # Production stage
-FROM php:8.2-fpm
+FROM php:8.4-fpm
 
 # Install runtime dependencies
 RUN apt-get update && apt-get install -y \

@@ -6,7 +6,7 @@ Backend API layanan administrasi berbasis Laravel 12 untuk pengelolaan antrean d
 
 # Tech Stack
 
-- PHP 8.2+
+- PHP 8.4+
 - Laravel 12
 - MySQL / MariaDB
 - Laravel Eloquent ORM

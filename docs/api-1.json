@@ -1,0 +1,3855 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Sub-Prasojo API",
+    "version": "2.1.2",
+    "description": "API Design untuk Dashboard Kinerja dan TAMAT"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000",
+      "description": "Local Server"
+    },
+    {
+      "url": "https://6ifb537y9e5l.mock.hoppscotch.io",
+      "description": "Mock Server"
+    },
+    {
+      "url": "https://cloud.arenakita.my.id",
+      "description": "Cloud Server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "PASETO"
+      },
+      "refreshTokenCookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "refresh_token"
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/api/v1/auth/register": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Register",
+        "description": "Mendaftarkan user baru ke dalam sistem.",
+        "security": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": "{\n  \"fullname\": \"Zangen Shiro\",\n  \"email\": \"shiro@gmail.com\",\n  \"password\": \"shiro123\"\n}\n"
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "fullname": {
+                          "type": "string"
+                        },
+                        "email": {
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "type": "string"
+                        },
+                        "created_at": {
+                          "type": "string"
+                        },
+                        "deleted_at": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "status": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "example": "{\n  \"status\": true,\n  \"code\": 201,\n  \"message\": \"Registrasi berhasil\",\n  \"data\": {\n    \"fullname\": \"Zangen Shiro\",\n    \"email\": \"shiro@gmail.com\",\n    \"updated_at\": \"2026-05-27 12:00:00\",\n    \"created_at\": \"2026-05-27 12:00:00\",\n    \"deleted_at\": null\n  }\n}\n"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": null
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 401,\n  \"message\": \"Akses ditolak. Sesi Anda tidak valid atau telah berakhir.\",\n  \"data\": null\n}\n"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/login": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Login",
+        "description": "Login user ke dalam sistem.",
+        "security": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": "{\n  \"email\": \"shiro@gmail.com\",\n  \"password\": \"shiro123\"\n}\n"
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Set-Cookie": {
+                "description": "Refresh token cookie",
+                "schema": {
+                  "type": "string",
+                  "example": "refresh_token=xxxxxxx; HttpOnly; Secure"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "access_token": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "status": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Login berhasil\",\n  \"data\": {\n    \"access_token\": \"v2.xxxxxxx\"\n  }\n}\n"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": null
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 401,\n  \"message\": \"Email atau password yang Anda masukkan salah.\",\n  \"data\": null\n}\n"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/logout": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Logout",
+        "description": "Logout dari aplikasi",
+        "security": [
+          {
+            "bearerAuth": [],
+            "refreshTokenCookie": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Logout berhasil\"\n}\n"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": null
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 401,\n  \"message\": \"Akses ditolak. Sesi Anda tidak valid atau telah berakhir.\",\n  \"data\": null\n}\n"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/refresh": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Refresh Token",
+        "description": "Mendapatkan access token baru",
+        "security": [
+          {
+            "bearerAuth": [],
+            "refreshTokenCookie": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Set-Cookie": {
+                "description": "Refresh token cookie",
+                "schema": {
+                  "type": "string",
+                  "example": "refresh_token=xxxxxxx; HttpOnly; Secure"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "access_token": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "status": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Refresh berhasil\",\n  \"data\": {\n    \"access_token\": \"v2.xxxxxxx\"\n  }\n}\n"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": null
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 401,\n  \"message\": \"Akses ditolak. Sesi Anda tidak valid atau telah berakhir.\",\n  \"data\": null\n}\n"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/forgot-password": {
+      "post": {
+        "tags": [
+          "Password"
+        ],
+        "summary": "Forgot Password",
+        "description": "Mengirimkan email untuk mengubah password",
+        "security": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": "{\n  \"email\": \"shiro@gmail.com\"\n}\n"
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Email berhasil dikirim",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Email berhasil dikirim.\"\n}\n"
+              }
+            }
+          },
+          "400": {
+            "description": "Email tidak valid atau tidak terdaftar",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": null
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 401,\n  \"message\": \"Akses ditolak. Sesi Anda tidak valid atau telah berakhir.\",\n  \"data\": null\n}\n"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/reset-password": {
+      "post": {
+        "tags": [
+          "Password"
+        ],
+        "summary": "Reset Password",
+        "description": "Mengubah password berdasarkan token yang diterima",
+        "security": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": "{\n  \"email\": \"shiro@gmail.com\",\n  \"token\": \"1234567\",\n  \"password\": \"ShiroKawaii123\",\n  \"password_confirmation\": \"ShiroKawaii123\"\n}\n"
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password berhasil diubah",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Password berhasil diubah.\"\n}\n"
+              }
+            }
+          },
+          "400": {
+            "description": "Token tidak valid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": null
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 401,\n  \"message\": \"Akses ditolak. Sesi Anda tidak valid atau telah berakhir.\",\n  \"data\": null\n}\n"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/wilayah/distribusi": {
+      "get": {
+        "tags": [
+          "Wilayah"
+        ],
+        "summary": "List Distribusi Wilayah",
+        "description": "Mendapatkan semua distribusi wilayah\n\n**Catatan:** Jika filter `kecamatan_code` (atau id_kecamatan) diterapkan, maka data yang ditampilkan adalah distribusi pada tingkat desa/kelurahan di kecamatan tersebut.",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "description": "Nomor halaman."
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Pencarian berdasarkan nama kecamatan atau nama desa."
+          },
+          {
+            "name": "id_kecamatan",
+            "in": "query",
+            "description": "Filter data berdasarkan ID kecamatan. Jika filter kecamatan diterapkan, maka akan menampilkan data desa/kelurahan.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "newest"
+            },
+            "description": "Urutan data (contoh: newest, oldest)."
+          },
+          {
+            "name": "periode_bulan",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Memfilter data berdasarkan bulan tertentu (1-12)."
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Memfilter data berdasarkan rentang tanggal spesifik (Format tanggal harus: dd-mm-yyyy)."
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Memfilter data berdasarkan rentang tanggal spesifik (Format tanggal harus: dd-mm-yyyy)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "total_kecamatan": {
+                          "type": "integer"
+                        },
+                        "total_ajuan_dokumen": {
+                          "type": "integer"
+                        },
+                        "rata_rata_ajuan": {
+                          "type": "integer"
+                        },
+                        "daftar_ajuan": {
+                          "type": "object",
+                          "properties": {
+                            "list": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "integer"
+                                  },
+                                  "desa": {
+                                    "type": "string"
+                                  },
+                                  "kecamatan": {
+                                    "type": "string"
+                                  },
+                                  "total_ajuan": {
+                                    "type": "integer"
+                                  },
+                                  "ktp-el": {
+                                    "type": "integer"
+                                  },
+                                  "kia": {
+                                    "type": "integer"
+                                  },
+                                  "akta_kelahiran": {
+                                    "type": "integer"
+                                  },
+                                  "akta_kematian": {
+                                    "type": "integer"
+                                  },
+                                  "perpindahan": {
+                                    "type": "integer"
+                                  },
+                                  "kedatangan": {
+                                    "type": "integer"
+                                  },
+                                  "update_data": {
+                                    "type": "integer"
+                                  },
+                                  "rekam_jemput_bola": {
+                                    "type": "integer"
+                                  }
+                                }
+                              }
+                            },
+                            "meta": {
+                              "type": "object",
+                              "properties": {
+                                "page": {
+                                  "type": "integer"
+                                },
+                                "per_page": {
+                                  "type": "integer"
+                                },
+                                "total": {
+                                  "type": "integer"
+                                },
+                                "total_page": {
+                                  "type": "integer"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "status": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Distribusi wilayah berhasil ditemukan\",\n  \"data\": {\n    \"total_kecamatan\": 14,\n    \"total_ajuan_dokumen\": 267,\n    \"rata_rata_ajuan\": 200,\n    \"daftar_ajuan\": {\n      \"list\": [\n        {\n          \"id\": 1,\n          \"desa\": \"Gentan\",\n          \"kecamatan\": \"Baki\",\n          \"total_ajuan\": 124,\n          \"ktp-el\": 42,\n          \"kia\": 38,\n          \"akta_kelahiran\": 17,\n          \"akta_kematian\": 12,\n          \"perpindahan\": 32,\n          \"kedatangan\": 81,\n          \"update_data\": 22,\n          \"rekam_jemput_bola\": 1\n        },\n        {\n          \"id\": 2,\n          \"desa\": \"Gentan\",\n          \"kecamatan\": \"Baki\",\n          \"total_ajuan\": 124,\n          \"ktp-el\": 42,\n          \"kia\": 38,\n          \"akta_kelahiran\": 17,\n          \"akta_kematian\": 12,\n          \"perpindahan\": 32,\n          \"kedatangan\": 81,\n          \"update_data\": 22,\n          \"rekam_jemput_bola\": 1\n        },\n        {\n          \"id\": 3,\n          \"desa\": \"Gentan\",\n          \"kecamatan\": \"Baki\",\n          \"total_ajuan\": 124,\n          \"ktp-el\": 42,\n          \"kia\": 38,\n          \"akta_kelahiran\": 17,\n          \"akta_kematian\": 12,\n          \"perpindahan\": 32,\n          \"kedatangan\": 81,\n          \"update_data\": 22,\n          \"rekam_jemput_bola\": 1\n        },\n        {\n          \"id\": 4,\n          \"desa\": \"Gentan\",\n          \"kecamatan\": \"Baki\",\n          \"total_ajuan\": 124,\n          \"ktp-el\": 42,\n          \"kia\": 38,\n          \"akta_kelahiran\": 17,\n          \"akta_kematian\": 12,\n          \"perpindahan\": 32,\n          \"kedatangan\": 81,\n          \"update_data\": 22,\n          \"rekam_jemput_bola\": 1\n        },\n        {\n          \"id\": 5,\n          \"desa\": \"Gentan\",\n          \"kecamatan\": \"Baki\",\n          \"total_ajuan\": 124,\n          \"ktp-el\": 42,\n          \"kia\": 38,\n          \"akta_kelahiran\": 17,\n          \"akta_kematian\": 12,\n          \"perpindahan\": 32,\n          \"kedatangan\": 81,\n          \"update_data\": 22,\n          \"rekam_jemput_bola\": 1\n        }\n      ],\n      \"meta\": {\n        \"page\": 1,\n        \"per_page\": 5,\n        \"total\": 20,\n        \"total_page\": 4\n      }\n    }\n  }\n}\n"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": null
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 401,\n  \"message\": \"Akses ditolak. Sesi Anda tidak valid atau telah berakhir.\",\n  \"data\": null\n}\n"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/sla": {
+      "get": {
+        "tags": [
+          "SLA"
+        ],
+        "summary": "List SLA",
+        "description": "Mendapatkan semua SLA",
+        "parameters": [
+          {
+            "name": "page",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Nomor halaman."
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Pencarian berdasarkan nama layanan."
+          },
+          {
+            "name": "id_kecamatan",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Memfilter data berdasarkan ID kecamatan."
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "newest"
+            },
+            "description": "Urutan data (contoh: newest, oldest)."
+          },
+          {
+            "name": "id_layanan",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Memfilter data berdasarkan ID layanan."
+          },
+          {
+            "name": "periode_bulan",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Memfilter data berdasarkan bulan tertentu (1-12)."
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Memfilter data berdasarkan rentang tanggal spesifik (Format tanggal harus: dd-mm-yyyy)."
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Memfilter data berdasarkan rentang tanggal spesifik (Format tanggal harus: dd-mm-yyyy)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "rata_rata_waktu_proses": {
+                          "type": "number"
+                        },
+                        "pencapaian_sla": {
+                          "type": "integer"
+                        },
+                        "target_sla": {
+                          "type": "integer"
+                        },
+                        "daftar_rincian": {
+                          "type": "object",
+                          "properties": {
+                            "list": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "integer"
+                                  },
+                                  "jenis_layanan": {
+                                    "type": "string"
+                                  },
+                                  "jumlah_ajuan": {
+                                    "type": "integer"
+                                  },
+                                  "rata_rata_waktu": {
+                                    "type": "integer"
+                                  }
+                                }
+                              }
+                            },
+                            "meta": {
+                              "type": "object",
+                              "properties": {
+                                "page": {
+                                  "type": "integer"
+                                },
+                                "per_page": {
+                                  "type": "integer"
+                                },
+                                "total": {
+                                  "type": "integer"
+                                },
+                                "total_page": {
+                                  "type": "integer"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "status": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil mendapatkan data SLA\",\n  \"data\": {\n    \"rata_rata_waktu_proses\": 8.5,\n    \"pencapaian_sla\": 92,\n    \"target_sla\": 6,\n    \"jumlah_ajuan\": 124,\n    \"daftar_rincian\": {\n      \"list\": [\n        {\n          \"id\": 1,\n          \"jenis_layanan\": \"total_ajuan\",\n          \"jumlah_ajuan\": 124,\n          \"rata_rata_waktu\": 3\n        },\n        {\n          \"id\": 2,\n          \"jenis_layanan\": \"KTP-EL\",\n          \"jumlah_ajuan\": 124,\n          \"rata_rata_waktu\": 5\n        },\n        {\n          \"id\": 3,\n          \"jenis_layanan\": \"KIA\",\n          \"jumlah_ajuan\": 124,\n          \"rata_rata_waktu\": 7\n        },\n        {\n          \"id\": 4,\n          \"jenis_layanan\": \"AKTA KELAHIRAN\",\n          \"jumlah_ajuan\": 124,\n          \"rata_rata_waktu\": 4.5\n        },\n        {\n          \"id\": 5,\n          \"jenis_layanan\": \"AKTA KEMATIAN\",\n          \"jumlah_ajuan\": 124,\n          \"rata_rata_waktu\": 4.5\n        }\n      ],\n      \"meta\": {\n        \"page\": 1,\n        \"per_page\": 5,\n        \"total\": 20,\n        \"total_page\": 4\n      }\n    }\n  }\n}\n"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": null
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 401,\n  \"message\": \"Akses ditolak. Sesi Anda tidak valid atau telah berakhir.\",\n  \"data\": null\n}\n"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/ulasan": {
+      "get": {
+        "tags": [
+          "Ulasan"
+        ],
+        "summary": "List Ulasan",
+        "description": "Mendapatkan semua ulasan",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Nomor halaman untuk paginasi (default 1).",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "description": "Pencarian berdasarkan isi ulasan atau nama pelapor.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "description": "Mengurutkan data (opsi: newest, oldest, rating_asc, rating_desc).",
+            "schema": {
+              "type": "string",
+              "default": "newest"
+            }
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "description": "Memfilter data berdasarkan rentang tanggal spesifik (Format tanggal harus: dd-mm-yyyy).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "description": "Memfilter data berdasarkan rentang tanggal spesifik (Format tanggal harus: dd-mm-yyyy).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "rating",
+            "in": "query",
+            "description": "Memfilter data berdasarkan jumlah bintang (1-5).",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "layanan_kode",
+            "in": "query",
+            "description": "Memfilter data berdasarkan jenis layanan.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "rata_rata_ulasan": {
+                          "type": "number"
+                        },
+                        "total_ulasan": {
+                          "type": "integer"
+                        },
+                        "total_rating": {
+                          "type": "object",
+                          "properties": {
+                            "1": {
+                              "type": "integer"
+                            },
+                            "2": {
+                              "type": "integer"
+                            },
+                            "3": {
+                              "type": "integer"
+                            },
+                            "4": {
+                              "type": "integer"
+                            },
+                            "5": {
+                              "type": "integer"
+                            }
+                          }
+                        },
+                        "daftar_ulasan": {
+                          "type": "object",
+                          "properties": {
+                            "list": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "integer"
+                                  },
+                                  "nama": {
+                                    "type": "string"
+                                  },
+                                  "layanan": {
+                                    "type": "string"
+                                  },
+                                  "rating": {
+                                    "type": "integer"
+                                  },
+                                  "ulasan": {
+                                    "type": "string"
+                                  },
+                                  "tanggal": {
+                                    "type": "string"
+                                  },
+                                  "waktu": {
+                                    "type": "string"
+                                  }
+                                }
+                              }
+                            },
+                            "meta": {
+                              "type": "object",
+                              "properties": {
+                                "page": {
+                                  "type": "integer"
+                                },
+                                "per_page": {
+                                  "type": "integer"
+                                },
+                                "total": {
+                                  "type": "integer"
+                                },
+                                "total_page": {
+                                  "type": "integer"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "status": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil mendapatkan ulasan\",\n  \"data\": {\n    \"rata_rata_ulasan\": 4.8,\n    \"total_ulasan\": 1234,\n    \"total_rating\": {\n      \"5\": 800,\n      \"4\": 300,\n      \"3\": 100,\n      \"2\": 50,\n      \"1\": 20\n    },\n    \"daftar_ulasan\": {\n      \"list\": [\n        {\n          \"id\": 1,\n          \"nama\": \"Anonim\",\n          \"layanan\": \"TAMAT\",\n          \"rating\": 5,\n          \"ulasan\": \"ulasan 1\",\n          \"tanggal\": \"12-10-2026\",\n          \"waktu\": \"09:45\"\n        },\n        {\n          \"id\": 2,\n          \"nama\": \"Anonim\",\n          \"layanan\": \"TAMAT\",\n          \"rating\": 4,\n          \"ulasan\": \"ulasan 2\",\n          \"tanggal\": \"12-10-2026\",\n          \"waktu\": \"10:00\"\n        },\n        {\n          \"id\": 3,\n          \"nama\": \"Anonim\",\n          \"layanan\": \"TAMAT\",\n          \"rating\": 3,\n          \"ulasan\": \"ulasan 3\",\n          \"tanggal\": \"12-10-2026\",\n          \"waktu\": \"10:30\"\n        }\n      ],\n      \"meta\": {\n        \"page\": 1,\n        \"per_page\": 5,\n        \"total\": 20,\n        \"total_page\": 4\n      }\n    }\n  }\n}\n"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": null
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 401,\n  \"message\": \"Akses ditolak. Sesi Anda tidak valid atau telah berakhir.\",\n  \"data\": null\n}\n"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/me": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Me",
+        "description": "Mendapatkan data pengguna yang sedang login",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "fullname": {
+                          "type": "string"
+                        },
+                        "email": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "status": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Data user berhasil diambil\",\n  \"data\": {\n    \"fullname\": \"Shiro\",\n    \"email\": \"shiro@gmail.com\"\n  }\n}\n"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 401,\n  \"message\": \"Akses ditolak. Sesi Anda tidak valid atau telah berakhir.\",\n  \"data\": null\n}\n"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/email/verify": {
+      "get": {
+        "tags": [
+          "Email"
+        ],
+        "summary": "Notifikasi",
+        "description": "Middleware untuk notifikasi verifikasi email yang belum terverifikasi",
+        "security": [],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": null
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 401,\n  \"message\": \"Akses ditolak. Sesi Anda tidak valid atau telah berakhir.\",\n  \"data\": null\n}\n"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": "{\n  \"code\": 403,\n  \"message\": \"Email belum diverifikasi. Silakan periksa email Anda.\"\n}\n"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/email/verify/{id}/{hash}": {
+      "get": {
+        "tags": [
+          "Email"
+        ],
+        "summary": "Verifikasi",
+        "description": "Verifikasi email berdasarkan id dan hash",
+        "security": [],
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "hash",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "Redirect ke halaman setelah verifikasi\n\nContoh:\n- Success: https://frontend.app/verify-success\n- Failure: https://frontend.app/verify-failure?message=error\n",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": null
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 401,\n  \"message\": \"Akses ditolak. Sesi Anda tidak valid atau telah berakhir.\",\n  \"data\": null\n}\n"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/email/resend": {
+      "post": {
+        "tags": [
+          "Email"
+        ],
+        "summary": "Kirim Ulang",
+        "description": "Mengirim ulang email verifikasi ke alamat email yang terdaftar",
+        "security": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": "{\n  \"email\": \"shiro@gmail.com\"\n}\n"
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Email verifikasi berhasil dikirim ulang",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Email verifikasi telah dikirim ulang.\"\n}\n"
+              }
+            }
+          },
+          "400": {
+            "description": "Email tidak valid atau tidak terdaftar",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": null
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 401,\n  \"message\": \"Akses ditolak. Sesi Anda tidak valid atau telah berakhir.\",\n  \"data\": null\n}\n"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/dashboard/kpi": {
+      "get": {
+        "tags": [
+          "Dashboard"
+        ],
+        "summary": "Dashboard",
+        "description": "Mendapatkan semua data yang diperlukan untuk dashboard",
+        "parameters": [
+          {
+            "name": "id_kecamatan",
+            "in": "query",
+            "description": "Memfilter data berdasarkan kecamatan tertentu.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "id_layanan",
+            "in": "query",
+            "description": "Memfilter data berdasarkan jenis layanan tertentu.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "periode_bulan",
+            "in": "query",
+            "description": "Memfilter data berdasarkan bulan tertentu (contoh: 1 untuk Januari, 6 untuk Juni). Data akan otomatis disaring untuk tahun saat ini.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "description": "Memfilter data berdasarkan rentang tanggal spesifik (Format tanggal harus: dd-mm-yyyy).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "description": "Memfilter data berdasarkan rentang tanggal spesifik (Format tanggal harus: dd-mm-yyyy).",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "total_pengajuan": {
+                          "type": "integer"
+                        },
+                        "total_selesai": {
+                          "type": "integer"
+                        },
+                        "total_ditolak": {
+                          "type": "integer"
+                        },
+                        "rata_rata_kepuasan": {
+                          "type": "integer"
+                        },
+                        "ajuan_bulanan": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "label": {
+                                "type": "string"
+                              },
+                              "belum_diverifikasi": {
+                                "type": "integer"
+                              },
+                              "diverifikasi": {
+                                "type": "integer"
+                              },
+                              "diproses": {
+                                "type": "integer"
+                              },
+                              "disetujui": {
+                                "type": "integer"
+                              },
+                              "ditolak": {
+                                "type": "integer"
+                              },
+                              "selesai": {
+                                "type": "integer"
+                              }
+                            }
+                          }
+                        },
+                        "distribusi_wilayah": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "integer"
+                              },
+                              "label": {
+                                "type": "string"
+                              },
+                              "value": {
+                                "type": "integer"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "status": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil mendapatkan data terbaru\",\n  \"data\": {\n    \"total_pengajuan\": 1230,\n    \"total_selesai\": 1230,\n    \"total_ditolak\": 1230,\n    \"rata_rata_kepuasan\": 90,\n    \"ajuan_bulanan\": [\n      {\n        \"label\": \"Jan\",\n        \"belum_diverifikasi\": 1,\n        \"diverifikasi\": 1,\n        \"diproses\": 1,\n        \"disetujui\": 1,\n        \"ditolak\": 1,\n        \"selesai\": 1\n      },\n      {\n        \"label\": \"Feb\",\n        \"belum_diverifikasi\": 1,\n        \"diverifikasi\": 1,\n        \"diproses\": 1,\n        \"disetujui\": 1,\n        \"ditolak\": 1,\n        \"selesai\": 1\n      },\n      {\n        \"label\": \"Mar\",\n        \"belum_diverifikasi\": 1,\n        \"diverifikasi\": 1,\n        \"diproses\": 1,\n        \"disetujui\": 1,\n        \"ditolak\": 1,\n        \"selesai\": 1\n      },\n      {\n        \"label\": \"Apr\",\n        \"belum_diverifikasi\": 1,\n        \"diverifikasi\": 1,\n        \"diproses\": 1,\n        \"disetujui\": 1,\n        \"ditolak\": 1,\n        \"selesai\": 1\n      },\n      {\n        \"label\": \"Mei\",\n        \"belum_diverifikasi\": 1,\n        \"diverifikasi\": 1,\n        \"diproses\": 1,\n        \"disetujui\": 1,\n        \"ditolak\": 1,\n        \"selesai\": 1\n      },\n      {\n        \"label\": \"Jun\",\n        \"belum_diverifikasi\": 1,\n        \"diverifikasi\": 1,\n        \"diproses\": 1,\n        \"disetujui\": 1,\n        \"ditolak\": 1,\n        \"selesai\": 1\n      },\n      {\n        \"label\": \"Jul\",\n        \"belum_diverifikasi\": 1,\n        \"diverifikasi\": 1,\n        \"diproses\": 1,\n        \"disetujui\": 1,\n        \"ditolak\": 1,\n        \"selesai\": 1\n      },\n      {\n        \"label\": \"Agu\",\n        \"belum_diverifikasi\": 1,\n        \"diverifikasi\": 1,\n        \"diproses\": 1,\n        \"disetujui\": 1,\n        \"ditolak\": 1,\n        \"selesai\": 1\n      },\n      {\n        \"label\": \"Sep\",\n        \"belum_diverifikasi\": 1,\n        \"diverifikasi\": 1,\n        \"diproses\": 1,\n        \"disetujui\": 1,\n        \"ditolak\": 1,\n        \"selesai\": 1\n      },\n      {\n        \"label\": \"Okt\",\n        \"belum_diverifikasi\": 1,\n        \"diverifikasi\": 1,\n        \"diproses\": 1,\n        \"disetujui\": 1,\n        \"ditolak\": 1,\n        \"selesai\": 1\n      },\n      {\n        \"label\": \"Nov\",\n        \"belum_diverifikasi\": 1,\n        \"diverifikasi\": 1,\n        \"diproses\": 1,\n        \"disetujui\": 1,\n        \"ditolak\": 1,\n        \"selesai\": 1\n      },\n      {\n        \"label\": \"Des\",\n        \"belum_diverifikasi\": 1,\n        \"diverifikasi\": 1,\n        \"diproses\": 1,\n        \"disetujui\": 1,\n        \"ditolak\": 1,\n        \"selesai\": 1\n      }\n    ],\n    \"distribusi_wilayah\": [\n      {\n        \"id\": 1,\n        \"label\": \"Kecamatan Situ\",\n        \"value\": 60\n      },\n      {\n        \"id\": 2,\n        \"label\": \"Kecamatan Mana\",\n        \"value\": 30\n      },\n      {\n        \"id\": 3,\n        \"label\": \"Kecamatan Sini\",\n        \"value\": 10\n      }\n    ]\n  }\n}\n"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": null
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 401,\n  \"message\": \"Akses ditolak. Sesi Anda tidak valid atau telah berakhir.\",\n  \"data\": null\n}\n"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/profile": {
+      "put": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Update Profile",
+        "description": "Memperbarui data pengguna.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "fullname": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": null
+                  }
+                },
+                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Profil berhasil diperbarui\",\n  \"data\": null\n}\n"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": null
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 401,\n  \"message\": \"Akses ditolak. Sesi Anda tidak valid atau telah berakhir.\",\n  \"data\": null\n}\n"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/pengajuan/lembar-kerja": {
+      "get": {
+        "tags": [
+          "Pengajuan"
+        ],
+        "summary": "List Lembar Kerja",
+        "description": "Menampilkan list pengajuan untuk halaman lembar kerja.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Pencarian cepat (no reg / NIK pelapor / layanan / kecamatan)"
+          },
+          {
+            "name": "kecamatan",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter kode kecamatan"
+          },
+          {
+            "name": "pelapor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter nama peran pelapor"
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Tanggal awal (format dd-mm-yyyy)"
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Tanggal akhir (format dd-mm-yyyy)"
+          },
+          {
+            "name": "periode",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter periode berdasarkan bulan (1-12)"
+          },
+          {
+            "name": "layanan",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter kode layanan"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Urutan data"
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Jumlah data per halaman paginasi"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Nomor halaman paginasi"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil mengambil data\",\n  \"data\": [\n    {\n      \"ajuan_id\": 1,\n      \"ajuan_no_reg\": \"REG-12345\",\n      \"ajuan_create_datetime\": \"2024-01-01 10:00:00\",\n      \"ajuan_status\": \"DIPROSES\",\n      \"ajuan_pelapor_role_name\": \"Online\",\n      \"ajuan_is_online\": 1,\n      \"kecamatan\": {\n         \"kecamatan_id\": 1,\n         \"kecamatan_name\": \"Klojen\"\n      },\n      \"layanan\": {\n         \"layanan_id\": 1,\n         \"layanan_name\": \"KTP Elektronik\"\n      },\n      \"pelapor\": {\n         \"user_id\": 1,\n         \"user_nik\": \"3573010000000001\",\n         \"user_nama_lengkap\": \"Budi Santoso\"\n      }\n    }\n  ],\n  \"meta\": {\n    \"page\": 1,\n    \"per_page\": 10,\n    \"total\": 100,\n    \"total_page\": 10\n  },\n  \"chart_status\": [\n    {\"status\": \"DIPROSES\", \"total\": 50},\n    {\"status\": \"DITERIMA\", \"total\": 50}\n  ],\n  \"chart_layanan\": [\n    {\"layanan\": \"KTP Elektronik\", \"total\": 100}\n  ]\n}\n"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 401,\n  \"message\": \"Akses ditolak. Sesi Anda tidak valid atau telah berakhir.\",\n  \"data\": null\n}\n"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/pengajuan/ajuan": {
+      "get": {
+        "tags": [
+          "Pengajuan"
+        ],
+        "summary": "List Ajuan",
+        "description": "Menampilkan list pengajuan untuk halaman ajuan.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Pencarian cepat (no reg / NIK pelapor / layanan / kecamatan)"
+          },
+          {
+            "name": "kecamatan",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter kode kecamatan"
+          },
+          {
+            "name": "pelapor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter nama peran pelapor"
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Tanggal awal (format dd-mm-yyyy)"
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Tanggal akhir (format dd-mm-yyyy)"
+          },
+          {
+            "name": "periode",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter periode berdasarkan bulan (1-12)"
+          },
+          {
+            "name": "layanan",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter kode layanan"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Urutan data"
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Jumlah data per halaman paginasi"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Nomor halaman paginasi"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil mengambil data\",\n  \"data\": [\n    {\n      \"ajuan_id\": 1,\n      \"ajuan_no_reg\": \"REG-12345\",\n      \"ajuan_create_datetime\": \"2024-01-01 10:00:00\",\n      \"ajuan_status\": \"MENUNGGU\",\n      \"ajuan_pelapor_role_name\": \"Online\",\n      \"ajuan_is_online\": 1,\n      \"kecamatan\": {\n         \"kecamatan_id\": 1,\n         \"kecamatan_name\": \"Klojen\"\n      },\n      \"layanan\": {\n         \"layanan_id\": 1,\n         \"layanan_name\": \"KTP Elektronik\"\n      },\n      \"pelapor\": {\n         \"user_id\": 1,\n         \"user_nik\": \"3573010000000001\",\n         \"user_nama_lengkap\": \"Budi Santoso\"\n      }\n    }\n  ],\n  \"meta\": {\n    \"page\": 1,\n    \"per_page\": 10,\n    \"total\": 100,\n    \"total_page\": 10\n  }\n}\n"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 401,\n  \"message\": \"Akses ditolak. Sesi Anda tidak valid atau telah berakhir.\",\n  \"data\": null\n}\n"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/pengajuan/produk": {
+      "get": {
+        "tags": [
+          "Pengajuan"
+        ],
+        "summary": "List Produk",
+        "description": "Menampilkan list pengajuan untuk halaman produk, dilengkapi nama identitas produk.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Pencarian cepat (no reg / layanan / kecamatan)"
+          },
+          {
+            "name": "kecamatan",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter kode kecamatan"
+          },
+          {
+            "name": "nama_identitas_produk",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Pencarian berdasarkan nama identitas produk"
+          },
+          {
+            "name": "periode",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter periode berdasarkan bulan (1-12)"
+          },
+          {
+            "name": "layanan",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter kode layanan"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Urutan data"
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Jumlah data per halaman paginasi"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Nomor halaman paginasi"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil mengambil data\",\n  \"data\": [\n    {\n      \"ajuan_id\": 1,\n      \"ajuan_no_reg\": \"REG-12345\",\n      \"ajuan_create_datetime\": \"2024-01-01 10:00:00\",\n      \"ajuan_status\": \"SELESAI\",\n      \"ajuan_is_online\": 1,\n      \"nama_identitas_produk\": \"Kartu Keluarga a.n Budi\",\n      \"kecamatan\": {\n         \"kecamatan_id\": 1,\n         \"kecamatan_name\": \"Klojen\"\n      },\n      \"layanan\": {\n         \"layanan_id\": 1,\n         \"layanan_name\": \"KTP Elektronik\"\n      }\n    }\n  ],\n  \"meta\": {\n    \"page\": 1,\n    \"per_page\": 10,\n    \"total\": 100,\n    \"total_page\": 10\n  }\n}\n"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 401,\n  \"message\": \"Akses ditolak. Sesi Anda tidak valid atau telah berakhir.\",\n  \"data\": null\n}\n"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/pengajuan/{ajuan_id}/detail": {
+      "get": {
+        "tags": [
+          "Pengajuan"
+        ],
+        "summary": "Detail Timeline Pengajuan",
+        "description": "Menampilkan detail timeline status dari sebuah pengajuan.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "ajuan_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil\",\n  \"data\": {\n    \"ajuan_id\": 1,\n    \"no_reg\": \"REG-123\",\n    \"status_saat_ini\": \"DIPROSES\",\n    \"timeline\": [\n      {\n        \"status\": \"MENUNGGU\",\n        \"note\": \"Pengajuan baru masuk\",\n        \"datetime\": \"2024-01-01 10:00:00\"\n      },\n      {\n        \"status\": \"DIPROSES\",\n        \"note\": \"Berkas sedang diverifikasi oleh petugas\",\n        \"datetime\": \"2024-01-02 11:30:00\"\n      }\n    ]\n  }\n}\n"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/pengajuan/export": {
+      "get": {
+        "tags": [
+          "Pengajuan"
+        ],
+        "summary": "Export Excel Pengajuan",
+        "description": "Mengunduh file .xlsx.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "status_kategori",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "lembar_kerja",
+                "produk",
+                "all"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": null
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 401,\n  \"message\": \"Akses ditolak. Sesi Anda tidak valid atau telah berakhir.\",\n  \"data\": null\n}\n"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/dashboard/chart-trend": {
+      "get": {
+        "tags": [
+          "Dashboard"
+        ],
+        "summary": "Dashboard Trend Chart",
+        "description": "Mengambil array pergerakan data untuk Line Chart.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id_kecamatan",
+            "in": "query",
+            "description": "Memfilter data berdasarkan kecamatan tertentu.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "id_layanan",
+            "in": "query",
+            "description": "Memfilter data berdasarkan jenis layanan tertentu.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "periode_bulan",
+            "in": "query",
+            "description": "Memfilter data berdasarkan bulan tertentu (contoh: 1 untuk Januari, 6 untuk Juni). Data akan otomatis disaring untuk tahun saat ini.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "description": "Memfilter data berdasarkan rentang tanggal spesifik (Format tanggal harus: dd-mm-yyyy).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "description": "Memfilter data berdasarkan rentang tanggal spesifik (Format tanggal harus: dd-mm-yyyy).",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil mengambil Chart Trend\",\n  \"data\": [\n    {\n      \"tanggal\": \"2026-06-25\",\n      \"total_ajuan\": 45,\n      \"belum_diverifikasi\": 5,\n      \"diverifikasi\": 10,\n      \"ditolak\": 2,\n      \"diproses\": 8,\n      \"selesai\": 15,\n      \"disetujui\": 5\n    },\n    {\n      \"tanggal\": \"2026-06-26\",\n      \"total_ajuan\": 30,\n      \"belum_diverifikasi\": 2,\n      \"diverifikasi\": 5,\n      \"ditolak\": 1,\n      \"diproses\": 10,\n      \"selesai\": 10,\n      \"disetujui\": 2\n    }\n  ]\n}\n"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": null
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 401,\n  \"message\": \"Akses ditolak. Sesi Anda tidak valid atau telah berakhir.\",\n  \"data\": null\n}\n"
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": null
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 500,\n  \"message\": \"Pesan error internal server / Message error spesifik\",\n  \"data\": null\n}\n"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/dashboard/top-wilayah": {
+      "get": {
+        "tags": [
+          "Dashboard"
+        ],
+        "summary": "Dashboard Top Wilayah",
+        "description": "Mengambil top 5 wilayah penyumbang ajuan terbanyak (Bar chart).",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id_kecamatan",
+            "in": "query",
+            "description": "Memfilter data berdasarkan kecamatan tertentu.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "id_layanan",
+            "in": "query",
+            "description": "Memfilter data berdasarkan jenis layanan tertentu.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "periode_bulan",
+            "in": "query",
+            "description": "Memfilter data berdasarkan bulan tertentu (contoh: 1 untuk Januari, 6 untuk Juni). Data akan otomatis disaring untuk tahun saat ini.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "description": "Memfilter data berdasarkan rentang tanggal spesifik (Format tanggal harus: dd-mm-yyyy).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "description": "Memfilter data berdasarkan rentang tanggal spesifik (Format tanggal harus: dd-mm-yyyy).",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil\",\n  \"data\": [\n    { \"id_kecamatan\": 1, \"nama_kecamatan\": \"Klojen\", \"total\": 4500 },\n    { \"id_kecamatan\": 2, \"nama_kecamatan\": \"Lowokwaru\", \"total\": 4000 }\n  ]\n}\n"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": null
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 401,\n  \"message\": \"Akses ditolak. Sesi Anda tidak valid atau telah berakhir.\",\n  \"data\": null\n}\n"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/operator/kpi-global": {
+      "get": {
+        "tags": [
+          "Operator"
+        ],
+        "summary": "Operator KPI Global",
+        "description": "KPI Global untuk Operator",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil\",\n  \"data\": {\n    \"total_ajuan\": 1234,\n    \"total_selesai\": 1211,\n    \"tingkat_selesai\": 98.2,\n    \"rata_rata_durasi\": 14.5\n  }\n}"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": null
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 401,\n  \"message\": \"Akses ditolak. Sesi Anda tidak valid atau telah berakhir.\",\n  \"data\": null\n}\n"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id_kecamatan",
+            "in": "query",
+            "description": "Memfilter data berdasarkan kecamatan tertentu.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "periode_bulan",
+            "in": "query",
+            "description": "Memfilter data berdasarkan bulan tertentu (contoh: 1 untuk Januari, 6 untuk Juni). Data akan otomatis disaring untuk tahun saat ini.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "description": "Memfilter data berdasarkan rentang tanggal spesifik (Format tanggal harus: dd-mm-yyyy).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "description": "Memfilter data berdasarkan rentang tanggal spesifik (Format tanggal harus: dd-mm-yyyy).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id_operator",
+            "in": "query",
+            "description": "Memfilter data berdasarkan operator tertentu.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/operator/export": {
+      "get": {
+        "tags": [
+          "Operator"
+        ],
+        "summary": "Export Ranking Operator",
+        "description": "Mengekspor tabel urutan ranking operator dalam format Excel (.xlsx).",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": null
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 401,\n  \"message\": \"Akses ditolak. Sesi Anda tidak valid atau telah berakhir.\",\n  \"data\": null\n}\n"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/wilayah/export": {
+      "get": {
+        "tags": [
+          "Wilayah"
+        ],
+        "summary": "Export Distribusi Wilayah",
+        "description": "Mengekspor tabel volume per kecamatan ke dalam file Excel (.xlsx).",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": null
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 401,\n  \"message\": \"Akses ditolak. Sesi Anda tidak valid atau telah berakhir.\",\n  \"data\": null\n}\n"
+              }
+            }
+          }
+        },
+        "parameters": []
+      }
+    },
+    "/api/v1/sla/kpi": {
+      "get": {
+        "tags": [
+          "SLA"
+        ],
+        "summary": "KPI SLA",
+        "description": "Menampilkan rata-rata proses & rasio pencapaian SLA.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id_kecamatan",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Memfilter data berdasarkan ID kecamatan."
+          },
+          {
+            "name": "id_layanan",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Memfilter data berdasarkan ID layanan."
+          },
+          {
+            "name": "periode_bulan",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Memfilter data berdasarkan bulan tertentu (1-12)."
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Memfilter data berdasarkan rentang tanggal spesifik (Format tanggal harus: dd-mm-yyyy)."
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Memfilter data berdasarkan rentang tanggal spesifik (Format tanggal harus: dd-mm-yyyy)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "code": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Berhasil"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "rata_rata_global_text": {
+                          "type": "string",
+                          "example": "6 Jam 0 Menit"
+                        },
+                        "capaian_sla_persen": {
+                          "type": "number",
+                          "example": 100
+                        },
+                        "target_sla": {
+                          "type": "integer",
+                          "example": 6,
+                          "description": "Target waktu SLA dalam jam"
+                        },
+                        "jumlah_ajuan": {
+                          "type": "integer",
+                          "example": 120,
+                          "description": "Total keseluruhan ajuan yang dilayani sampai selesai"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil\",\n  \"data\": {\n    \"rata_rata_global_text\": \"3 Jam 15 Menit\",\n    \"capaian_sla_persen\": 88.5,\n    \"target_sla\": 6,\n    \"jumlah_ajuan\": 124\n  }\n}\n"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": null
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 401,\n  \"message\": \"Akses ditolak. Sesi Anda tidak valid atau telah berakhir.\",\n  \"data\": null\n}\n"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/sla/export": {
+      "get": {
+        "tags": [
+          "SLA"
+        ],
+        "summary": "Export Tabel Komparasi Layanan",
+        "description": "Mengekspor data komparasi pemenuhan SLA layanan ke format file Excel (.xlsx).",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": null
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 401,\n  \"message\": \"Akses ditolak. Sesi Anda tidak valid atau telah berakhir.\",\n  \"data\": null\n}\n"
+              }
+            }
+          }
+        },
+        "parameters": []
+      }
+    },
+    "/api/v1/ulasan/kpi": {
+      "get": {
+        "tags": [
+          "Ulasan"
+        ],
+        "summary": "Ulasan KPI",
+        "description": "Hero score ulasan dan hitungan per bintang.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "description": "Pencarian berdasarkan isi ulasan atau nama pelapor.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "description": "Memfilter data berdasarkan rentang tanggal spesifik (Format tanggal harus: dd-mm-yyyy).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "description": "Memfilter data berdasarkan rentang tanggal spesifik (Format tanggal harus: dd-mm-yyyy).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "rating",
+            "in": "query",
+            "description": "Memfilter data berdasarkan jumlah bintang (1-5).",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "layanan_kode",
+            "in": "query",
+            "description": "Memfilter data berdasarkan jenis layanan.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil\",\n  \"data\": {\n    \"rata_rata_bintang\": 4.5,\n    \"distribusi\": {\n      \"bintang_5\": 1200,\n      \"bintang_4\": 400,\n      \"bintang_3\": 50,\n      \"bintang_2\": 10,\n      \"bintang_1\": 5\n    }\n  }\n}\n"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": null
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 401,\n  \"message\": \"Akses ditolak. Sesi Anda tidak valid atau telah berakhir.\",\n  \"data\": null\n}\n"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/ulasan/export": {
+      "get": {
+        "tags": [
+          "Ulasan"
+        ],
+        "summary": "Export Ulasan",
+        "description": "Mengunduh data ulasan dalam format Excel (.xlsx).",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": null
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 401,\n  \"message\": \"Akses ditolak. Sesi Anda tidak valid atau telah berakhir.\",\n  \"data\": null\n}\n"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/operator/peringkat": {
+      "get": {
+        "tags": [
+          "Operator"
+        ],
+        "summary": "List Peringkat Operator",
+        "description": "Mendapatkan semua peringkat operator",
+        "parameters": [
+          {
+            "name": "page",
+            "required": true,
+            "in": "query",
+            "description": "Nomor halaman untuk paginasi.",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Jumlah data per halaman.",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "description": "Pencarian berdasarkan nama operator atau NIK.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id_kecamatan",
+            "in": "query",
+            "description": "Memfilter data berdasarkan kecamatan tertentu.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "periode_bulan",
+            "in": "query",
+            "description": "Memfilter data berdasarkan bulan tertentu (contoh: 1 untuk Januari, 6 untuk Juni). Data akan otomatis disaring untuk tahun saat ini.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Mengurutkan data (default: newest).",
+            "schema": {
+              "type": "string",
+              "default": "newest"
+            }
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "description": "Memfilter data berdasarkan rentang tanggal spesifik (Format tanggal harus: dd-mm-yyyy).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "description": "Memfilter data berdasarkan rentang tanggal spesifik (Format tanggal harus: dd-mm-yyyy).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id_operator",
+            "in": "query",
+            "description": "Memfilter data berdasarkan operator tertentu.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "list": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "integer"
+                              },
+                              "peringkat": {
+                                "type": "integer"
+                              },
+                              "operator": {
+                                "type": "string"
+                              },
+                              "desa": {
+                                "type": "string"
+                              },
+                              "kecamatan": {
+                                "type": "string"
+                              },
+                              "jumlah_ajuan": {
+                                "type": "integer"
+                              }
+                            }
+                          }
+                        },
+                        "meta": {
+                          "type": "object",
+                          "properties": {
+                            "page": {
+                              "type": "integer"
+                            },
+                            "per_page": {
+                              "type": "integer"
+                            },
+                            "total": {
+                              "type": "integer"
+                            },
+                            "total_page": {
+                              "type": "integer"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil mendapatkan data operator\",\n  \"data\": {\n    \"list\": [\n      {\n        \"id\": 22,\n        \"peringkat\": 1,\n        \"operator\": \"Reza\",\n        \"desa\": \"Gentan\",\n        \"kecamatan\": \"Baki\",\n        \"jumlah_ajuan\": 124\n      },\n      {\n        \"id\": 23,\n        \"peringkat\": 2,\n        \"operator\": \"Erza\",\n        \"desa\": \"Gentan\",\n        \"kecamatan\": \"Baki\",\n        \"jumlah_ajuan\": 123\n      }\n    ],\n    \"meta\": {\n      \"page\": 1,\n      \"per_page\": 10,\n      \"total\": 20,\n      \"total_page\": 2\n    }\n  }\n}"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": null
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 401,\n  \"message\": \"Akses ditolak. Sesi Anda tidak valid atau telah berakhir.\",\n  \"data\": null\n}\n"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/operator/{id}/kpi": {
+      "get": {
+        "tags": [
+          "Operator"
+        ],
+        "summary": "Detail Operator (Chart & KPI)",
+        "description": "Mendapatkan data agregasi indikator (total ajuan, selesai) dan chart bulanan",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "tahun",
+            "required": true,
+            "in": "query",
+            "description": "Memfilter data berdasarkan tahun tertentu (Format tahun: yyyy).",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "periode_bulan",
+            "in": "query",
+            "description": "Memfilter data berdasarkan bulan tertentu (contoh: 1 untuk Januari, 6 untuk Juni). Data akan otomatis disaring untuk tahun saat ini.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "id_layanan",
+            "in": "query",
+            "description": "Memfilter data berdasarkan jenis layanan tertentu.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Detail operator berhasil ditemukan\",\n  \"data\": {\n    \"id\": 99,\n    \"nama\": \"Cynthia Glacieterna\",\n    \"total_ajuan\": 124,\n    \"total_selesai\": 98,\n    \"tingkat_selesai\": 79,\n    \"layanan_perbulan\": {\n      \"Jan\": 70,\n      \"Feb\": 20,\n      \"Mar\": 40,\n      \"Apr\": 25,\n      \"Mei\": 50,\n      \"Jun\": 10,\n      \"Jul\": 0,\n      \"Agu\": 0,\n      \"Sep\": 0,\n      \"Okt\": 0,\n      \"Nov\": 0,\n      \"Des\": 0\n    }\n  }\n}"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": null
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 401,\n  \"message\": \"Akses ditolak. Sesi Anda tidak valid atau telah berakhir.\",\n  \"data\": null\n}\n"
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object"
+                    },
+                    "status": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 404,\n  \"message\": \"Data tidak ditemukan\",\n  \"data\": null\n}\n"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/operator/{id}/riwayat": {
+      "get": {
+        "tags": [
+          "Operator"
+        ],
+        "summary": "Detail Operator (Riwayat Layanan)",
+        "description": "Mendapatkan tabel riwayat layanan dengan pagination",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "page",
+            "required": true,
+            "in": "query",
+            "description": "Nomor halaman untuk paginasi.",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Jumlah data per halaman.",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          },
+          {
+            "name": "tahun",
+            "required": true,
+            "in": "query",
+            "description": "Memfilter data berdasarkan tahun tertentu (Format tahun: yyyy).",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "periode_bulan",
+            "in": "query",
+            "description": "Memfilter data berdasarkan bulan tertentu (contoh: 1 untuk Januari, 6 untuk Juni). Data akan otomatis disaring untuk tahun saat ini.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "id_layanan",
+            "in": "query",
+            "description": "Memfilter data berdasarkan jenis layanan tertentu.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "description": "Pencarian berdasarkan nama operator atau NIK.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Riwayat operator berhasil ditemukan\",\n  \"data\": {\n    \"list\": [\n      {\n        \"id\": 1,\n        \"no_regis\": \"REG-123\",\n        \"pemohon\": \"Aslam\",\n        \"kode_ajuan\": \"KK-NEW\",\n        \"desa\": \"Baki\",\n        \"tanggal\": \"12-07-2026\",\n        \"waktu\": \"09:15\",\n        \"status\": \"DIVERIFIKASI\"\n      }\n    ],\n    \"meta\": {\n      \"page\": 1,\n      \"per_page\": 10,\n      \"total\": 5,\n      \"total_page\": 1\n    }\n  }\n}"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": null
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 401,\n  \"message\": \"Akses ditolak. Sesi Anda tidak valid atau telah berakhir.\",\n  \"data\": null\n}\n"
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object"
+                    },
+                    "status": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "example": "{\n  \"status\": false,\n  \"code\": 404,\n  \"message\": \"Data tidak ditemukan\",\n  \"data\": null\n}\n"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
