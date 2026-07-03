@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Filters\ProdukFilter;
 use App\Models\Prasojo\Produk;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Log;
 
 final class ProdukService
 {
@@ -17,30 +18,44 @@ final class ProdukService
     public function getAll(
         array $filters
     ): LengthAwarePaginator {
-        $query = Produk::query()
-            ->with([
-                'ajuan',
-                'pelapor',
+        try {
+            $query = Produk::query()
+                ->with([
+                    'ajuan',
+                    'pelapor',
+                ]);
+
+            $query = $this->filter->apply(
+                $query,
+                $filters
+            );
+
+            return $query
+                ->latest('prod_create_datetime')
+                ->paginate(10);
+        } catch (\Throwable $e) {
+            Log::error('[ProdukService@getAll] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
             ]);
-
-        $query = $this->filter->apply(
-            $query,
-            $filters
-        );
-
-        return $query
-            ->latest('prod_create_datetime')
-            ->paginate(10);
+            throw $e;
+        }
     }
 
     public function getDetail(int $produkId): Produk
     {
-        return Produk::query()
-            ->with([
-                'ajuan',
-                'pelapor',
-                'logStatuses'
-            ])
-            ->findOrFail($produkId);
+        try {
+            return Produk::query()
+                ->with([
+                    'ajuan',
+                    'pelapor',
+                    'logStatuses'
+                ])
+                ->findOrFail($produkId);
+        } catch (\Throwable $e) {
+            Log::error('[ProdukService@getDetail] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            throw $e;
+        }
     }
 }

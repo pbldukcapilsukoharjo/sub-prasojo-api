@@ -14,6 +14,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
 use App\Exports\WilayahDistribusiExport;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Illuminate\Support\Facades\Log;
 
 final class WilayahController extends Controller
 {
@@ -28,26 +29,39 @@ final class WilayahController extends Controller
      */
     public function distribusi(WilayahRequest $request): JsonResponse
     {
-        $validated = $request->validated();
-        $filter = new WilayahFilter($validated);
-        $perPage = (int) ($validated['per_page'] ?? 10);
+        try {
+            $validated = $request->validated();
+            $filter = new WilayahFilter($validated);
+            $perPage = (int) ($validated['per_page'] ?? 10);
 
-        $data = $this->wilayahService->getDistribusi($filter, $perPage);
+            $data = $this->wilayahService->getDistribusi($filter, $perPage);
 
-        return ApiResponse::paginated('Berhasil', $data);
+            return ApiResponse::paginated('Berhasil', $data);
+        } catch (\Throwable $e) {
+            Log::error('[WilayahController@distribusi] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return ApiResponse::error('Gagal mengambil data distribusi wilayah', 500, ['error' => $e->getMessage()]);
+        }
     }
 
     /**
      * @param WilayahRequest $request
-     * @return BinaryFileResponse
      */
-    public function export(WilayahRequest $request): BinaryFileResponse
+    public function export(WilayahRequest $request)
     {
-        $validated = $request->validated();
-        $filter = new WilayahFilter($validated);
-        
-        $filename = 'export_wilayah_' . Carbon::now()->format('Ymd_His') . '.xlsx';
+        try {
+            $validated = $request->validated();
+            $filter = new WilayahFilter($validated);
+            
+            $filename = 'export_wilayah_' . Carbon::now()->format('Ymd_His') . '.xlsx';
 
-        return Excel::download(new WilayahDistribusiExport($filter), $filename);
+            return Excel::download(new WilayahDistribusiExport($filter), $filename);
+        } catch (\Throwable $e) {
+            Log::error('[WilayahController@export] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return ApiResponse::error('Gagal mengekspor data wilayah', 500, ['error' => $e->getMessage()]);
+        }
     }
 }

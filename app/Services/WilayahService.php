@@ -9,6 +9,7 @@ use App\Filters\WilayahFilter;
 use App\Models\Prasojo\Ajuan;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class WilayahService
 {
@@ -21,14 +22,21 @@ class WilayahService
      */
     public function getDistribusi(WilayahFilter $filter, int $perPage = 10): LengthAwarePaginator
     {
-        $query = $this->buildDistribusiQuery($filter);
+        try {
+            $query = $this->buildDistribusiQuery($filter);
 
-        $paginator = $query->paginate($perPage);
-        $paginator->getCollection()->transform(function ($item) {
-            return $this->formatDistribusiItem($item);
-        });
+            $paginator = $query->paginate($perPage);
+            $paginator->getCollection()->transform(function ($item) {
+                return $this->formatDistribusiItem($item);
+            });
 
-        return $paginator;
+            return $paginator;
+        } catch (\Throwable $e) {
+            Log::error('[WilayahService@getDistribusi] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            throw $e;
+        }
     }
 
     /**
@@ -39,44 +47,51 @@ class WilayahService
      */
     public function buildDistribusiQuery(WilayahFilter $filter)
     {
-        $query = Ajuan::query();
-        $query = $filter->apply($query);
+        try {
+            $query = Ajuan::query();
+            $query = $filter->apply($query);
 
-        $statusSelesai = "'" . implode("','", AjuanStatus::getStatusSelesai()) . "'";
+            $statusSelesai = "'" . implode("','", AjuanStatus::getStatusSelesai()) . "'";
 
-        // Cek apakah filter id_kecamatan diterapkan
-        $isFilteredByKecamatan = request()->has('id_kecamatan') && request()->get('id_kecamatan') != '';
+            // Cek apakah filter id_kecamatan diterapkan
+            $isFilteredByKecamatan = request()->has('id_kecamatan') && request()->get('id_kecamatan') != '';
 
-        if ($isFilteredByKecamatan) {
-            $query->whereNotNull('ajuan_desa_code')
-                  ->where('ajuan_desa_code', '!=', '');
+            if ($isFilteredByKecamatan) {
+                $query->whereNotNull('ajuan_desa_code')
+                      ->where('ajuan_desa_code', '!=', '');
 
-            $query->select(
-                'ajuan_desa_code as id_wilayah',
-                'ajuan_desa_name as nama_wilayah',
-                DB::raw('COUNT(ajuan_id) as total_ajuan'),
-                DB::raw("SUM(CASE WHEN ajuan_status IN ($statusSelesai) THEN 1 ELSE 0 END) as total_selesai"),
-                DB::raw("AVG(CASE WHEN ajuan_status IN ($statusSelesai) THEN TIMESTAMPDIFF(MINUTE, ajuan_create_datetime, ajuan_update_datetime) ELSE NULL END) as rata_rata_waktu_menit")
-            )
-            ->groupBy('ajuan_desa_code', 'ajuan_desa_name')
-            ->orderBy('ajuan_desa_name', 'asc');
-        } else {
-            // Pastikan tidak ada record tanpa kode kecamatan yang masuk
-            $query->whereNotNull('ajuan_kecamatan_code')
-                  ->where('ajuan_kecamatan_code', '!=', '');
+                $query->select(
+                    'ajuan_desa_code as id_wilayah',
+                    'ajuan_desa_name as nama_wilayah',
+                    DB::raw('COUNT(ajuan_id) as total_ajuan'),
+                    DB::raw("SUM(CASE WHEN ajuan_status IN ($statusSelesai) THEN 1 ELSE 0 END) as total_selesai"),
+                    DB::raw("AVG(CASE WHEN ajuan_status IN ($statusSelesai) THEN TIMESTAMPDIFF(MINUTE, ajuan_create_datetime, ajuan_update_datetime) ELSE NULL END) as rata_rata_waktu_menit")
+                )
+                ->groupBy('ajuan_desa_code', 'ajuan_desa_name')
+                ->orderBy('ajuan_desa_name', 'asc');
+            } else {
+                // Pastikan tidak ada record tanpa kode kecamatan yang masuk
+                $query->whereNotNull('ajuan_kecamatan_code')
+                      ->where('ajuan_kecamatan_code', '!=', '');
 
-            $query->select(
-                'ajuan_kecamatan_code as id_wilayah',
-                'ajuan_kecamatan_name as nama_wilayah',
-                DB::raw('COUNT(ajuan_id) as total_ajuan'),
-                DB::raw("SUM(CASE WHEN ajuan_status IN ($statusSelesai) THEN 1 ELSE 0 END) as total_selesai"),
-                DB::raw("AVG(CASE WHEN ajuan_status IN ($statusSelesai) THEN TIMESTAMPDIFF(MINUTE, ajuan_create_datetime, ajuan_update_datetime) ELSE NULL END) as rata_rata_waktu_menit")
-            )
-            ->groupBy('ajuan_kecamatan_code', 'ajuan_kecamatan_name')
-            ->orderBy('ajuan_kecamatan_name', 'asc');
+                $query->select(
+                    'ajuan_kecamatan_code as id_wilayah',
+                    'ajuan_kecamatan_name as nama_wilayah',
+                    DB::raw('COUNT(ajuan_id) as total_ajuan'),
+                    DB::raw("SUM(CASE WHEN ajuan_status IN ($statusSelesai) THEN 1 ELSE 0 END) as total_selesai"),
+                    DB::raw("AVG(CASE WHEN ajuan_status IN ($statusSelesai) THEN TIMESTAMPDIFF(MINUTE, ajuan_create_datetime, ajuan_update_datetime) ELSE NULL END) as rata_rata_waktu_menit")
+                )
+                ->groupBy('ajuan_kecamatan_code', 'ajuan_kecamatan_name')
+                ->orderBy('ajuan_kecamatan_name', 'asc');
+            }
+
+            return $query;
+        } catch (\Throwable $e) {
+            Log::error('[WilayahService@buildDistribusiQuery] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            throw $e;
         }
-
-        return $query;
     }
 
     /**

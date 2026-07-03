@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Filters\LembarKerjaFilter;
 use App\Models\Prasojo\LembarKerja;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Log;
 
 final class LembarKerjaService
 {
@@ -17,47 +18,59 @@ final class LembarKerjaService
     public function getAll(
         array $filters
     ): LengthAwarePaginator {
+        try {
+            $query = LembarKerja::query()
+                ->with([
+                    'ajuan.pelapor',
+                    'produk',
+                ]);
 
-        $query = LembarKerja::query()
-            ->with([
-                'ajuan.pelapor',
-                'produk',
+            $query = $this->filter->apply(
+                $query,
+                $filters
+            );
+
+            $sort_by = $filters['sort_by']
+                ?? 'newest';
+
+            if ($sort_by === 'oldest') {
+
+                $query->orderBy(
+                    'lk_create_datetime',
+                    'asc'
+                );
+
+            } else {
+
+                $query->orderByDesc(
+                    'lk_create_datetime'
+                );
+            }
+
+            return $query->paginate(10);
+        } catch (\Throwable $e) {
+            Log::error('[LembarKerjaService@getAll] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
             ]);
-
-        $query = $this->filter->apply(
-            $query,
-            $filters
-        );
-
-        $sort_by = $filters['sort_by']
-            ?? 'newest';
-
-        if ($sort_by === 'oldest') {
-
-            $query->orderBy(
-                'lk_create_datetime',
-                'asc'
-            );
-
-        } else {
-
-            $query->orderByDesc(
-                'lk_create_datetime'
-            );
+            throw $e;
         }
-
-        return $query->paginate(10);
     }
 
     public function getDetail(
         int $lkId
     ): LembarKerja {
-
-        return LembarKerja::query()
-            ->with([
-                'ajuan.pelapor',
-                'produk',
-            ])
-            ->findOrFail($lkId);
+        try {
+            return LembarKerja::query()
+                ->with([
+                    'ajuan.pelapor',
+                    'produk',
+                ])
+                ->findOrFail($lkId);
+        } catch (\Throwable $e) {
+            Log::error('[LembarKerjaService@getDetail] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            throw $e;
+        }
     }
 }

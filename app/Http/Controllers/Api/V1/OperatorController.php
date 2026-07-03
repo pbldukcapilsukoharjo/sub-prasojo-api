@@ -16,6 +16,8 @@ use App\Http\Resources\Operator\OperatorRiwayatResource;
 use Illuminate\Http\JsonResponse;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Illuminate\Support\Facades\Log;
+use App\Http\Responses\ApiResponse;
 
 final class OperatorController extends Controller
 {
@@ -28,15 +30,22 @@ final class OperatorController extends Controller
      */
     public function kpiGlobal(OperatorFilterRequest $request): JsonResponse
     {
-        $filter = new OperatorFilter($request->validated());
-        $data = $this->service->getKpiGlobal($filter);
+        try {
+            $filter = new OperatorFilter($request->validated());
+            $data = $this->service->getKpiGlobal($filter);
 
-        return response()->json([
-            'status' => true,
-            'code' => 200,
-            'message' => 'Berhasil mengambil KPI global operator',
-            'data' => new OperatorKpiGlobalResource($data),
-        ]);
+            return response()->json([
+                'status' => true,
+                'code' => 200,
+                'message' => 'Berhasil mengambil KPI global operator',
+                'data' => new OperatorKpiGlobalResource($data),
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('[OperatorController@kpiGlobal] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return ApiResponse::error('Gagal mengambil KPI global operator', 500, ['error' => $e->getMessage()]);
+        }
     }
 
     /**
@@ -44,16 +53,23 @@ final class OperatorController extends Controller
      */
     public function peringkat(OperatorFilterRequest $request): JsonResponse
     {
-        $filter = new OperatorFilter($request->validated());
-        $limit = (int) $request->input('limit', 10);
-        $data = $this->service->getRanking($filter, $limit);
+        try {
+            $filter = new OperatorFilter($request->validated());
+            $limit = (int) $request->input('limit', 10);
+            $data = $this->service->getRanking($filter, $limit);
 
-        return response()->json([
-            'status' => true,
-            'code' => 200,
-            'message' => 'Berhasil mendapatkan data operator',
-            'data' => new OperatorPeringkatResource($data),
-        ]);
+            return response()->json([
+                'status' => true,
+                'code' => 200,
+                'message' => 'Berhasil mendapatkan data operator',
+                'data' => new OperatorPeringkatResource($data),
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('[OperatorController@peringkat] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return ApiResponse::error('Gagal mendapatkan peringkat operator', 500, ['error' => $e->getMessage()]);
+        }
     }
 
     /**
@@ -61,14 +77,21 @@ final class OperatorController extends Controller
      */
     public function kpi(OperatorFilterRequest $request, int $id): JsonResponse
     {
-        $data = $this->service->getDetailKpi($id, $request->validated());
+        try {
+            $data = $this->service->getDetailKpi($id, $request->validated());
 
-        return response()->json([
-            'status' => true,
-            'code' => 200,
-            'message' => 'Detail operator berhasil ditemukan',
-            'data' => new OperatorKpiDetailResource($data),
-        ]);
+            return response()->json([
+                'status' => true,
+                'code' => 200,
+                'message' => 'Detail operator berhasil ditemukan',
+                'data' => new OperatorKpiDetailResource($data),
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('[OperatorController@kpi] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return ApiResponse::error('Gagal mengambil detail operator', 500, ['error' => $e->getMessage()]);
+        }
     }
 
     /**
@@ -76,24 +99,38 @@ final class OperatorController extends Controller
      */
     public function riwayat(OperatorFilterRequest $request, int $id): JsonResponse
     {
-        $limit = (int) $request->input('limit', 10);
-        $data = $this->service->getRiwayat($id, $request->validated(), $limit);
+        try {
+            $limit = (int) $request->input('limit', 10);
+            $data = $this->service->getRiwayat($id, $request->validated(), $limit);
 
-        return response()->json([
-            'status' => true,
-            'code' => 200,
-            'message' => 'Riwayat operator berhasil ditemukan',
-            'data' => new OperatorRiwayatResource($data),
-        ]);
+            return response()->json([
+                'status' => true,
+                'code' => 200,
+                'message' => 'Riwayat operator berhasil ditemukan',
+                'data' => new OperatorRiwayatResource($data),
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('[OperatorController@riwayat] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return ApiResponse::error('Gagal mengambil riwayat operator', 500, ['error' => $e->getMessage()]);
+        }
     }
 
     /**
      * Export Ranking Operator
      */
-    public function export(OperatorFilterRequest $request): BinaryFileResponse
+    public function export(OperatorFilterRequest $request)
     {
-        $filter = new OperatorFilter($request->validated());
-        $filename = 'export_operator_' . date('Ymd_His') . '.xlsx';
-        return Excel::download(new OperatorRankingExport($filter), $filename);
+        try {
+            $filter = new OperatorFilter($request->validated());
+            $filename = 'export_operator_' . date('Ymd_His') . '.xlsx';
+            return Excel::download(new OperatorRankingExport($filter), $filename);
+        } catch (\Throwable $e) {
+            Log::error('[OperatorController@export] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return ApiResponse::error('Gagal mengekspor data operator', 500, ['error' => $e->getMessage()]);
+        }
     }
 }

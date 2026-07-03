@@ -12,6 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 final class SlaController extends Controller
 {
@@ -24,27 +25,48 @@ final class SlaController extends Controller
 
     public function kpi(Request $request): JsonResponse
     {
-        $filter = new SlaFilter($request->all());
-        $data = $this->slaService->getKpi($filter);
+        try {
+            $filter = new SlaFilter($request->all());
+            $data = $this->slaService->getKpi($filter);
 
-        return ApiResponse::success('Berhasil mengambil KPI SLA', $data);
+            return ApiResponse::success('Berhasil mengambil KPI SLA', $data);
+        } catch (\Throwable $e) {
+            Log::error('[SlaController@kpi] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return ApiResponse::error('Gagal mengambil KPI SLA', 500, ['error' => $e->getMessage()]);
+        }
     }
 
     public function layanan(Request $request): JsonResponse
     {
-        $filter = new SlaFilter($request->all());
-        $data = $this->slaService->getLayanan($filter);
+        try {
+            $filter = new SlaFilter($request->all());
+            $data = $this->slaService->getLayanan($filter);
 
-        return ApiResponse::paginated('Berhasil mengambil data komparasi layanan', $data);
+            return ApiResponse::paginated('Berhasil mengambil data komparasi layanan', $data);
+        } catch (\Throwable $e) {
+            Log::error('[SlaController@layanan] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return ApiResponse::error('Gagal mengambil data komparasi layanan', 500, ['error' => $e->getMessage()]);
+        }
     }
 
     public function export(Request $request)
     {
-        $filter = new SlaFilter($request->all());
-        $data = $this->slaService->exportLayanan($filter);
+        try {
+            $filter = new SlaFilter($request->all());
+            $data = $this->slaService->exportLayanan($filter);
 
-        $filename = 'export_sla_' . Carbon::now()->format('Ymd_His') . '.xlsx';
+            $filename = 'export_sla_' . Carbon::now()->format('Ymd_His') . '.xlsx';
 
-        return Excel::download(new SlaLayananExport($data), $filename);
+            return Excel::download(new SlaLayananExport($data), $filename);
+        } catch (\Throwable $e) {
+            Log::error('[SlaController@export] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return ApiResponse::error('Gagal mengekspor data SLA', 500, ['error' => $e->getMessage()]);
+        }
     }
 }

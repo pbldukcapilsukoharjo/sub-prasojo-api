@@ -12,6 +12,7 @@ use App\Http\Resources\Produk\ProdukDetailResource;
 use App\Services\ProdukService;
 use Illuminate\Http\JsonResponse;
 use App\Http\Responses\ApiResponse;
+use Illuminate\Support\Facades\Log;
 
 final class ProdukController extends Controller
 {
@@ -22,23 +23,37 @@ final class ProdukController extends Controller
     public function index(
         IndexProdukRequest $request
     ): JsonResponse {
-        $data = $this->service->getAll(
-            $request->validated()
-        );
+        try {
+            $data = $this->service->getAll(
+                $request->validated()
+            );
 
-        return response()->json(array_merge([
-            'status' => true,
-            'code' => 200,
-            'message' => 'Berhasil mengambil data produk',
-        ], (new ProdukCollection($data))->resolve()));
+            return response()->json(array_merge([
+                'status' => true,
+                'code' => 200,
+                'message' => 'Berhasil mengambil data produk',
+            ], (new ProdukCollection($data))->resolve()));
+        } catch (\Throwable $e) {
+            Log::error('[ProdukController@index] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return ApiResponse::error('Gagal mengambil data produk', 500, ['error' => $e->getMessage()]);
+        }
     }
 
     public function show(
         ShowProdukRequest $request,
         int $produk_id
     ): JsonResponse {
-        $data = $this->service->getDetail($produk_id);
+        try {
+            $data = $this->service->getDetail($produk_id);
 
-        return ApiResponse::success('Berhasil mengambil detail produk', new ProdukDetailResource($data));
+            return ApiResponse::success('Berhasil mengambil detail produk', new ProdukDetailResource($data));
+        } catch (\Throwable $e) {
+            Log::error('[ProdukController@show] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return ApiResponse::error('Gagal mengambil detail produk', 500, ['error' => $e->getMessage()]);
+        }
     }
 }
