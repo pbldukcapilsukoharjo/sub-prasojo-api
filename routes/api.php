@@ -38,6 +38,7 @@ Route::prefix('v1')->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::prefix('operator')
+        ->middleware('paseto.auth')
         ->controller(OperatorController::class)
         ->group(function (): void {
             Route::get('/kpi-global', 'kpiGlobal')->name('api.v1.operator.kpi-global');
@@ -53,7 +54,7 @@ Route::prefix('v1')->group(function () {
     | Dashboard
     |--------------------------------------------------------------------------
     */
-    Route::prefix('dashboard')->group(function () {
+    Route::prefix('dashboard')->middleware('paseto.auth')->group(function () {
         Route::get('/kpi', [DashboardController::class, 'kpi']);
         Route::get('/chart-trend', [DashboardController::class, 'chartTrend']);
         Route::get('/top-wilayah', [DashboardController::class, 'topWilayah']);
@@ -64,7 +65,7 @@ Route::prefix('v1')->group(function () {
     | Pengajuan (Lembar Kerja, Ajuan, Produk)
     |--------------------------------------------------------------------------
     */
-    Route::prefix('pengajuan')->controller(PengajuanController::class)->group(function () {
+    Route::prefix('pengajuan')->middleware('paseto.auth')->controller(PengajuanController::class)->group(function () {
         Route::get('/export', 'export')->name('api.v1.pengajuan.export');
         Route::get('/lembar-kerja', 'getLembarKerja');
         Route::get('/ajuan', 'getAjuan');
@@ -77,7 +78,7 @@ Route::prefix('v1')->group(function () {
     | Ulasan (Tambahan)
     |--------------------------------------------------------------------------
     */
-    Route::prefix('ulasan')->controller(UlasanController::class)->group(function () {
+    Route::prefix('ulasan')->middleware('paseto.auth')->controller(UlasanController::class)->group(function () {
         Route::get('/kpi', 'kpi');
         Route::get('/', 'index');
         Route::get('/export', 'export');
@@ -88,7 +89,7 @@ Route::prefix('v1')->group(function () {
     | Monitoring Wilayah
     |--------------------------------------------------------------------------
     */
-    Route::prefix('wilayah')->controller(\App\Http\Controllers\Api\V1\WilayahController::class)->group(function () {
+    Route::prefix('wilayah')->middleware('paseto.auth')->controller(\App\Http\Controllers\Api\V1\WilayahController::class)->group(function () {
         Route::get('/distribusi', 'distribusi');
         Route::get('/export', 'export');
     });
@@ -98,7 +99,7 @@ Route::prefix('v1')->group(function () {
     | SLA
     |--------------------------------------------------------------------------
     */
-    Route::prefix('sla')->controller(\App\Http\Controllers\Api\V1\SLAController::class)->group(function () {
+    Route::prefix('sla')->middleware('paseto.auth')->controller(\App\Http\Controllers\Api\V1\SLAController::class)->group(function () {
         Route::get('/', 'index');
         Route::get('/layanan', 'index');
         Route::get('/kpi', 'kpi');

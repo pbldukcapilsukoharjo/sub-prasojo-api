@@ -4,11 +4,14 @@ namespace Tests\Feature\Pengajuan;
 
 use App\Services\PengajuanService;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
 use Tests\TestCase;
 
 class PengajuanTest extends TestCase
 {
+    use RefreshDatabase;
+
     protected function tearDown(): void
     {
         Mockery::close();
@@ -17,6 +20,8 @@ class PengajuanTest extends TestCase
 
     public function test_get_lembar_kerja()
     {
+        $this->authenticateWithPaseto();
+
         $mockService = Mockery::mock(PengajuanService::class);
         
         $items = collect([
@@ -72,6 +77,8 @@ class PengajuanTest extends TestCase
 
     public function test_get_ajuan()
     {
+        $this->authenticateWithPaseto();
+
         $mockService = Mockery::mock(PengajuanService::class);
         
         $items = collect([
@@ -121,6 +128,8 @@ class PengajuanTest extends TestCase
 
     public function test_get_produk()
     {
+        $this->authenticateWithPaseto();
+
         $mockService = Mockery::mock(PengajuanService::class);
         
         $items = collect([
@@ -174,6 +183,8 @@ class PengajuanTest extends TestCase
 
     public function test_get_detail_timeline()
     {
+        $this->authenticateWithPaseto();
+
         $mockService = Mockery::mock(PengajuanService::class);
         
         $mockService->shouldReceive('getDetailTimeline')->once()->with(123)->andReturn([

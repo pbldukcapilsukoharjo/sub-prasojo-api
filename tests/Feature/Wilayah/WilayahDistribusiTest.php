@@ -4,11 +4,14 @@ namespace Tests\Feature\Wilayah;
 
 use App\Services\WilayahService;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
 use Tests\TestCase;
 
 class WilayahDistribusiTest extends TestCase
 {
+    use RefreshDatabase;
+
     protected function tearDown(): void
     {
         Mockery::close();
@@ -17,6 +20,8 @@ class WilayahDistribusiTest extends TestCase
 
     public function test_distribusi_endpoint()
     {
+        $this->authenticateWithPaseto();
+
         $mockService = Mockery::mock(WilayahService::class);
         
         $items = [
@@ -59,3 +64,4 @@ class WilayahDistribusiTest extends TestCase
                  ]);
     }
 }
+

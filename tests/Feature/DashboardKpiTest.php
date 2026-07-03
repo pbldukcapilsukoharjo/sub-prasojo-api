@@ -9,14 +9,24 @@ use Tests\TestCase;
 
 class DashboardKpiTest extends TestCase
 {
+    use RefreshDatabase;
+
     protected function tearDown(): void
     {
         Mockery::close();
         parent::tearDown();
     }
 
+    public function test_unauthenticated_user_cannot_access_kpi()
+    {
+        $response = $this->getJson('/api/v1/dashboard/kpi');
+        $response->assertStatus(401);
+    }
+
     public function test_kpi_endpoint_returns_valid_structure()
     {
+        $this->authenticateWithPaseto();
+
         $mockService = Mockery::mock(DashboardService::class);
         $mockService->shouldReceive('getKpi')->once()->andReturn([
             'total_pengajuan' => 100,
@@ -55,6 +65,8 @@ class DashboardKpiTest extends TestCase
 
     public function test_chart_trend_endpoint_returns_valid_structure()
     {
+        $this->authenticateWithPaseto();
+
         $mockService = Mockery::mock(DashboardService::class);
         $mockService->shouldReceive('getChartTrend')->once()->andReturn([
             [
@@ -85,6 +97,8 @@ class DashboardKpiTest extends TestCase
 
     public function test_top_wilayah_endpoint_returns_valid_structure()
     {
+        $this->authenticateWithPaseto();
+
         $mockService = Mockery::mock(DashboardService::class);
         $mockService->shouldReceive('getTopWilayah')->once()->andReturn([
             [

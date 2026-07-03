@@ -15,28 +15,6 @@ class SlaKpiTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected function getAuthToken($user)
-    {
-        $response = $this->postJson('/api/v1/auth/login', [
-            'email' => $user->email,
-            'password' => 'password123'
-        ]);
-
-        return $response->json('data.token');
-    }
-
-    protected function createAuthUser()
-    {
-        $user = SubUser::create([
-            'id' => Str::uuid(),
-            'fullname' => 'Test User SLA',
-            'email' => 'testsla@example.com',
-            'hashed_password' => Hash::make('password123'),
-        ]);
-
-        return $user;
-    }
-
     public function test_kpi_endpoint_returns_successful_response()
     {
         $this->instance(
@@ -49,12 +27,9 @@ class SlaKpiTest extends TestCase
             })
         );
 
-        $user = $this->createAuthUser();
-        $token = $this->getAuthToken($user);
+        $this->authenticateWithPaseto();
         
-        $response = $this->getJson('/api/v1/sla/kpi', [
-            'Authorization' => "Bearer $token"
-        ]);
+        $response = $this->getJson('/api/v1/sla/kpi');
 
         $response->assertStatus(200)
                  ->assertJsonStructure([
@@ -98,12 +73,9 @@ class SlaKpiTest extends TestCase
             })
         );
 
-        $user = $this->createAuthUser();
-        $token = $this->getAuthToken($user);
+        $this->authenticateWithPaseto();
         
-        $response = $this->getJson('/api/v1/sla', [
-            'Authorization' => "Bearer $token"
-        ]);
+        $response = $this->getJson('/api/v1/sla');
 
         $response->assertStatus(200)
                  ->assertJsonStructure([
@@ -153,12 +125,9 @@ class SlaKpiTest extends TestCase
             })
         );
 
-        $user = $this->createAuthUser();
-        $token = $this->getAuthToken($user);
+        $this->authenticateWithPaseto();
         
-        $response = $this->get('/api/v1/sla/export', [
-            'Authorization' => "Bearer $token"
-        ]);
+        $response = $this->get('/api/v1/sla/export');
 
         $response->assertStatus(200);
         $response->assertHeader('content-type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');

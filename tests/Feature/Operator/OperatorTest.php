@@ -5,11 +5,14 @@ namespace Tests\Feature\Operator;
 use App\Services\OperatorService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
 use Tests\TestCase;
 
 class OperatorTest extends TestCase
 {
+    use RefreshDatabase;
+
     protected function tearDown(): void
     {
         Mockery::close();
@@ -18,6 +21,8 @@ class OperatorTest extends TestCase
 
     public function test_kpi_global_endpoint()
     {
+        $this->authenticateWithPaseto();
+
         $mockService = Mockery::mock(OperatorService::class);
         $mockService->shouldReceive('getKpiGlobal')->once()->andReturn([
             'total_ajuan' => 100,
@@ -46,6 +51,8 @@ class OperatorTest extends TestCase
 
     public function test_peringkat_endpoint()
     {
+        $this->authenticateWithPaseto();
+
         $mockService = Mockery::mock(OperatorService::class);
         
         $items = collect([
@@ -94,6 +101,8 @@ class OperatorTest extends TestCase
 
     public function test_kpi_detail_endpoint()
     {
+        $this->authenticateWithPaseto();
+
         $mockService = Mockery::mock(OperatorService::class);
         $mockService->shouldReceive('getDetailKpi')->once()->with(1, Mockery::any())->andReturn([
             'id' => 1,
@@ -130,6 +139,8 @@ class OperatorTest extends TestCase
 
     public function test_riwayat_endpoint()
     {
+        $this->authenticateWithPaseto();
+
         $mockService = Mockery::mock(OperatorService::class);
         
         $items = collect([
@@ -182,6 +193,8 @@ class OperatorTest extends TestCase
 
     public function test_kpi_detail_not_found()
     {
+        $this->authenticateWithPaseto();
+
         $mockService = Mockery::mock(OperatorService::class);
         $mockService->shouldReceive('getDetailKpi')->once()->with(99999, Mockery::any())->andThrow(new ModelNotFoundException());
 
