@@ -43,6 +43,12 @@ final class ProdukFilter
         );
 
         $query->when(
+            !empty($filters['nomor_produk']),
+            fn (Builder $q) =>
+                $q->where('prod_nomor', $filters['nomor_produk'])
+        );
+
+        $query->when(
             !empty($filters['layanan']),
             fn (Builder $q) =>
                 $q->where('prod_layanan_kode', $filters['layanan'])

@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Prasojo\Ajuan;
 use App\Models\Prasojo\IlokasiKecamatan;
 use App\Models\Prasojo\Layanan;
+use App\Models\Prasojo\JenisAjuan;
 use Illuminate\Http\JsonResponse;
 
 final class FilterController extends Controller
@@ -86,6 +87,41 @@ final class FilterController extends Controller
             'code' => 200,
             'message' => 'Berhasil mengambil filter status',
             'data' => array_values($data),
+        ]);
+    }
+
+    /**
+     * Filter Jenis Ajuan
+     */
+    public function jenisAjuan(): JsonResponse
+    {
+        $data = JenisAjuan::select('ja_id as id', 'ja_judul as name')
+            ->orderBy('ja_judul')
+            ->get();
+
+        return response()->json([
+            'status' => true,
+            'code' => 200,
+            'message' => 'Berhasil mengambil filter jenis ajuan',
+            'data' => $data,
+        ]);
+    }
+
+    /**
+     * Filter Jalur
+     */
+    public function jalur(): JsonResponse
+    {
+        $data = [
+            ['id' => '1', 'name' => 'Online'],
+            ['id' => '0', 'name' => 'Offline'],
+        ];
+
+        return response()->json([
+            'status' => true,
+            'code' => 200,
+            'message' => 'Berhasil mengambil filter jalur',
+            'data' => $data,
         ]);
     }
 }

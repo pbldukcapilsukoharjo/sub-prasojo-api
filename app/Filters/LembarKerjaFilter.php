@@ -91,6 +91,29 @@ final class LembarKerjaFilter
             }
         );
 
+        $query->when(
+            !empty($filters['jenis_ajuan']),
+            fn (Builder $q) =>
+                $q->where('lk_jenis_ajuan_id', $filters['jenis_ajuan'])
+        );
+
+        $query->when(
+            isset($filters['jalur']),
+            function (Builder $q) use ($filters) {
+                $jalur = $filters['jalur'];
+                if (is_numeric($jalur)) {
+                     $q->where('lk_ajuan_is_online', $jalur);
+                } else {
+                     $jalurLower = strtolower((string)$jalur);
+                     if ($jalurLower === 'online') {
+                         $q->where('lk_ajuan_is_online', 1);
+                     } elseif ($jalurLower === 'offline') {
+                         $q->where('lk_ajuan_is_online', 0);
+                     }
+                }
+            }
+        );
+
         $pelapor = $filters['pelapor'] ?? $filters['reporter'] ?? null;
         $query->when(
             !empty($pelapor),

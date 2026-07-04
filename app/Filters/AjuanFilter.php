@@ -43,6 +43,29 @@ final class AjuanFilter
                 $q->where('ajuan_layanan_kode', $filters['layanan'])
         );
 
+        $query->when(
+            !empty($filters['jenis_ajuan']),
+            fn (Builder $q) =>
+                $q->where('ajuan_jenis_ajuan_id', $filters['jenis_ajuan'])
+        );
+
+        $query->when(
+            isset($filters['jalur']),
+            function (Builder $q) use ($filters) {
+                $jalur = $filters['jalur'];
+                if (is_numeric($jalur)) {
+                     $q->where('ajuan_is_online', $jalur);
+                } else {
+                     $jalurLower = strtolower((string)$jalur);
+                     if ($jalurLower === 'online') {
+                         $q->where('ajuan_is_online', 1);
+                     } elseif ($jalurLower === 'offline') {
+                         $q->where('ajuan_is_online', 0);
+                     }
+                }
+            }
+        );
+
         $pelapor = $filters['pelapor'] ?? $filters['reporter'] ?? null;
         $query->when(
             !empty($pelapor),
@@ -120,6 +143,24 @@ final class AjuanFilter
 
         if (!empty($filters['status'])) {
             $query->where('ajuan_status', $filters['status']);
+        }
+
+        if (!empty($filters['jenis_ajuan'])) {
+            $query->where('ajuan_jenis_ajuan_id', $filters['jenis_ajuan']);
+        }
+
+        if (isset($filters['jalur'])) {
+            $jalur = $filters['jalur'];
+            if (is_numeric($jalur)) {
+                $query->where('ajuan_is_online', $jalur);
+            } else {
+                $jalurLower = strtolower((string)$jalur);
+                if ($jalurLower === 'online') {
+                    $query->where('ajuan_is_online', 1);
+                } elseif ($jalurLower === 'offline') {
+                    $query->where('ajuan_is_online', 0);
+                }
+            }
         }
 
         if (!empty($filters['pelapor'])) {

@@ -118,5 +118,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/kecamatan', 'kecamatan');
         Route::get('/pelapor', 'pelapor');
         Route::get('/status', 'status');
+        Route::get('/jenis-ajuan', 'jenisAjuan');
+        Route::get('/jalur', 'jalur');
     });
 });
