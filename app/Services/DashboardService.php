@@ -145,10 +145,12 @@ class DashboardService
                 $statusDiverifikasi = "'" . AjuanStatus::DIVERIFIKASI . "'";
                 $statusDiproses = "'" . AjuanStatus::DIPROSES . "'";
                 $statusDisetujui = "'" . AjuanStatus::DISETUJUI . "'";
+                $statusDiajukan = "'" . AjuanStatus::DIAJUKAN . "'";
 
                 $data = $query->select(
                     DB::raw('DATE(ajuan_create_datetime) as tanggal'),
                     DB::raw('COUNT(ajuan_id) as total_ajuan'),
+                    DB::raw("SUM(CASE WHEN ajuan_status = $statusDiajukan THEN 1 ELSE 0 END) as diajukan"),
                     DB::raw("SUM(CASE WHEN ajuan_status = $statusBelumDiverifikasi THEN 1 ELSE 0 END) as belum_diverifikasi"),
                     DB::raw("SUM(CASE WHEN ajuan_status = $statusDiverifikasi THEN 1 ELSE 0 END) as diverifikasi"),
                     DB::raw("SUM(CASE WHEN ajuan_status IN ($statusDitolak) THEN 1 ELSE 0 END) as ditolak"),
@@ -160,7 +162,19 @@ class DashboardService
                 ->orderBy('tanggal', 'asc')
                 ->get();
 
-                return $data->toArray();
+                return collect($data)->map(function ($item) {
+                    return [
+                        'tanggal' => $item->tanggal,
+                        'total_ajuan' => (int) $item->total_ajuan,
+                        'diajukan' => (int) ($item->diajukan ?? 0),
+                        'belum_diverifikasi' => (int) ($item->belum_diverifikasi ?? 0),
+                        'diverifikasi' => (int) ($item->diverifikasi ?? 0),
+                        'ditolak' => (int) ($item->ditolak ?? 0),
+                        'diproses' => (int) ($item->diproses ?? 0),
+                        'selesai' => (int) ($item->selesai ?? 0),
+                        'disetujui' => (int) ($item->disetujui ?? 0),
+                    ];
+                })->toArray();
             });
         } catch (\Throwable $e) {
             Log::error('[DashboardService@getChartTrend] ' . $e->getMessage(), [
