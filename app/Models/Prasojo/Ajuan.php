@@ -64,6 +64,7 @@ final class Ajuan extends Model
     public const string STATUS_VERIFIKASI = 'VERIFIKASI';
     public const string STATUS_DIPROSES = 'DIPROSES';
     public const string STATUS_SELESAI = 'SELESAI';
+    public const string STATUS_SELESAI_DIPROSES = 'SELESAI DIPROSES';
     public const string STATUS_DITOLAK = 'DITOLAK';
     public const string STATUS_DIKOREKSI = 'DIKOREKSI';
     public const string STATUS_DIBATALKAN = 'DIBATALKAN';
@@ -73,6 +74,7 @@ final class Ajuan extends Model
         self::STATUS_VERIFIKASI,
         self::STATUS_DIPROSES,
         self::STATUS_SELESAI,
+        self::STATUS_SELESAI_DIPROSES,
         self::STATUS_DITOLAK,
         self::STATUS_DIKOREKSI,
         self::STATUS_DIBATALKAN,
@@ -299,7 +301,7 @@ final class Ajuan extends Model
      */
     public function scopeSelesai(Builder $query): Builder
     {
-        return $query->where('ajuan_status', self::STATUS_SELESAI);
+        return $query->whereIn('ajuan_status', [self::STATUS_SELESAI, self::STATUS_SELESAI_DIPROSES]);
     }
 
     /**
@@ -347,7 +349,7 @@ final class Ajuan extends Model
 
     public function isSelesai(): bool
     {
-        return $this->ajuan_status === self::STATUS_SELESAI;
+        return in_array($this->ajuan_status, [self::STATUS_SELESAI, self::STATUS_SELESAI_DIPROSES], true);
     }
 
     public function isDitolak(): bool

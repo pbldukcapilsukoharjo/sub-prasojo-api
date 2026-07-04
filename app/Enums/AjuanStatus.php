@@ -5,13 +5,14 @@ namespace App\Enums;
 class AjuanStatus
 {
     public const DIAJUKAN = 'DIAJUKAN';
-    public const BELUM_DIVERIFIKASI = 'BELUM_DIVERIFIKASI';
+    public const BELUM_DIVERIFIKASI = 'BELUM DIVERIFIKASI';
     public const DIVERIFIKASI = 'DIVERIFIKASI';
     public const DIPROSES = 'DIPROSES';
     public const MENUNGGU_KONFIRMASI = 'MENUNGGU_KONFIRMASI';
     public const DISETUJUI = 'DISETUJUI';
     public const DITOLAK = 'DITOLAK';
     public const SELESAI = 'SELESAI';
+    public const SELESAI_DIPROSES = 'SELESAI DIPROSES';
     public const DIAJUKAN_TTE = 'DIAJUKAN_TTE';
     public const TIDAK_DIPROSES = 'TIDAK_DIPROSES';
     public const SIAP_DOWNLOAD = 'SIAP_DOWNLOAD';
@@ -23,6 +24,7 @@ class AjuanStatus
     {
         return [
             self::SELESAI,
+            self::SELESAI_DIPROSES,
             self::SIAP_DOWNLOAD,
             self::SIAP_DICETAK,
             self::SUDAH_DICETAK,
