@@ -35,14 +35,8 @@ class PengajuanTest extends TestCase
                 'created_at' => '2024-01-01 08:00:00',
             ]
         ]);
-        
         $paginator = new LengthAwarePaginator($items, 1, 10, 1);
-        
-        $mockService->shouldReceive('getLembarKerjaList')->once()->andReturn([
-            'paginator' => $paginator,
-            'chart_status' => collect([['label' => 'MENUNGGU', 'value' => 1]]),
-            'chart_layanan' => collect([['label' => 'KTP-el', 'value' => 1]])
-        ]);
+        $mockService->shouldReceive('getLembarKerjaList')->once()->andReturn($paginator);
         
         $this->app->instance(PengajuanService::class, $mockService);
 
@@ -70,8 +64,33 @@ class PengajuanTest extends TestCase
                          'total',
                          'total_page',
                      ],
-                     'chart_status',
-                     'chart_layanan'
+                 ]);
+    }
+
+    public function test_get_ajuan_chart()
+    {
+        $this->authenticateWithPaseto();
+
+        $mockService = Mockery::mock(PengajuanService::class);
+        
+        $mockService->shouldReceive('getAjuanChart')->once()->andReturn([
+            'chart_status' => collect([['label' => 'MENUNGGU', 'value' => 1]]),
+            'chart_layanan' => collect([['label' => 'KTP-el', 'value' => 1]])
+        ]);
+        
+        $this->app->instance(PengajuanService::class, $mockService);
+
+        $response = $this->getJson('/api/v1/pengajuan/ajuan/chart');
+
+        $response->assertStatus(200)
+                 ->assertJsonStructure([
+                     'status',
+                     'code',
+                     'message',
+                     'data' => [
+                         'chart_status',
+                         'chart_layanan'
+                     ]
                  ]);
     }
 

@@ -40,39 +40,20 @@ class PengajuanService
         }
     }
 
-    public function getLembarKerjaList(array $filters): array
+    public function getAjuanChart(array $filters): array
     {
         try {
-            $query = LembarKerja::query()->with(['ajuan.pelapor', 'ajuan.layanan']);
+            $query = Ajuan::query();
             
-            $filter = new LembarKerjaFilter();
+            $filter = new AjuanFilter();
             $query = $filter->apply($query, $filters);
             
-            // Calculate chart data before pagination
-            // Need to clone query without eager loading for faster aggregation
-            $baseChartQuery = (clone $query)->without(['ajuan.pelapor', 'ajuan.layanan']);
+            $baseChartQuery = $query->without(['pelapor', 'layanan']);
             
-            // 1. Chart Status (Donut Chart)
             $chartStatus = (clone $baseChartQuery)
                 ->reorder()
-                ->select('lk_status as label', DB::raw('count(*) as count'))
-                ->groupBy('lk_status')
-                ->get()
-                ->map(function($item) use ($baseChartQuery) {
-                    // To get percentage, we need total
-                    // We'll calculate percentage on the frontend, just return count
-                    return [
-                        'label' => $item->label,
-                        'value' => $item->count
-                    ];
-                });
-
-            // 2. Chart Layanan (Bar Chart)
-            $chartLayanan = (clone $baseChartQuery)
-                ->reorder()
-                ->join('layanan', 'lembar_kerja.lk_layanan_kode', '=', 'layanan.layanan_kode')
-                ->select('layanan.layanan_nama as label', DB::raw('count(lembar_kerja.lk_id) as count'))
-                ->groupBy('layanan.layanan_kode', 'layanan.layanan_nama')
+                ->select('ajuan_status as label', DB::raw('count(*) as count'))
+                ->groupBy('ajuan_status')
                 ->get()
                 ->map(function($item) {
                     return [
@@ -81,6 +62,38 @@ class PengajuanService
                     ];
                 });
 
+            $chartLayanan = (clone $baseChartQuery)
+                ->reorder()
+                ->join('layanan', 'ajuan.ajuan_layanan_kode', '=', 'layanan.layanan_kode')
+                ->select('layanan.layanan_nama as label', DB::raw('count(ajuan.ajuan_id) as count'))
+                ->groupBy('layanan.layanan_kode', 'layanan.layanan_nama')
+                ->get()
+                ->map(function($item) {
+                    return [
+                        'label' => $item->label,
+                        'value' => $item->count
+                    ];
+                });
+                
+            return [
+                'chart_status' => $chartStatus,
+                'chart_layanan' => $chartLayanan
+            ];
+        } catch (\Throwable $e) {
+            Log::error('[PengajuanService@getAjuanChart] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            throw $e;
+        }
+    }
+
+    public function getLembarKerjaList(array $filters): LengthAwarePaginator
+    {
+        try {
+            $query = LembarKerja::query()->with(['ajuan.pelapor', 'ajuan.layanan']);
+            
+            $filter = new LembarKerjaFilter();
+            $query = $filter->apply($query, $filters);
             $paginator = $query->paginate((int) request('per_page', 10));
             
             $paginator->getCollection()->transform(function (LembarKerja $lk) {
@@ -100,11 +113,7 @@ class PengajuanService
                 ];
             });
 
-            return [
-                'paginator' => $paginator,
-                'chart_status' => $chartStatus,
-                'chart_layanan' => $chartLayanan
-            ];
+            return $paginator;
         } catch (\Throwable $e) {
             Log::error('[PengajuanService@getLembarKerjaList] ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),

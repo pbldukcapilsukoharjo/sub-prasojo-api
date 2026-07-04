@@ -86,6 +86,8 @@ final class OperatorController extends Controller
                 'message' => 'Detail operator berhasil ditemukan',
                 'data' => new OperatorKpiDetailResource($data),
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return ApiResponse::error('Operator tidak ditemukan', 404);
         } catch (\Throwable $e) {
             Log::error('[OperatorController@kpi] ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
@@ -109,6 +111,8 @@ final class OperatorController extends Controller
                 'message' => 'Riwayat operator berhasil ditemukan',
                 'data' => new OperatorRiwayatResource($data),
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return ApiResponse::error('Operator tidak ditemukan', 404);
         } catch (\Throwable $e) {
             Log::error('[OperatorController@riwayat] ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),

@@ -28,11 +28,7 @@ final class PengajuanController extends Controller
             
             return ApiResponse::paginated(
                 'Berhasil mengambil data lembar kerja', 
-                $result['paginator'],
-                [
-                    'chart_status' => $result['chart_status'],
-                    'chart_layanan' => $result['chart_layanan']
-                ]
+                $result
             );
         } catch (\Throwable $e) {
             Log::error('[PengajuanController@getLembarKerja] ' . $e->getMessage(), [
@@ -52,6 +48,19 @@ final class PengajuanController extends Controller
                 'trace' => $e->getTraceAsString(),
             ]);
             return ApiResponse::error('Gagal mengambil data ajuan', 500, ['error' => $e->getMessage()]);
+        }
+    }
+
+    public function getAjuanChart(IndexAjuanRequest $request): JsonResponse
+    {
+        try {
+            $data = $this->service->getAjuanChart($request->validated());
+            return ApiResponse::success('Berhasil mengambil data chart ajuan', $data);
+        } catch (\Throwable $e) {
+            Log::error('[PengajuanController@getAjuanChart] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return ApiResponse::error('Gagal mengambil data chart ajuan', 500, ['error' => $e->getMessage()]);
         }
     }
 

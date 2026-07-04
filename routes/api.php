@@ -69,6 +69,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/export', 'export')->name('api.v1.pengajuan.export');
         Route::get('/lembar-kerja', 'getLembarKerja');
         Route::get('/ajuan', 'getAjuan');
+        Route::get('/ajuan/chart', 'getAjuanChart');
         Route::get('/produk', 'getProduk');
         Route::get('/{ajuan_id}/detail', 'getDetailTimeline');
     });
