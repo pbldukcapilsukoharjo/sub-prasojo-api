@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\Api\V1\FilterController;
 use App\Http\Controllers\Api\V1\OperatorController;
 use App\Http\Controllers\Api\V1\DashboardController;
 use App\Http\Controllers\Api\V1\PengajuanController;
@@ -105,5 +106,17 @@ Route::prefix('v1')->group(function () {
         Route::get('/layanan', 'index');
         Route::get('/kpi', 'kpi');
         Route::get('/export', 'export');
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Filter Dropdown
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('filter')->middleware('paseto.auth')->controller(FilterController::class)->group(function () {
+        Route::get('/layanan', 'layanan');
+        Route::get('/kecamatan', 'kecamatan');
+        Route::get('/pelapor', 'pelapor');
+        Route::get('/status', 'status');
     });
 });

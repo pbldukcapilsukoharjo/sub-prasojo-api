@@ -57,10 +57,6 @@ final class OperatorFilterRequest extends FormRequest
                 'nullable',
                 'string',
             ],
-            'id_operator' => [
-                'nullable',
-                'integer',
-            ],
             'tahun' => [
                 'nullable',
                 'integer',

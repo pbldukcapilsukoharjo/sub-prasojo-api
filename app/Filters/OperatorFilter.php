@@ -15,10 +15,6 @@ final class OperatorFilter extends BaseFilter
     {
         parent::apply($query);
 
-        if (!empty($this->request['id_operator'])) {
-            $query->where('admin.id', (int) $this->request['id_operator']);
-        }
-
         if (!empty($this->request['id_kecamatan'])) {
             $kec = $this->request['id_kecamatan'];
             $query->where(function (Builder $builder) use ($kec) {

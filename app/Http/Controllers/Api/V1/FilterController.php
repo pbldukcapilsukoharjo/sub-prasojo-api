@@ -1,0 +1,91 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Http\Controllers\Api\V1;
+
+use App\Http\Controllers\Controller;
+use App\Models\Prasojo\Ajuan;
+use App\Models\Prasojo\IlokasiKecamatan;
+use App\Models\Prasojo\Layanan;
+use Illuminate\Http\JsonResponse;
+
+final class FilterController extends Controller
+{
+    /**
+     * Filter Layanan
+     */
+    public function layanan(): JsonResponse
+    {
+        $data = Layanan::select('layanan_kode as id', 'layanan_nama as name')
+            ->where('layanan_is_active', true)
+            ->orderBy('layanan_pos')
+            ->get();
+
+        return response()->json([
+            'status' => true,
+            'code' => 200,
+            'message' => 'Berhasil mengambil filter layanan',
+            'data' => $data,
+        ]);
+    }
+
+    /**
+     * Filter Kecamatan
+     */
+    public function kecamatan(): JsonResponse
+    {
+        // Berdasarkan IlokasiKecamatan
+        $data = IlokasiKecamatan::select('kecamatan_code as id', 'kecamatan_name as name')
+            ->orderBy('kecamatan_name')
+            ->get();
+
+        return response()->json([
+            'status' => true,
+            'code' => 200,
+            'message' => 'Berhasil mengambil filter kecamatan',
+            'data' => $data,
+        ]);
+    }
+
+    /**
+     * Filter Pelapor
+     */
+    public function pelapor(): JsonResponse
+    {
+        // Opsi statis yang di-support oleh AjuanFilter & LembarKerjaFilter
+        $data = [
+            ['id' => 'online', 'name' => 'Online'],
+            ['id' => 'offline', 'name' => 'Offline'],
+            ['id' => 'mandiri', 'name' => 'Mandiri'],
+            ['id' => 'operator', 'name' => 'Operator'],
+        ];
+
+        return response()->json([
+            'status' => true,
+            'code' => 200,
+            'message' => 'Berhasil mengambil filter pelapor',
+            'data' => $data,
+        ]);
+    }
+
+    /**
+     * Filter Status Ajuan
+     */
+    public function status(): JsonResponse
+    {
+        $data = array_map(function ($status) {
+            return [
+                'id' => $status,
+                'name' => $status,
+            ];
+        }, Ajuan::STATUSES);
+
+        return response()->json([
+            'status' => true,
+            'code' => 200,
+            'message' => 'Berhasil mengambil filter status',
+            'data' => array_values($data),
+        ]);
+    }
+}
