@@ -15,8 +15,8 @@
       "description": "Mock Server"
     },
     {
-      "url": "https://cloud.arenakita.my.id",
-      "description": "Cloud Server"
+      "url": "https://api.arenakita.my.id",
+      "description": "Production Server"
     }
   ],
   "components": {
