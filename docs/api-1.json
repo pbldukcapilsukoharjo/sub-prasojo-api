@@ -4085,7 +4085,17 @@
                     }
                   }
                 },
-                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil mengambil data filter layanan\",\n  \"data\": null\n}\n"
+                "example": {
+                  "status": true,
+                  "code": 200,
+                  "message": "Berhasil mengambil data filter layanan",
+                  "data": [
+                    {
+                      "id": "KK",
+                      "name": "Kartu Keluarga"
+                    }
+                  ]
+                }
               }
             }
           }
@@ -4138,7 +4148,17 @@
                     }
                   }
                 },
-                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil mengambil data filter kecamatan\",\n  \"data\": null\n}\n"
+                "example": {
+                  "status": true,
+                  "code": 200,
+                  "message": "Berhasil mengambil data filter kecamatan",
+                  "data": [
+                    {
+                      "id": "33.11.06",
+                      "name": "BENDOSARI"
+                    }
+                  ]
+                }
               }
             }
           }
@@ -4191,7 +4211,17 @@
                     }
                   }
                 },
-                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil mengambil data filter pelapor\",\n  \"data\": null\n}\n"
+                "example": {
+                  "status": true,
+                  "code": 200,
+                  "message": "Berhasil mengambil data filter pelapor",
+                  "data": [
+                    {
+                      "id": "mandiri",
+                      "name": "Mandiri"
+                    }
+                  ]
+                }
               }
             }
           }
@@ -4244,7 +4274,17 @@
                     }
                   }
                 },
-                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil mengambil data filter status\",\n  \"data\": null\n}\n"
+                "example": {
+                  "status": true,
+                  "code": 200,
+                  "message": "Berhasil mengambil data filter status",
+                  "data": [
+                    {
+                      "id": "MENUNGGU",
+                      "name": "MENUNGGU"
+                    }
+                  ]
+                }
               }
             }
           }
@@ -4297,7 +4337,17 @@
                     }
                   }
                 },
-                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil mengambil data ajuan\",\n  \"data\": null\n}\n"
+                "example": {
+                  "status": true,
+                  "code": 200,
+                  "message": "Berhasil mengambil data filter jenis ajuan",
+                  "data": [
+                    {
+                      "id": 1,
+                      "name": "Baru"
+                    }
+                  ]
+                }
               }
             }
           }
@@ -4350,7 +4400,17 @@
                     }
                   }
                 },
-                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil mengambil data filter jalur\",\n  \"data\": null\n}\n"
+                "example": {
+                  "status": true,
+                  "code": 200,
+                  "message": "Berhasil mengambil data filter jalur",
+                  "data": [
+                    {
+                      "id": "1",
+                      "name": "Online"
+                    }
+                  ]
+                }
               }
             }
           }
