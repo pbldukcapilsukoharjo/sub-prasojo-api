@@ -63,7 +63,8 @@
                                     "type": "object",
                                     "properties": {
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 201
                                         },
                                         "message": {
                                             "type": "string"
@@ -105,7 +106,8 @@
                                     "type": "object",
                                     "properties": {
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 400
                                         },
                                         "message": {
                                             "type": "string"
@@ -118,7 +120,7 @@
                                         }
                                     }
                                 },
-                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\n      \"Pesan error spesifik dari backend (bahasa indonesia)\"\n    ]\n  }\n}\n"
                             }
                         }
                     },
@@ -133,7 +135,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 401
                                         },
                                         "message": {
                                             "type": "string"
@@ -181,7 +184,8 @@
                                     "type": "object",
                                     "properties": {
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 200
                                         },
                                         "message": {
                                             "type": "string"
@@ -211,7 +215,8 @@
                                     "type": "object",
                                     "properties": {
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 400
                                         },
                                         "message": {
                                             "type": "string"
@@ -224,7 +229,7 @@
                                         }
                                     }
                                 },
-                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\n      \"Pesan error spesifik dari backend (bahasa indonesia)\"\n    ]\n  }\n}\n"
                             }
                         }
                     },
@@ -239,7 +244,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 401
                                         },
                                         "message": {
                                             "type": "string"
@@ -247,7 +253,7 @@
                                         "data": null
                                     }
                                 },
-                                "example": "{\n  \"status\": false,\n  \"code\": 401,\n  \"message\": \"Email atau password yang Anda masukkan salah.\",\n  \"data\": null\n}\n"
+                                "example": "{\n  \"status\": false,\n  \"code\": 401,\n  \"message\": \"Akses ditolak. Sesi Anda tidak valid atau telah berakhir.\",\n  \"data\": null\n}\n"
                             }
                         }
                     }
@@ -276,7 +282,8 @@
                                     "type": "object",
                                     "properties": {
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 200
                                         },
                                         "message": {
                                             "type": "string"
@@ -286,7 +293,7 @@
                                         }
                                     }
                                 },
-                                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Logout berhasil\"\n}\n"
+                                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Logout berhasil\",\n  \"data\": null\n}\n"
                             }
                         }
                     },
@@ -298,7 +305,8 @@
                                     "type": "object",
                                     "properties": {
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 400
                                         },
                                         "message": {
                                             "type": "string"
@@ -311,7 +319,7 @@
                                         }
                                     }
                                 },
-                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\n      \"Pesan error spesifik dari backend (bahasa indonesia)\"\n    ]\n  }\n}\n"
                             }
                         }
                     },
@@ -326,7 +334,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 401
                                         },
                                         "message": {
                                             "type": "string"
@@ -372,7 +381,8 @@
                                     "type": "object",
                                     "properties": {
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 200
                                         },
                                         "message": {
                                             "type": "string"
@@ -402,7 +412,8 @@
                                     "type": "object",
                                     "properties": {
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 400
                                         },
                                         "message": {
                                             "type": "string"
@@ -415,7 +426,7 @@
                                         }
                                     }
                                 },
-                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\n      \"Pesan error spesifik dari backend (bahasa indonesia)\"\n    ]\n  }\n}\n"
                             }
                         }
                     },
@@ -430,7 +441,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 401
                                         },
                                         "message": {
                                             "type": "string"
@@ -469,7 +481,8 @@
                                     "type": "object",
                                     "properties": {
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 200
                                         },
                                         "message": {
                                             "type": "string"
@@ -479,7 +492,7 @@
                                         }
                                     }
                                 },
-                                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Email berhasil dikirim.\"\n}\n"
+                                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Email berhasil dikirim.\",\n  \"data\": null\n}\n"
                             }
                         }
                     },
@@ -491,7 +504,8 @@
                                     "type": "object",
                                     "properties": {
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 400
                                         },
                                         "message": {
                                             "type": "string"
@@ -501,7 +515,7 @@
                                         }
                                     }
                                 },
-                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\n      \"Pesan error spesifik dari backend (bahasa indonesia)\"\n    ]\n  }\n}\n"
                             }
                         }
                     },
@@ -516,7 +530,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 401
                                         },
                                         "message": {
                                             "type": "string"
@@ -555,7 +570,8 @@
                                     "type": "object",
                                     "properties": {
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 200
                                         },
                                         "message": {
                                             "type": "string"
@@ -565,7 +581,7 @@
                                         }
                                     }
                                 },
-                                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Password berhasil diubah.\"\n}\n"
+                                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Password berhasil diubah.\",\n  \"data\": null\n}\n"
                             }
                         }
                     },
@@ -577,7 +593,8 @@
                                     "type": "object",
                                     "properties": {
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 400
                                         },
                                         "message": {
                                             "type": "string"
@@ -587,7 +604,7 @@
                                         }
                                     }
                                 },
-                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\n      \"Pesan error spesifik dari backend (bahasa indonesia)\"\n    ]\n  }\n}\n"
                             }
                         }
                     },
@@ -602,7 +619,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 401
                                         },
                                         "message": {
                                             "type": "string"
@@ -694,7 +712,8 @@
                                     "type": "object",
                                     "properties": {
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 200
                                         },
                                         "message": {
                                             "type": "string"
@@ -799,7 +818,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 400
                                         },
                                         "message": {
                                             "type": "string"
@@ -809,7 +829,7 @@
                                         }
                                     }
                                 },
-                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\n      \"Pesan error spesifik dari backend (bahasa indonesia)\"\n    ]\n  }\n}\n"
                             }
                         }
                     },
@@ -824,7 +844,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 401
                                         },
                                         "message": {
                                             "type": "string"
@@ -923,7 +944,8 @@
                                     "type": "object",
                                     "properties": {
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 200
                                         },
                                         "message": {
                                             "type": "string"
@@ -1004,7 +1026,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 400
                                         },
                                         "message": {
                                             "type": "string"
@@ -1014,7 +1037,7 @@
                                         }
                                     }
                                 },
-                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\n      \"Pesan error spesifik dari backend (bahasa indonesia)\"\n    ]\n  }\n}\n"
                             }
                         }
                     },
@@ -1029,7 +1052,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 401
                                         },
                                         "message": {
                                             "type": "string"
@@ -1121,7 +1145,8 @@
                                     "type": "object",
                                     "properties": {
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 200
                                         },
                                         "message": {
                                             "type": "string"
@@ -1213,7 +1238,7 @@
                                         }
                                     }
                                 },
-                                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil mendapatkan ulasan\",\n  \"data\": {\n    \"rata_rata_ulasan\": 4.8,\n    \"total_ulasan\": 1234,\n    \"total_rating\": {\n      \"5\": 800,\n      \"4\": 300,\n      \"3\": 100,\n      \"2\": 50,\n      \"1\": 20\n    },\n    \"daftar_ulasan\": {\n      \"list\": [\n        {\n          \"id\": 1,\n          \"nama\": \"Anonim\",\n          \"layanan\": \"TAMAT\",\n          \"rating\": 5,\n          \"ulasan\": \"ulasan 1\",\n          \"tanggal\": \"12-10-2026\",\n          \"waktu\": \"09:45\"\n        },\n        {\n          \"id\": 2,\n          \"nama\": \"Anonim\",\n          \"layanan\": \"TAMAT\",\n          \"rating\": 4,\n          \"ulasan\": \"ulasan 2\",\n          \"tanggal\": \"12-10-2026\",\n          \"waktu\": \"10:00\"\n        },\n        {\n          \"id\": 3,\n          \"nama\": \"Anonim\",\n          \"layanan\": \"TAMAT\",\n          \"rating\": 3,\n          \"ulasan\": \"ulasan 3\",\n          \"tanggal\": \"12-10-2026\",\n          \"waktu\": \"10:30\"\n        }\n      ],\n      \"meta\": {\n        \"page\": 1,\n        \"per_page\": 5,\n        \"total\": 20,\n        \"total_page\": 4\n      }\n    }\n  }\n}\n"
+                                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil mendapatkan ulasan\",\n  \"data\": {\n    \"rata_rata_ulasan\": 4.8,\n    \"total_ulasan\": 1234,\n    \"total_rating\": {\n      \"1\": 20,\n      \"2\": 50,\n      \"3\": 100,\n      \"4\": 300,\n      \"5\": 800\n    },\n    \"daftar_ulasan\": {\n      \"list\": [\n        {\n          \"id\": 1,\n          \"nama\": \"Anonim\",\n          \"layanan\": \"TAMAT\",\n          \"rating\": 5,\n          \"ulasan\": \"ulasan 1\",\n          \"tanggal\": \"12-10-2026\",\n          \"waktu\": \"09:45\"\n        },\n        {\n          \"id\": 2,\n          \"nama\": \"Anonim\",\n          \"layanan\": \"TAMAT\",\n          \"rating\": 4,\n          \"ulasan\": \"ulasan 2\",\n          \"tanggal\": \"12-10-2026\",\n          \"waktu\": \"10:00\"\n        },\n        {\n          \"id\": 3,\n          \"nama\": \"Anonim\",\n          \"layanan\": \"TAMAT\",\n          \"rating\": 3,\n          \"ulasan\": \"ulasan 3\",\n          \"tanggal\": \"12-10-2026\",\n          \"waktu\": \"10:30\"\n        }\n      ],\n      \"meta\": {\n        \"page\": 1,\n        \"per_page\": 5,\n        \"total\": 20,\n        \"total_page\": 4\n      }\n    }\n  }\n}\n"
                             }
                         }
                     },
@@ -1228,7 +1253,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 400
                                         },
                                         "message": {
                                             "type": "string"
@@ -1238,7 +1264,7 @@
                                         }
                                     }
                                 },
-                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\n      \"Pesan error spesifik dari backend (bahasa indonesia)\"\n    ]\n  }\n}\n"
                             }
                         }
                     },
@@ -1253,7 +1279,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 401
                                         },
                                         "message": {
                                             "type": "string"
@@ -1284,7 +1311,8 @@
                                     "type": "object",
                                     "properties": {
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 200
                                         },
                                         "message": {
                                             "type": "string"
@@ -1320,7 +1348,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 400
                                         },
                                         "message": {
                                             "type": "string"
@@ -1330,7 +1359,7 @@
                                         }
                                     }
                                 },
-                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\n      \"Pesan error spesifik dari backend (bahasa indonesia)\"\n    ]\n  }\n}\n"
                             }
                         }
                     },
@@ -1342,7 +1371,8 @@
                                     "type": "object",
                                     "properties": {
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 401
                                         },
                                         "message": {
                                             "type": "string"
@@ -1379,7 +1409,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 400
                                         },
                                         "message": {
                                             "type": "string"
@@ -1389,7 +1420,7 @@
                                         }
                                     }
                                 },
-                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\n      \"Pesan error spesifik dari backend (bahasa indonesia)\"\n    ]\n  }\n}\n"
                             }
                         }
                     },
@@ -1404,7 +1435,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 401
                                         },
                                         "message": {
                                             "type": "string"
@@ -1424,14 +1456,15 @@
                                     "type": "object",
                                     "properties": {
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 403
                                         },
                                         "message": {
                                             "type": "string"
                                         }
                                     }
                                 },
-                                "example": "{\n  \"code\": 403,\n  \"message\": \"Email belum diverifikasi. Silakan periksa email Anda.\"\n}\n"
+                                "example": "{\n  \"status\": false,\n  \"code\": 403,\n  \"message\": \"Akses dilarang. Anda tidak memiliki izin.\",\n  \"data\": null\n}\n"
                             }
                         }
                     }
@@ -1474,6 +1507,14 @@
                                     "format": "uri"
                                 }
                             }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                },
+                                "example": "{}\n"
+                            }
                         }
                     },
                     "400": {
@@ -1487,7 +1528,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 400
                                         },
                                         "message": {
                                             "type": "string"
@@ -1497,7 +1539,7 @@
                                         }
                                     }
                                 },
-                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\n      \"Pesan error spesifik dari backend (bahasa indonesia)\"\n    ]\n  }\n}\n"
                             }
                         }
                     },
@@ -1512,7 +1554,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 401
                                         },
                                         "message": {
                                             "type": "string"
@@ -1551,7 +1594,8 @@
                                     "type": "object",
                                     "properties": {
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 200
                                         },
                                         "message": {
                                             "type": "string"
@@ -1561,7 +1605,7 @@
                                         }
                                     }
                                 },
-                                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Email verifikasi telah dikirim ulang.\"\n}\n"
+                                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Email verifikasi telah dikirim ulang.\",\n  \"data\": null\n}\n"
                             }
                         }
                     },
@@ -1573,7 +1617,8 @@
                                     "type": "object",
                                     "properties": {
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 400
                                         },
                                         "message": {
                                             "type": "string"
@@ -1583,7 +1628,7 @@
                                         }
                                     }
                                 },
-                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\n      \"Pesan error spesifik dari backend (bahasa indonesia)\"\n    ]\n  }\n}\n"
                             }
                         }
                     },
@@ -1598,7 +1643,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 401
                                         },
                                         "message": {
                                             "type": "string"
@@ -1671,7 +1717,8 @@
                                     "type": "object",
                                     "properties": {
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 200
                                         },
                                         "message": {
                                             "type": "string"
@@ -1759,7 +1806,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 400
                                         },
                                         "message": {
                                             "type": "string"
@@ -1769,7 +1817,7 @@
                                         }
                                     }
                                 },
-                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\n      \"Pesan error spesifik dari backend (bahasa indonesia)\"\n    ]\n  }\n}\n"
                             }
                         }
                     },
@@ -1784,7 +1832,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 401
                                         },
                                         "message": {
                                             "type": "string"
@@ -1843,7 +1892,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 200
                                         },
                                         "message": {
                                             "type": "string"
@@ -1866,7 +1916,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 400
                                         },
                                         "message": {
                                             "type": "string"
@@ -1876,7 +1927,7 @@
                                         }
                                     }
                                 },
-                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\n      \"Pesan error spesifik dari backend (bahasa indonesia)\"\n    ]\n  }\n}\n"
                             }
                         }
                     },
@@ -1891,7 +1942,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 401
                                         },
                                         "message": {
                                             "type": "string"
@@ -2008,7 +2060,7 @@
                                 "schema": {
                                     "type": "object"
                                 },
-                                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil mengambil data\",\n  \"data\": [\n    {\n      \"ajuan_id\": 1,\n      \"ajuan_no_reg\": \"REG-12345\",\n      \"ajuan_create_datetime\": \"2024-01-01 10:00:00\",\n      \"ajuan_status\": \"DIPROSES\",\n      \"ajuan_pelapor_role_name\": \"Online\",\n      \"ajuan_is_online\": 1,\n      \"kecamatan\": {\n         \"kecamatan_id\": 1,\n         \"kecamatan_name\": \"Klojen\"\n      },\n      \"layanan\": {\n         \"layanan_id\": 1,\n         \"layanan_name\": \"KTP Elektronik\"\n      },\n      \"pelapor\": {\n         \"user_id\": 1,\n         \"user_nik\": \"3573010000000001\",\n         \"user_nama_lengkap\": \"Budi Santoso\"\n      }\n    }\n  ],\n  \"meta\": {\n    \"page\": 1,\n    \"per_page\": 10,\n    \"total\": 100,\n    \"total_page\": 10\n  },\n  \"chart_status\": [\n    {\"status\": \"DIPROSES\", \"total\": 50},\n    {\"status\": \"DITERIMA\", \"total\": 50}\n  ],\n  \"chart_layanan\": [\n    {\"layanan\": \"KTP Elektronik\", \"total\": 100}\n  ]\n}\n"
+                                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil mengambil data lembar kerja\",\n  \"data\": [\n    {\n      \"ajuan_id\": 1,\n      \"ajuan_no_reg\": \"REG-12345\",\n      \"ajuan_create_datetime\": \"2024-01-01 10:00:00\",\n      \"ajuan_status\": \"DIPROSES\",\n      \"ajuan_pelapor_role_name\": \"Online\",\n      \"ajuan_is_online\": 1,\n      \"kecamatan\": {\n        \"kecamatan_id\": 1,\n        \"kecamatan_name\": \"Klojen\"\n      },\n      \"layanan\": {\n        \"layanan_id\": 1,\n        \"layanan_name\": \"KTP Elektronik\"\n      },\n      \"pelapor\": {\n        \"user_id\": 1,\n        \"user_nik\": \"3573010000000001\",\n        \"user_nama_lengkap\": \"Budi Santoso\"\n      }\n    }\n  ],\n  \"meta\": {\n    \"page\": 1,\n    \"per_page\": 10,\n    \"total\": 100,\n    \"total_page\": 10\n  },\n  \"chart_status\": [\n    {\n      \"status\": \"DIPROSES\",\n      \"total\": 50\n    },\n    {\n      \"status\": \"DITERIMA\",\n      \"total\": 50\n    }\n  ],\n  \"chart_layanan\": [\n    {\n      \"layanan\": \"KTP Elektronik\",\n      \"total\": 100\n    }\n  ]\n}\n"
                             }
                         }
                     },
@@ -2019,7 +2071,7 @@
                                 "schema": {
                                     "type": "object"
                                 },
-                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\n      \"Pesan error spesifik dari backend (bahasa indonesia)\"\n    ]\n  }\n}\n"
                             }
                         }
                     },
@@ -2139,7 +2191,7 @@
                                 "schema": {
                                     "type": "object"
                                 },
-                                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil mengambil data\",\n  \"data\": [\n    {\n      \"ajuan_id\": 1,\n      \"ajuan_no_reg\": \"REG-12345\",\n      \"ajuan_create_datetime\": \"2024-01-01 10:00:00\",\n      \"ajuan_status\": \"MENUNGGU\",\n      \"ajuan_pelapor_role_name\": \"Online\",\n      \"ajuan_is_online\": 1,\n      \"kecamatan\": {\n         \"kecamatan_id\": 1,\n         \"kecamatan_name\": \"Klojen\"\n      },\n      \"layanan\": {\n         \"layanan_id\": 1,\n         \"layanan_name\": \"KTP Elektronik\"\n      },\n      \"pelapor\": {\n         \"user_id\": 1,\n         \"user_nik\": \"3573010000000001\",\n         \"user_nama_lengkap\": \"Budi Santoso\"\n      }\n    }\n  ],\n  \"meta\": {\n    \"page\": 1,\n    \"per_page\": 10,\n    \"total\": 100,\n    \"total_page\": 10\n  }\n}\n"
+                                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil mengambil data ajuan\",\n  \"data\": [\n    {\n      \"ajuan_id\": 1,\n      \"ajuan_no_reg\": \"REG-12345\",\n      \"ajuan_create_datetime\": \"2024-01-01 10:00:00\",\n      \"ajuan_status\": \"MENUNGGU\",\n      \"ajuan_pelapor_role_name\": \"Online\",\n      \"ajuan_is_online\": 1,\n      \"kecamatan\": {\n        \"kecamatan_id\": 1,\n        \"kecamatan_name\": \"Klojen\"\n      },\n      \"layanan\": {\n        \"layanan_id\": 1,\n        \"layanan_name\": \"KTP Elektronik\"\n      },\n      \"pelapor\": {\n        \"user_id\": 1,\n        \"user_nik\": \"3573010000000001\",\n        \"user_nama_lengkap\": \"Budi Santoso\"\n      }\n    }\n  ],\n  \"meta\": {\n    \"page\": 1,\n    \"per_page\": 10,\n    \"total\": 100,\n    \"total_page\": 10\n  }\n}\n"
                             }
                         }
                     },
@@ -2150,7 +2202,7 @@
                                 "schema": {
                                     "type": "object"
                                 },
-                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\n      \"Pesan error spesifik dari backend (bahasa indonesia)\"\n    ]\n  }\n}\n"
                             }
                         }
                     },
@@ -2254,7 +2306,7 @@
                                 "schema": {
                                     "type": "object"
                                 },
-                                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil mengambil data\",\n  \"data\": [\n    {\n      \"ajuan_id\": 1,\n      \"ajuan_no_reg\": \"REG-12345\",\n      \"ajuan_create_datetime\": \"2024-01-01 10:00:00\",\n      \"ajuan_status\": \"SELESAI\",\n      \"ajuan_is_online\": 1,\n      \"nama_identitas_produk\": \"Kartu Keluarga a.n Budi\",\n      \"kecamatan\": {\n         \"kecamatan_id\": 1,\n         \"kecamatan_name\": \"Klojen\"\n      },\n      \"layanan\": {\n         \"layanan_id\": 1,\n         \"layanan_name\": \"KTP Elektronik\"\n      }\n    }\n  ],\n  \"meta\": {\n    \"page\": 1,\n    \"per_page\": 10,\n    \"total\": 100,\n    \"total_page\": 10\n  }\n}\n"
+                                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil mengambil data ajuan\",\n  \"data\": [\n    {\n      \"ajuan_id\": 1,\n      \"ajuan_no_reg\": \"REG-12345\",\n      \"ajuan_create_datetime\": \"2024-01-01 10:00:00\",\n      \"ajuan_status\": \"SELESAI\",\n      \"ajuan_is_online\": 1,\n      \"nama_identitas_produk\": \"Kartu Keluarga a.n Budi\",\n      \"kecamatan\": {\n        \"kecamatan_id\": 1,\n        \"kecamatan_name\": \"Klojen\"\n      },\n      \"layanan\": {\n        \"layanan_id\": 1,\n        \"layanan_name\": \"KTP Elektronik\"\n      }\n    }\n  ],\n  \"meta\": {\n    \"page\": 1,\n    \"per_page\": 10,\n    \"total\": 100,\n    \"total_page\": 10\n  }\n}\n"
                             }
                         }
                     },
@@ -2265,7 +2317,7 @@
                                 "schema": {
                                     "type": "object"
                                 },
-                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\n      \"Pesan error spesifik dari backend (bahasa indonesia)\"\n    ]\n  }\n}\n"
                             }
                         }
                     },
@@ -2313,7 +2365,7 @@
                                 "schema": {
                                     "type": "object"
                                 },
-                                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil\",\n  \"data\": {\n    \"ajuan_id\": 1,\n    \"no_reg\": \"REG-123\",\n    \"status_saat_ini\": \"DIPROSES\",\n    \"timeline\": [\n      {\n        \"status\": \"MENUNGGU\",\n        \"note\": \"Pengajuan baru masuk\",\n        \"datetime\": \"2024-01-01 10:00:00\"\n      },\n      {\n        \"status\": \"DIPROSES\",\n        \"note\": \"Berkas sedang diverifikasi oleh petugas\",\n        \"datetime\": \"2024-01-02 11:30:00\"\n      }\n    ]\n  }\n}\n"
+                                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil mengambil data ajuan\",\n  \"data\": {\n    \"ajuan_id\": 1,\n    \"no_reg\": \"REG-123\",\n    \"status_saat_ini\": \"DIPROSES\",\n    \"timeline\": [\n      {\n        \"status\": \"MENUNGGU\",\n        \"note\": \"Pengajuan baru masuk\",\n        \"datetime\": \"2024-01-01 10:00:00\"\n      },\n      {\n        \"status\": \"DIPROSES\",\n        \"note\": \"Berkas sedang diverifikasi oleh petugas\",\n        \"datetime\": \"2024-01-02 11:30:00\"\n      }\n    ]\n  }\n}\n"
                             }
                         }
                     }
@@ -2351,11 +2403,11 @@
                     "200": {
                         "description": "OK",
                         "content": {
-                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                            "application/json": {
                                 "schema": {
-                                    "type": "string",
-                                    "format": "binary"
-                                }
+                                    "type": "object"
+                                },
+                                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil mengambil data ajuan\",\n  \"data\": null\n}\n"
                             }
                         }
                     },
@@ -2370,7 +2422,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 400
                                         },
                                         "message": {
                                             "type": "string"
@@ -2380,7 +2433,7 @@
                                         }
                                     }
                                 },
-                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\n      \"Pesan error spesifik dari backend (bahasa indonesia)\"\n    ]\n  }\n}\n"
                             }
                         }
                     },
@@ -2395,7 +2448,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 401
                                         },
                                         "message": {
                                             "type": "string"
@@ -2487,7 +2541,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 400
                                         },
                                         "message": {
                                             "type": "string"
@@ -2497,7 +2552,7 @@
                                         }
                                     }
                                 },
-                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\n      \"Pesan error spesifik dari backend (bahasa indonesia)\"\n    ]\n  }\n}\n"
                             }
                         }
                     },
@@ -2512,7 +2567,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 401
                                         },
                                         "message": {
                                             "type": "string"
@@ -2535,7 +2591,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 500
                                         },
                                         "message": {
                                             "type": "string"
@@ -2543,7 +2600,7 @@
                                         "data": null
                                     }
                                 },
-                                "example": "{\n  \"status\": false,\n  \"code\": 500,\n  \"message\": \"Pesan error internal server / Message error spesifik\",\n  \"data\": null\n}\n"
+                                "example": "{\n  \"status\": false,\n  \"code\": 500,\n  \"message\": \"Terjadi kesalahan pada server.\",\n  \"data\": {\n    \"error\": \"Pesan error internal (hanya tampil di mode debug/development)\"\n  }\n}\n"
                             }
                         }
                     }
@@ -2612,7 +2669,7 @@
                                 "schema": {
                                     "type": "object"
                                 },
-                                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil\",\n  \"data\": [\n    { \"id_kecamatan\": 1, \"nama_kecamatan\": \"Klojen\", \"total\": 4500 },\n    { \"id_kecamatan\": 2, \"nama_kecamatan\": \"Lowokwaru\", \"total\": 4000 }\n  ]\n}\n"
+                                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil mengambil data top wilayah\",\n  \"data\": [\n    {\n      \"id_kecamatan\": 1,\n      \"nama_kecamatan\": \"Klojen\",\n      \"total\": 4500\n    },\n    {\n      \"id_kecamatan\": 2,\n      \"nama_kecamatan\": \"Lowokwaru\",\n      \"total\": 4000\n    }\n  ]\n}\n"
                             }
                         }
                     },
@@ -2627,7 +2684,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 400
                                         },
                                         "message": {
                                             "type": "string"
@@ -2637,7 +2695,7 @@
                                         }
                                     }
                                 },
-                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\n      \"Pesan error spesifik dari backend (bahasa indonesia)\"\n    ]\n  }\n}\n"
                             }
                         }
                     },
@@ -2652,7 +2710,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 401
                                         },
                                         "message": {
                                             "type": "string"
@@ -2687,7 +2746,7 @@
                                 "schema": {
                                     "type": "object"
                                 },
-                                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil\",\n  \"data\": {\n    \"total_ajuan\": 1234,\n    \"total_selesai\": 1211,\n    \"tingkat_selesai\": 98.2,\n    \"rata_rata_durasi\": 14.5\n  }\n}"
+                                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil mengambil data KPI global operator\",\n  \"data\": {\n    \"total_ajuan\": 1234,\n    \"total_selesai\": 1211,\n    \"tingkat_selesai\": 98.2,\n    \"rata_rata_durasi\": 14.5\n  }\n}\n"
                             }
                         }
                     },
@@ -2702,7 +2761,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 400
                                         },
                                         "message": {
                                             "type": "string"
@@ -2712,7 +2772,7 @@
                                         }
                                     }
                                 },
-                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\n      \"Pesan error spesifik dari backend (bahasa indonesia)\"\n    ]\n  }\n}\n"
                             }
                         }
                     },
@@ -2727,7 +2787,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 401
                                         },
                                         "message": {
                                             "type": "string"
@@ -2800,11 +2861,11 @@
                     "200": {
                         "description": "OK",
                         "content": {
-                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                            "application/json": {
                                 "schema": {
-                                    "type": "string",
-                                    "format": "binary"
-                                }
+                                    "type": "object"
+                                },
+                                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil mengambil data export data\",\n  \"data\": null\n}\n"
                             }
                         }
                     },
@@ -2819,7 +2880,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 400
                                         },
                                         "message": {
                                             "type": "string"
@@ -2829,7 +2891,7 @@
                                         }
                                     }
                                 },
-                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\n      \"Pesan error spesifik dari backend (bahasa indonesia)\"\n    ]\n  }\n}\n"
                             }
                         }
                     },
@@ -2844,7 +2906,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 401
                                         },
                                         "message": {
                                             "type": "string"
@@ -2875,11 +2938,11 @@
                     "200": {
                         "description": "OK",
                         "content": {
-                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                            "application/json": {
                                 "schema": {
-                                    "type": "string",
-                                    "format": "binary"
-                                }
+                                    "type": "object"
+                                },
+                                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil mengambil data export data\",\n  \"data\": null\n}\n"
                             }
                         }
                     },
@@ -2894,7 +2957,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 400
                                         },
                                         "message": {
                                             "type": "string"
@@ -2904,7 +2968,7 @@
                                         }
                                     }
                                 },
-                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\n      \"Pesan error spesifik dari backend (bahasa indonesia)\"\n    ]\n  }\n}\n"
                             }
                         }
                     },
@@ -2919,7 +2983,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 401
                                         },
                                         "message": {
                                             "type": "string"
@@ -3034,7 +3099,7 @@
                                         }
                                     }
                                 },
-                                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil\",\n  \"data\": {\n    \"rata_rata_global_text\": \"3 Jam 15 Menit\",\n    \"capaian_sla_persen\": 88.5,\n    \"target_sla\": 6,\n    \"jumlah_ajuan\": 124\n  }\n}\n"
+                                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil mengambil data KPI SLA\",\n  \"data\": {\n    \"rata_rata_global_text\": \"3 Jam 15 Menit\",\n    \"capaian_sla_persen\": 88.5,\n    \"target_sla\": 6,\n    \"jumlah_ajuan\": 124\n  }\n}\n"
                             }
                         }
                     },
@@ -3049,7 +3114,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 400
                                         },
                                         "message": {
                                             "type": "string"
@@ -3059,7 +3125,7 @@
                                         }
                                     }
                                 },
-                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\n      \"Pesan error spesifik dari backend (bahasa indonesia)\"\n    ]\n  }\n}\n"
                             }
                         }
                     },
@@ -3074,7 +3140,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 401
                                         },
                                         "message": {
                                             "type": "string"
@@ -3105,11 +3172,11 @@
                     "200": {
                         "description": "OK",
                         "content": {
-                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                            "application/json": {
                                 "schema": {
-                                    "type": "string",
-                                    "format": "binary"
-                                }
+                                    "type": "object"
+                                },
+                                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil mengambil data export data\",\n  \"data\": null\n}\n"
                             }
                         }
                     },
@@ -3124,7 +3191,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 400
                                         },
                                         "message": {
                                             "type": "string"
@@ -3134,7 +3202,7 @@
                                         }
                                     }
                                 },
-                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\n      \"Pesan error spesifik dari backend (bahasa indonesia)\"\n    ]\n  }\n}\n"
                             }
                         }
                     },
@@ -3149,7 +3217,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 401
                                         },
                                         "message": {
                                             "type": "string"
@@ -3227,7 +3296,7 @@
                                 "schema": {
                                     "type": "object"
                                 },
-                                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil\",\n  \"data\": {\n    \"rata_rata_bintang\": 4.5,\n    \"distribusi\": {\n      \"bintang_5\": 1200,\n      \"bintang_4\": 400,\n      \"bintang_3\": 50,\n      \"bintang_2\": 10,\n      \"bintang_1\": 5\n    }\n  }\n}\n"
+                                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil mengambil data KPI ulasan\",\n  \"data\": {\n    \"rata_rata_bintang\": 4.5,\n    \"distribusi\": {\n      \"bintang_5\": 1200,\n      \"bintang_4\": 400,\n      \"bintang_3\": 50,\n      \"bintang_2\": 10,\n      \"bintang_1\": 5\n    }\n  }\n}\n"
                             }
                         }
                     },
@@ -3242,7 +3311,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 400
                                         },
                                         "message": {
                                             "type": "string"
@@ -3252,7 +3322,7 @@
                                         }
                                     }
                                 },
-                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\n      \"Pesan error spesifik dari backend (bahasa indonesia)\"\n    ]\n  }\n}\n"
                             }
                         }
                     },
@@ -3267,7 +3337,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 401
                                         },
                                         "message": {
                                             "type": "string"
@@ -3298,11 +3369,11 @@
                     "200": {
                         "description": "OK",
                         "content": {
-                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                            "application/json": {
                                 "schema": {
-                                    "type": "string",
-                                    "format": "binary"
-                                }
+                                    "type": "object"
+                                },
+                                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil mengambil data export data\",\n  \"data\": null\n}\n"
                             }
                         }
                     },
@@ -3317,7 +3388,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 400
                                         },
                                         "message": {
                                             "type": "string"
@@ -3327,7 +3399,7 @@
                                         }
                                     }
                                 },
-                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\n      \"Pesan error spesifik dari backend (bahasa indonesia)\"\n    ]\n  }\n}\n"
                             }
                         }
                     },
@@ -3342,7 +3414,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 401
                                         },
                                         "message": {
                                             "type": "string"
@@ -3451,7 +3524,8 @@
                                     "type": "object",
                                     "properties": {
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 200
                                         },
                                         "message": {
                                             "type": "string"
@@ -3509,7 +3583,7 @@
                                         }
                                     }
                                 },
-                                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil mendapatkan data operator\",\n  \"data\": {\n    \"list\": [\n      {\n        \"id\": 22,\n        \"peringkat\": 1,\n        \"operator\": \"Reza\",\n        \"desa\": \"Gentan\",\n        \"kecamatan\": \"Baki\",\n        \"jumlah_ajuan\": 124\n      },\n      {\n        \"id\": 23,\n        \"peringkat\": 2,\n        \"operator\": \"Erza\",\n        \"desa\": \"Gentan\",\n        \"kecamatan\": \"Baki\",\n        \"jumlah_ajuan\": 123\n      }\n    ],\n    \"meta\": {\n      \"page\": 1,\n      \"per_page\": 10,\n      \"total\": 20,\n      \"total_page\": 2\n    }\n  }\n}"
+                                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil mendapatkan data operator\",\n  \"data\": {\n    \"list\": [\n      {\n        \"id\": 22,\n        \"peringkat\": 1,\n        \"operator\": \"Reza\",\n        \"desa\": \"Gentan\",\n        \"kecamatan\": \"Baki\",\n        \"jumlah_ajuan\": 124\n      },\n      {\n        \"id\": 23,\n        \"peringkat\": 2,\n        \"operator\": \"Erza\",\n        \"desa\": \"Gentan\",\n        \"kecamatan\": \"Baki\",\n        \"jumlah_ajuan\": 123\n      }\n    ],\n    \"meta\": {\n      \"page\": 1,\n      \"per_page\": 10,\n      \"total\": 20,\n      \"total_page\": 2\n    }\n  }\n}\n"
                             }
                         }
                     },
@@ -3524,7 +3598,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 400
                                         },
                                         "message": {
                                             "type": "string"
@@ -3534,7 +3609,7 @@
                                         }
                                     }
                                 },
-                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\n      \"Pesan error spesifik dari backend (bahasa indonesia)\"\n    ]\n  }\n}\n"
                             }
                         }
                     },
@@ -3549,7 +3624,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 401
                                         },
                                         "message": {
                                             "type": "string"
@@ -3614,7 +3690,7 @@
                                 "schema": {
                                     "type": "object"
                                 },
-                                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Detail operator berhasil ditemukan\",\n  \"data\": {\n    \"id\": 99,\n    \"nama\": \"Cynthia Glacieterna\",\n    \"total_ajuan\": 124,\n    \"total_selesai\": 98,\n    \"tingkat_selesai\": 79,\n    \"layanan_perbulan\": {\n      \"Jan\": 70,\n      \"Feb\": 20,\n      \"Mar\": 40,\n      \"Apr\": 25,\n      \"Mei\": 50,\n      \"Jun\": 10,\n      \"Jul\": 0,\n      \"Agu\": 0,\n      \"Sep\": 0,\n      \"Okt\": 0,\n      \"Nov\": 0,\n      \"Des\": 0\n    }\n  }\n}"
+                                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Detail operator berhasil ditemukan\",\n  \"data\": {\n    \"id\": 99,\n    \"nama\": \"Cynthia Glacieterna\",\n    \"total_ajuan\": 124,\n    \"total_selesai\": 98,\n    \"tingkat_selesai\": 79,\n    \"layanan_perbulan\": {\n      \"Jan\": 70,\n      \"Feb\": 20,\n      \"Mar\": 40,\n      \"Apr\": 25,\n      \"Mei\": 50,\n      \"Jun\": 10,\n      \"Jul\": 0,\n      \"Agu\": 0,\n      \"Sep\": 0,\n      \"Okt\": 0,\n      \"Nov\": 0,\n      \"Des\": 0\n    }\n  }\n}\n"
                             }
                         }
                     },
@@ -3629,7 +3705,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 400
                                         },
                                         "message": {
                                             "type": "string"
@@ -3639,7 +3716,7 @@
                                         }
                                     }
                                 },
-                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\n      \"Pesan error spesifik dari backend (bahasa indonesia)\"\n    ]\n  }\n}\n"
                             }
                         }
                     },
@@ -3654,7 +3731,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 401
                                         },
                                         "message": {
                                             "type": "string"
@@ -3674,7 +3752,8 @@
                                     "type": "object",
                                     "properties": {
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 404
                                         },
                                         "message": {
                                             "type": "string"
@@ -3687,7 +3766,7 @@
                                         }
                                     }
                                 },
-                                "example": "{\n  \"status\": false,\n  \"code\": 404,\n  \"message\": \"Data tidak ditemukan\",\n  \"data\": null\n}\n"
+                                "example": "{\n  \"status\": false,\n  \"code\": 404,\n  \"message\": \"Data tidak ditemukan.\",\n  \"data\": null\n}\n"
                             }
                         }
                     }
@@ -3771,7 +3850,7 @@
                                 "schema": {
                                     "type": "object"
                                 },
-                                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Riwayat operator berhasil ditemukan\",\n  \"data\": {\n    \"list\": [\n      {\n        \"id\": 1,\n        \"no_regis\": \"REG-123\",\n        \"pemohon\": \"Aslam\",\n        \"kode_ajuan\": \"KK-NEW\",\n        \"desa\": \"Baki\",\n        \"tanggal\": \"12-07-2026\",\n        \"waktu\": \"09:15\",\n        \"status\": \"DIVERIFIKASI\"\n      }\n    ],\n    \"meta\": {\n      \"page\": 1,\n      \"per_page\": 10,\n      \"total\": 5,\n      \"total_page\": 1\n    }\n  }\n}"
+                                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Riwayat operator berhasil ditemukan\",\n  \"data\": {\n    \"list\": [\n      {\n        \"id\": 1,\n        \"no_regis\": \"REG-123\",\n        \"pemohon\": \"Aslam\",\n        \"kode_ajuan\": \"KK-NEW\",\n        \"desa\": \"Baki\",\n        \"tanggal\": \"12-07-2026\",\n        \"waktu\": \"09:15\",\n        \"status\": \"DIVERIFIKASI\"\n      }\n    ],\n    \"meta\": {\n      \"page\": 1,\n      \"per_page\": 10,\n      \"total\": 5,\n      \"total_page\": 1\n    }\n  }\n}\n"
                             }
                         }
                     },
@@ -3786,7 +3865,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 400
                                         },
                                         "message": {
                                             "type": "string"
@@ -3796,7 +3876,7 @@
                                         }
                                     }
                                 },
-                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\"Pesan error spesifik dari backend (bahasa indonesia)\"]\n  }\n}\n"
+                                "example": "{\n  \"status\": false,\n  \"code\": 400,\n  \"message\": \"Validasi gagal. Silakan periksa kembali input Anda.\",\n  \"data\": {\n    \"nama_parameter\": [\n      \"Pesan error spesifik dari backend (bahasa indonesia)\"\n    ]\n  }\n}\n"
                             }
                         }
                     },
@@ -3811,7 +3891,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 401
                                         },
                                         "message": {
                                             "type": "string"
@@ -3831,7 +3912,8 @@
                                     "type": "object",
                                     "properties": {
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 404
                                         },
                                         "message": {
                                             "type": "string"
@@ -3844,7 +3926,7 @@
                                         }
                                     }
                                 },
-                                "example": "{\n  \"status\": false,\n  \"code\": 404,\n  \"message\": \"Data tidak ditemukan\",\n  \"data\": null\n}\n"
+                                "example": "{\n  \"status\": false,\n  \"code\": 404,\n  \"message\": \"Data tidak ditemukan.\",\n  \"data\": null\n}\n"
                             }
                         }
                     }
@@ -3875,7 +3957,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 200
                                         },
                                         "message": {
                                             "type": "string"
@@ -3895,7 +3978,8 @@
                                             }
                                         }
                                     }
-                                }
+                                },
+                                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil mengambil data filter layanan\",\n  \"data\": null\n}\n"
                             }
                         }
                     }
@@ -3926,7 +4010,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 200
                                         },
                                         "message": {
                                             "type": "string"
@@ -3946,7 +4031,8 @@
                                             }
                                         }
                                     }
-                                }
+                                },
+                                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil mengambil data filter kecamatan\",\n  \"data\": null\n}\n"
                             }
                         }
                     }
@@ -3977,7 +4063,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 200
                                         },
                                         "message": {
                                             "type": "string"
@@ -3997,7 +4084,8 @@
                                             }
                                         }
                                     }
-                                }
+                                },
+                                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil mengambil data filter pelapor\",\n  \"data\": null\n}\n"
                             }
                         }
                     }
@@ -4028,7 +4116,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 200
                                         },
                                         "message": {
                                             "type": "string"
@@ -4048,7 +4137,8 @@
                                             }
                                         }
                                     }
-                                }
+                                },
+                                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil mengambil data filter status\",\n  \"data\": null\n}\n"
                             }
                         }
                     }
@@ -4079,7 +4169,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 200
                                         },
                                         "message": {
                                             "type": "string"
@@ -4099,7 +4190,8 @@
                                             }
                                         }
                                     }
-                                }
+                                },
+                                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil mengambil data ajuan\",\n  \"data\": null\n}\n"
                             }
                         }
                     }
@@ -4130,7 +4222,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 200
                                         },
                                         "message": {
                                             "type": "string"
@@ -4150,7 +4243,8 @@
                                             }
                                         }
                                     }
-                                }
+                                },
+                                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil mengambil data filter jalur\",\n  \"data\": null\n}\n"
                             }
                         }
                     }
@@ -4247,7 +4341,8 @@
                                             "type": "boolean"
                                         },
                                         "code": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "example": 200
                                         },
                                         "message": {
                                             "type": "string"
@@ -4256,7 +4351,8 @@
                                             "type": "object"
                                         }
                                     }
-                                }
+                                },
+                                "example": "{\n  \"status\": true,\n  \"code\": 200,\n  \"message\": \"Berhasil mengambil data chart ajuan\",\n  \"data\": null\n}\n"
                             }
                         }
                     }
