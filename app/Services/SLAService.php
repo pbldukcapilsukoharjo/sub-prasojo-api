@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Enums\AjuanStatus;
-use App\Filters\SlaFilter;
+use App\Filters\SLAFilter;
 use App\Models\Prasojo\Ajuan;
 use App\Models\Prasojo\Layanan;
 use Illuminate\Support\Facades\DB;
@@ -25,7 +25,7 @@ class SLAService
 
             return Cache::remember($cacheKey, 600, function () use ($filters) {
                 $query = Ajuan::query()->from('ajuan');
-                $filter = new SlaFilter($filters);
+                $filter = new SLAFilter($filters);
                 $query = $filter->apply($query);
 
                 $statusSelesai = AjuanStatus::getStatusSelesai();
@@ -85,7 +85,7 @@ class SLAService
             // -- KODE AMRU (Base Query) -- //
             $query = Ajuan::query()->from('ajuan');
             
-            $filter = new SlaFilter($filters);
+            $filter = new SLAFilter($filters);
             $query = $filter->apply($query);
 
             $statusSelesai = AjuanStatus::getStatusSelesai();
@@ -201,7 +201,7 @@ class SLAService
             // dengan format data yang disesuaikan export.
             $query = Ajuan::query()->from('ajuan');
             
-            $filter = new SlaFilter($filters);
+            $filter = new SLAFilter($filters);
             $query = $filter->apply($query);
 
             $statusSelesai = AjuanStatus::getStatusSelesai();

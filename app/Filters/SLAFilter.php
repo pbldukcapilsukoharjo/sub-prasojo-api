@@ -6,7 +6,7 @@ namespace App\Filters;
 
 use Illuminate\Database\Eloquent\Builder;
 
-final class SlaFilter extends BaseFilter
+final class SLAFilter extends BaseFilter
 {
     protected string $dateColumn = 'ajuan_create_datetime';
 

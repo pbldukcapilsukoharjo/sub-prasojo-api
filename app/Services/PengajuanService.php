@@ -98,18 +98,22 @@ class PengajuanService
             
             $paginator->getCollection()->transform(function (LembarKerja $lk) {
                 $ajuan = $lk->ajuan;
-                $layananNama = $ajuan && $ajuan->layanan ? $ajuan->layanan->layanan_nama : $lk->lk_layanan_kode;
-                $pelaporName = $ajuan && $ajuan->pelapor ? $ajuan->pelapor->fullname : 'Unknown';
                 
+                $jalur = $lk->lk_ajuan_is_online ? 'Online' : 'Offline';
+                $layananNama = $ajuan && $ajuan->layanan ? $ajuan->layanan->layanan_nama : $lk->lk_layanan_kode;
+
                 // Format according to what frontend expects
                 return [
                     'id' => $lk->lk_id,
                     'no_reg' => $lk->lk_ajuan_no_reg,
+                    'kode_ajuan' => $lk->lk_ajuan_id,
+                    'kode_produk' => $lk->lk_produk_id,
                     'layanan' => $layananNama,
-                    'kecamatan' => $ajuan ? $ajuan->ajuan_kecamatan_name : null,
+                    'jalur' => $jalur,
                     'pelapor' => $lk->lk_pelapor_role_name,
                     'status' => $lk->lk_status,
-                    'created_at' => $lk->lk_create_datetime ? $lk->lk_create_datetime->format('Y-m-d H:i:s') : null,
+                    'tanggal' => $lk->lk_create_datetime ? $lk->lk_create_datetime->format('Y-m-d H:i:s') : null,
+                    'kecamatan' => $ajuan ? $ajuan->ajuan_kecamatan_name : null,
                 ];
             });
 

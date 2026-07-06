@@ -21,7 +21,7 @@ class UlasanService
                 $query = AjuanReview::query();
                 $query = $filter->apply($query);
 
-                $kpiData = (clone $query)->select(
+                $kpiData = (clone $query)->reorder()->select(
                     DB::raw('AVG(review_rating) as rata_rata_bintang'),
                     DB::raw('SUM(CASE WHEN review_rating = 5 THEN 1 ELSE 0 END) as bintang_5'),
                     DB::raw('SUM(CASE WHEN review_rating = 4 THEN 1 ELSE 0 END) as bintang_4'),
