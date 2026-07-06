@@ -1,0 +1,649 @@
+﻿Table admin {
+  id bigint
+  username varchar
+  fullname varchar
+  nik varchar
+  kk varchar
+  email varchar
+  phone varchar
+  password varchar
+  image longtext
+  level varchar
+  role_id bigint
+  is_active tinyint
+  is_verified tinyint
+  is_verified_email tinyint
+  is_verified_phone tinyint
+  kecamatan_code varchar
+  kecamatan_name varchar
+  kelurahan_code varchar
+  kelurahan_name varchar
+  dukuh varchar
+  rt varchar
+  rw varchar
+  extra longtext
+  fcm varchar
+  create_datetime datetime
+  update_datetime datetime
+}
+
+Table admin_auth {
+  auth_id bigint
+  auth_admin_id bigint
+  auth_token varchar
+  auth_create_datetime datetime
+  auth_expire_datetime datetime
+  auth_extra longtext
+}
+
+Table admin_role {
+  admin_role_id bigint
+  admin_role_name varchar
+  admin_role_access longtext
+}
+
+Table ajuan {
+  ajuan_id bigint
+  ajuan_no_reg varchar
+  ajuan_layanan_kode varchar
+  ajuan_jenis_ajuan_id tinyint
+  ajuan_pelapor_id bigint
+  ajuan_pelapor_nik varchar
+  ajuan_pelapor_kk varchar
+  ajuan_pelapor_role_id int
+  ajuan_pelapor_role_name varchar
+  ajuan_is_online tinyint
+  ajuan_is_mandiri tinyint
+  ajuan_status varchar
+  ajuan_kecamatan_code varchar
+  ajuan_kecamatan_name varchar
+  ajuan_kelurahan_code varchar
+  ajuan_kelurahan_name varchar
+  ajuan_keterangan longtext
+  ajuan_extra longtext
+  ajuan_data_ajuan longtext
+  ajuan_create_datetime datetime
+  ajuan_update_datetime datetime
+}
+
+Table ajuan_akta_kelahiran {
+  ajakel_id bigint
+  ajakel_ajuan_id bigint
+  ajakel_jenis_id bigint
+  ajakel_nik varchar
+  ajakel_nama_bayi varchar
+  ajakel_jenis_kelamin varchar
+  ajakel_tempat_lahir varchar
+  ajakel_tgl_lahir date
+  ajakel_tgl_kawin date
+  ajakel_anak_ke tinyint
+  ajakel_nama_ibu varchar
+  ajakel_nama_ayah varchar
+  ajakel_dokumen longtext
+}
+
+Table ajuan_akta_kematian {
+  ajakem_id bigint
+  ajakem_ajuan_id bigint
+  ajakem_jenis_id bigint
+  ajakem_nik varchar
+  ajakem_nama_jenazah varchar
+  ajakem_tgl_kematian datetime
+  ajakem_tempat_kematian varchar
+  ajakem_anak_ke tinyint
+  ajakem_nama_ibu varchar
+  ajakem_nama_ayah varchar
+  ajakem_dokumen longtext
+}
+
+Table ajuan_datang {
+  ajd_id bigint
+  ajd_ajuan_id bigint
+  ajd_jenis_id bigint
+  ajd_nik varchar
+  ajd_no_pindah varchar
+  ajd_nama_lengkap varchar
+  ajd_dokumen longtext
+}
+
+Table ajuan_kia {
+  ajkia_id bigint
+  ajkia_ajuan_id bigint
+  ajkia_jenis_id bigint
+  ajkia_nik varchar
+  ajkia_nama_lengkap varchar
+  ajkia_dokumen longtext
+}
+
+Table ajuan_kk {
+  ajkk_id bigint
+  ajkk_ajuan_id bigint
+  ajkk_jenis_id bigint
+  ajkk_kk varchar
+  ajkk_nama_kepala_keluarga varchar
+  ajkk_dokumen longtext
+}
+
+Table ajuan_ktpel {
+  ajktpel_id bigint
+  ajktpel_ajuan_id bigint
+  ajktpel_jenis_id bigint
+  ajktpel_nik varchar
+  ajktpel_nama_lengkap varchar
+  ajktpel_gol_darah varchar
+  ajktpel_dokumen longtext
+}
+
+Table ajuan_pindah {
+  ajp_id bigint
+  ajp_ajuan_id bigint
+  ajp_jenis_id bigint
+  ajp_nik varchar
+  ajp_kk varchar
+  ajp_nama_lengkap varchar
+  ajp_dokumen longtext
+}
+
+Table ajuan_rekam_jemput {
+  ajrj_id bigint
+  ajrj_ajuan_id bigint
+  ajrj_jenis_id bigint
+  ajrj_nik varchar
+  ajrj_nama_lengkap varchar
+  ajrj_alasan longtext
+  ajrj_dokumen longtext
+}
+
+Table ajuan_review {
+  review_id bigint
+  review_ajuan_id bigint
+  review_pelapor_id bigint
+  review_rating tinyint
+  review_content longtext
+  review_create_datetime datetime
+}
+
+Table ajuan_update_data {
+  ajud_id bigint
+  ajud_ajuan_id bigint
+  ajud_jenis_id bigint
+  ajud_nik varchar
+  ajud_nama_lengkap varchar
+  ajud_dokumen longtext
+}
+
+Table announcement {
+  announcement_id bigint
+  announcement_title varchar
+  announcement_author_id bigint
+  announcement_author_fullname varchar
+  announcement_type varchar
+  announcement_content longtext
+  announcement_status varchar
+  announcement_extra longtext
+  announcement_create_datetime datetime
+}
+
+Table bpp {
+  bpp_id bigint
+  bpp_no_reg varchar
+  bpp_nik varchar
+  bpp_nama varchar
+  bpp_tempat_lahir varchar
+  bpp_tanggal_lahir date
+  bpp_tempat_meninggal varchar
+  bpp_tanggal_meninggal date
+  bpp_alamat text
+  bpp_rt int
+  bpp_rw int
+  bpp_kecamatan_code varchar
+  bpp_kecamatan_name varchar
+  bpp_desa_code varchar
+  bpp_desa_name varchar
+  bpp_tanggal_pemakaman date
+  bpp_makam_kecamatan_code varchar
+  bpp_makam_kecamatan_name varchar
+  bpp_makam_desa_code varchar
+  bpp_makam_desa_name varchar
+  bpp_makam_nama varchar
+  bpp_makam_kode varchar
+  bpp_pelapor_id bigint
+  bpp_pelapor_nik varchar
+  bpp_pelapor_nama varchar
+  bpp_keluarga_telp_nama varchar
+  bpp_keluarga_telp_no varchar
+  bpp_note longtext
+  bpp_status varchar
+  bpp_extra longtext
+  bpp_create_datetime datetime
+  bpp_update_datetime datetime
+}
+
+Table bpp_tempat_pemakaman {
+  bpptp_id bigint
+  bpptp_jenis varchar
+  bpptp_nama varchar
+  bpptp_alamat text
+  bpptp_kecamatan_code varchar
+  bpptp_kecamatan_name varchar
+  bpptp_desa_code varchar
+  bpptp_desa_name varchar
+  bpptp_petugas_nama varchar
+  bpptp_petugas_desa_nama varchar
+}
+
+Table bpp_tempat_pemakaman_jenis {
+  bppj_id bigint
+  bppj_title varchar
+}
+
+Table category {
+  cat_id bigint
+  cat_pos int
+  cat_title varchar
+  cat_slug varchar
+  cat_content longtext
+  cat_type varchar
+  cat_image longtext
+  cat_extra longtext
+  cat_is_active tinyint
+}
+
+Table config {
+  config_id bigint
+  config_name varchar
+  config_value longtext
+  config_autoload tinyint
+}
+
+Table delivery {
+  delivery_id bigint
+  delivery_pelapor_id bigint
+  delivery_ajuan_id bigint
+  delivery_ajuan_no_reg varchar
+  delivery_kode varchar
+  delivery_resi varchar
+  delivery_proses_kode varchar
+  delivery_sender text
+  delivery_receiver text
+  delivery_receiver_name varchar
+  delivery_receiver_phone varchar
+  delivery_service text
+  delivery_status varchar
+  delivery_log longtext
+  delivery_proses_datetime datetime
+  delivery_create_datetime datetime
+  delivery_update_datetime datetime
+}
+
+Table delivery_item {
+  delivery_item_id bigint
+  delivery_item_pelapor_id bigint
+  delivery_item_delivery_id bigint
+  delivery_item_ajuan_id bigint
+  delivery_item_prod_id bigint
+  delivery_item_ajuan_no_reg varchar
+  delivery_item_layanan_kode varchar
+  delivery_item_prod_nomor varchar
+  delivery_item_prod_nama varchar
+  delivery_item_create_datetime datetime
+  delivery_item_update_datetime datetime
+}
+
+Table delivery_proses {
+  delivery_proses_id bigint
+  delivery_proses_kode varchar
+  delivery_proses_create_datetime datetime
+}
+
+Table ilokasi_desa {
+  desa_id bigint
+  desa_kecamatan_id bigint
+  desa_kecamatan_name varchar
+  desa_kecamatan_code varchar
+  desa_name varchar
+  desa_code varchar
+  desa_code_bps varchar
+}
+
+Table ilokasi_kabupaten {
+  kabupaten_id bigint
+  kabupaten_provinsi_id bigint
+  kabupaten_provinsi_name varchar
+  kabupaten_provinsi_code varchar
+  kabupaten_name varchar
+  kabupaten_code varchar
+  kabupaten_code_bps varchar
+}
+
+Table ilokasi_kecamatan {
+  kecamatan_id bigint
+  kecamatan_kabupaten_id bigint
+  kecamatan_kabupaten_name varchar
+  kecamatan_kabupaten_code varchar
+  kecamatan_name varchar
+  kecamatan_code varchar
+  kecamatan_code_bps varchar
+}
+
+Table ilokasi_provinsi {
+  provinsi_id bigint
+  provinsi_name varchar
+  provinsi_code varchar
+  provinsi_code_bps varchar
+}
+
+Table jenis_ajuan {
+  ja_id bigint
+  ja_judul varchar
+}
+
+Table layanan {
+  layanan_id bigint
+  layanan_pos int
+  layanan_is_layanan int
+  layanan_is_produk int
+  layanan_nama varchar
+  layanan_desc longtext
+  layanan_kode varchar
+  layanan_image varchar
+  layanan_extra longtext
+  layanan_is_active tinyint
+  layanan_jenis_ajuan_id_list varchar
+  layanan_create_datetime datetime
+  layanan_update_datetime datetime
+}
+
+Table layanan_content {
+  lc_id bigint
+  lc_author_id bigint
+  lc_author_fullname varchar
+  lc_title varchar
+  lc_slug varchar
+  lc_type varchar
+  lc_layanan_kode varchar
+  lc_status varchar
+  lc_content longtext
+  lc_image longtext
+  lc_extra longtext
+  lc_create_datetime datetime
+  lc_update_datetime datetime
+}
+
+Table lembar_kerja {
+  lk_id bigint
+  lk_ajuan_id bigint
+  lk_ajuan_no_reg varchar
+  lk_jenis_ajuan_id int
+  lk_from_layanan_kode varchar
+  lk_layanan_kode varchar
+  lk_is_produk tinyint
+  lk_ajuan_is_online tinyint
+  lk_ajuan_is_mandiri tinyint
+  lk_produk_id bigint
+  lk_pelapor_role_id int
+  lk_pelapor_role_name varchar
+  lk_status varchar
+  lk_create_datetime datetime
+  lk_update_datetime datetime
+}
+
+Table log_ajuan_status {
+  log_id bigint
+  log_pelapor_id bigint
+  log_ajuan_id bigint
+  log_ajuan_no_reg varchar
+  log_status varchar
+  log_layanan_kode varchar
+  log_note longtext
+  log_extra longtext
+  log_admin_id bigint
+  log_create_datetime datetime
+}
+
+Table log_produk_status {
+  log_id bigint
+  log_produk_id bigint
+  log_ajuan_id bigint
+  log_ajuan_no_reg varchar
+  log_status varchar
+  log_layanan_kode varchar
+  log_admin_id bigint
+  log_pelapor_id bigint
+  log_note longtext
+  log_extra longtext
+  log_create_datetime datetime
+}
+
+Table master_data_dukung {
+  mdadu_id bigint
+  mdadu_layanan_kode varchar
+  mdadu_judul varchar
+  mdadu_desc varchar
+  mdadu_image longtext
+  mdadu_is_required tinyint
+  mdadu_extra longtext
+  mdadu_create_datetime datetime
+}
+
+Table migrations {
+  id int
+  migration varchar
+  batch int
+}
+
+Table notification {
+  notification_id bigint
+  notification_user_id bigint
+  notification_title varchar
+  notification_type varchar
+  notification_is_read tinyint
+  notification_extra longtext
+  notification_create_datetime datetime
+}
+
+Table post {
+  post_id bigint
+  post_author_id bigint
+  post_author_fullname varchar
+  post_cat_id bigint
+  post_cat_title varchar
+  post_title varchar
+  post_slug varchar
+  post_type varchar
+  post_status varchar
+  post_content longtext
+  post_image longtext
+  post_extra longtext
+  post_create_datetime datetime
+  post_update_datetime datetime
+}
+
+Table produk {
+  prod_id bigint
+  prod_ajuan_id bigint
+  prod_pelapor_id bigint
+  prod_ajuan_no_reg varchar
+  prod_nama varchar
+  prod_nomor varchar
+  prod_from_layanan_kode varchar
+  prod_layanan_kode varchar
+  prod_status varchar
+  prod_url varchar
+  prod_extra longtext
+  prod_create_datetime datetime
+  prod_update_datetime datetime
+}
+
+Table site {
+  id bigint
+  pos int
+  title varchar
+  slug varchar
+  content longtext
+  type varchar
+  image longtext
+  extra longtext
+  status varchar
+}
+
+Table user {
+  id bigint
+  username varchar
+  fullname varchar
+  nik varchar
+  kk varchar
+  email varchar
+  phone varchar
+  password varchar
+  image longtext
+  swafoto longtext
+  level varchar
+  role_id bigint
+  is_active tinyint
+  is_verified tinyint
+  is_verified_email tinyint
+  is_verified_phone tinyint
+  is_request_update tinyint
+  kecamatan_code varchar
+  kecamatan_name varchar
+  kelurahan_code varchar
+  kelurahan_name varchar
+  dukuh varchar
+  rt varchar
+  rw varchar
+  extra longtext
+  quota longtext
+  fcm varchar
+  role_kabupaten_name varchar
+  role_kabupaten_code varchar
+  role_kecamatan_name varchar
+  role_kecamatan_code varchar
+  role_kelurahan_name varchar
+  role_kelurahan_code varchar
+  create_datetime datetime
+  update_datetime datetime
+}
+
+Table user_auth {
+  auth_id bigint
+  auth_user_id bigint
+  auth_token varchar
+  auth_create_datetime datetime
+  auth_expire_datetime datetime
+  auth_extra longtext
+}
+
+Table user_register_verify_data {
+  rvd_id bigint
+  rvd_status varchar
+  rvd_nik varchar
+  rvd_fullname varchar
+  rvd_kk varchar
+  rvd_email varchar
+  rvd_phone varchar
+  rvd_userdata longtext
+  rvd_token varchar
+  rvd_note longtext
+  rvd_create_datetime datetime
+  rvd_update_datetime datetime
+}
+
+Ref: "admin"."role_id" > "admin_role"."admin_role_id"
+Ref: "admin"."id" < "admin_auth"."auth_admin_id"
+Ref: "admin"."id" < "log_ajuan_status"."log_admin_id"
+Ref: "admin"."id" < "log_produk_status"."log_admin_id"
+Ref: "admin"."id" < "announcement"."announcement_author_id"
+Ref: "admin"."id" < "layanan_content"."lc_author_id"
+Ref: "admin_auth"."auth_admin_id" > "admin"."id"
+Ref: "admin_role"."admin_role_id" < "admin"."role_id"
+Ref: "ajuan"."ajuan_pelapor_id" > "user"."id"
+Ref: "ajuan"."ajuan_jenis_ajuan_id" > "jenis_ajuan"."ja_id"
+Ref: "ajuan"."ajuan_layanan_kode" > "layanan"."layanan_kode"
+Ref: "ajuan"."ajuan_id" < "ajuan_akta_kelahiran"."ajakel_ajuan_id"
+Ref: "ajuan"."ajuan_id" < "ajuan_akta_kematian"."ajakem_ajuan_id"
+Ref: "ajuan"."ajuan_id" < "ajuan_datang"."ajd_ajuan_id"
+Ref: "ajuan"."ajuan_id" < "ajuan_kia"."ajkia_ajuan_id"
+Ref: "ajuan"."ajuan_id" < "ajuan_kk"."ajkk_ajuan_id"
+Ref: "ajuan"."ajuan_id" < "ajuan_ktpel"."ajktpel_ajuan_id"
+Ref: "ajuan"."ajuan_id" < "ajuan_pindah"."ajp_ajuan_id"
+Ref: "ajuan"."ajuan_id" < "ajuan_rekam_jemput"."ajrj_ajuan_id"
+Ref: "ajuan"."ajuan_id" < "ajuan_update_data"."ajud_ajuan_id"
+Ref: "ajuan"."ajuan_id" < "ajuan_review"."review_ajuan_id"
+Ref: "ajuan"."ajuan_id" < "produk"."prod_ajuan_id"
+Ref: "ajuan"."ajuan_id" < "lembar_kerja"."lk_ajuan_id"
+Ref: "ajuan"."ajuan_id" < "log_ajuan_status"."log_ajuan_id"
+Ref: "ajuan"."ajuan_id" < "delivery"."delivery_ajuan_id"
+Ref: "ajuan"."ajuan_id" < "delivery_item"."delivery_item_ajuan_id"
+Ref: "ajuan_akta_kelahiran"."ajakel_ajuan_id" > "ajuan"."ajuan_id"
+Ref: "ajuan_akta_kelahiran"."ajakel_jenis_id" > "jenis_ajuan"."ja_id"
+Ref: "ajuan_akta_kematian"."ajakem_ajuan_id" > "ajuan"."ajuan_id"
+Ref: "ajuan_akta_kematian"."ajakem_jenis_id" > "jenis_ajuan"."ja_id"
+Ref: "ajuan_datang"."ajd_ajuan_id" > "ajuan"."ajuan_id"
+Ref: "ajuan_datang"."ajd_jenis_id" > "jenis_ajuan"."ja_id"
+Ref: "ajuan_kia"."ajkia_ajuan_id" > "ajuan"."ajuan_id"
+Ref: "ajuan_kia"."ajkia_jenis_id" > "jenis_ajuan"."ja_id"
+Ref: "ajuan_kk"."ajkk_ajuan_id" > "ajuan"."ajuan_id"
+Ref: "ajuan_kk"."ajkk_jenis_id" > "jenis_ajuan"."ja_id"
+Ref: "ajuan_ktpel"."ajktpel_ajuan_id" > "ajuan"."ajuan_id"
+Ref: "ajuan_ktpel"."ajktpel_jenis_id" > "jenis_ajuan"."ja_id"
+Ref: "ajuan_pindah"."ajp_ajuan_id" > "ajuan"."ajuan_id"
+Ref: "ajuan_pindah"."ajp_jenis_id" > "jenis_ajuan"."ja_id"
+Ref: "ajuan_rekam_jemput"."ajrj_ajuan_id" > "ajuan"."ajuan_id"
+Ref: "ajuan_rekam_jemput"."ajrj_jenis_id" > "jenis_ajuan"."ja_id"
+Ref: "ajuan_review"."review_ajuan_id" > "ajuan"."ajuan_id"
+Ref: "ajuan_review"."review_pelapor_id" > "user"."id"
+Ref: "ajuan_update_data"."ajud_ajuan_id" > "ajuan"."ajuan_id"
+Ref: "ajuan_update_data"."ajud_jenis_id" > "jenis_ajuan"."ja_id"
+Ref: "announcement"."announcement_author_id" > "admin"."id"
+Ref: "bpp"."bpp_pelapor_id" > "user"."id"
+Ref: "bpp"."bpp_makam_kode" > "bpp_tempat_pemakaman"."bpptp_id"
+Ref: "bpp_tempat_pemakaman"."bpptp_id" < "bpp"."bpp_makam_kode"
+Ref: "bpp_tempat_pemakaman_jenis"."bppj_title" < "bpp_tempat_pemakaman"."bpptp_jenis"
+Ref: "category"."cat_id" < "post"."post_cat_id"
+Ref: "delivery"."delivery_pelapor_id" > "user"."id"
+Ref: "delivery"."delivery_ajuan_id" > "ajuan"."ajuan_id"
+Ref: "delivery"."delivery_proses_kode" > "delivery_proses"."delivery_proses_kode"
+Ref: "delivery"."delivery_id" < "delivery_item"."delivery_item_delivery_id"
+Ref: "delivery_item"."delivery_item_pelapor_id" > "user"."id"
+Ref: "delivery_item"."delivery_item_delivery_id" > "delivery"."delivery_id"
+Ref: "delivery_item"."delivery_item_ajuan_id" > "ajuan"."ajuan_id"
+Ref: "delivery_item"."delivery_item_prod_id" > "produk"."prod_id"
+Ref: "delivery_proses"."delivery_proses_kode" < "delivery"."delivery_proses_kode"
+Ref: "ilokasi_desa"."desa_kecamatan_id" > "ilokasi_kecamatan"."kecamatan_id"
+Ref: "ilokasi_kabupaten"."kabupaten_provinsi_id" > "ilokasi_provinsi"."provinsi_id"
+Ref: "ilokasi_kabupaten"."kabupaten_id" < "ilokasi_kecamatan"."kecamatan_kabupaten_id"
+Ref: "ilokasi_kecamatan"."kecamatan_kabupaten_id" > "ilokasi_kabupaten"."kabupaten_id"
+Ref: "ilokasi_kecamatan"."kecamatan_id" < "ilokasi_desa"."desa_kecamatan_id"
+Ref: "ilokasi_provinsi"."provinsi_id" < "ilokasi_kabupaten"."kabupaten_provinsi_id"
+Ref: "layanan"."layanan_kode" < "layanan_content"."lc_layanan_kode"
+Ref: "layanan"."layanan_kode" < "master_data_dukung"."mdadu_layanan_kode"
+Ref: "layanan"."layanan_kode" < "ajuan"."ajuan_layanan_kode"
+Ref: "layanan_content"."lc_author_id" > "admin"."id"
+Ref: "layanan_content"."lc_layanan_kode" > "layanan"."layanan_kode"
+Ref: "lembar_kerja"."lk_ajuan_id" > "ajuan"."ajuan_id"
+Ref: "lembar_kerja"."lk_produk_id" > "produk"."prod_id"
+Ref: "log_ajuan_status"."log_pelapor_id" > "user"."id"
+Ref: "log_ajuan_status"."log_ajuan_id" > "ajuan"."ajuan_id"
+Ref: "log_ajuan_status"."log_admin_id" > "admin"."id"
+Ref: "log_produk_status"."log_produk_id" > "produk"."prod_id"
+Ref: "log_produk_status"."log_ajuan_id" > "ajuan"."ajuan_id"
+Ref: "log_produk_status"."log_admin_id" > "admin"."id"
+Ref: "log_produk_status"."log_pelapor_id" > "user"."id"
+Ref: "master_data_dukung"."mdadu_layanan_kode" > "layanan"."layanan_kode"
+Ref: "notification"."notification_user_id" > "user"."id"
+Ref: "post"."post_author_id" > "admin"."id"
+Ref: "post"."post_cat_id" > "category"."cat_id"
+Ref: "produk"."prod_ajuan_id" > "ajuan"."ajuan_id"
+Ref: "produk"."prod_pelapor_id" > "user"."id"
+Ref: "produk"."prod_id" < "log_produk_status"."log_produk_id"
+Ref: "produk"."prod_id" < "delivery_item"."delivery_item_prod_id"
+Ref: "user"."id" < "user_auth"."auth_user_id"
+Ref: "user"."id" < "ajuan"."ajuan_pelapor_id"
+Ref: "user"."id" < "produk"."prod_pelapor_id"
+Ref: "user"."id" < "delivery"."delivery_pelapor_id"
+Ref: "user"."id" < "bpp"."bpp_pelapor_id"
+Ref: "user"."id" < "ajuan_review"."review_pelapor_id"
+Ref: "user"."id" < "notification"."notification_user_id"
+Ref: "user_auth"."auth_user_id" > "user"."id"
+

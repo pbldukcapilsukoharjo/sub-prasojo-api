@@ -75,12 +75,26 @@ final class FilterController extends Controller
      */
     public function status(): JsonResponse
     {
+        // 1. Ambil status dinamis / legacy yang ada di database
+        $dbStatuses = Ajuan::query()
+            ->whereNotNull('ajuan_status')
+            ->where('ajuan_status', '!=', '')
+            ->distinct()
+            ->pluck('ajuan_status')
+            ->toArray();
+
+        // 2. Gabungkan dengan hardcode Model, lalu hilangkan duplikat (array_unique)
+        $allStatuses = array_unique(array_merge(Ajuan::STATUSES, $dbStatuses));
+        
+        // Opsional: Urutkan secara alfabet agar rapi di dropdown
+        sort($allStatuses);
+
         $data = array_map(function ($status) {
             return [
                 'id' => $status,
                 'name' => $status,
             ];
-        }, Ajuan::STATUSES);
+        }, $allStatuses);
 
         return response()->json([
             'status' => true,

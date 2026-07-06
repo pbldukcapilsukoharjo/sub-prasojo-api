@@ -1,0 +1,111 @@
+{
+    "ajuan": {
+        "id": 1,
+        "no_regis": "KK-20250603000001",
+        "nama": "User Santi",
+        "nik": "1234567890123456",
+        "jenis_layanan": "KK",
+        "kecamatan": "BENDOSARI",
+        "tanggal_ajuan": "03 Juni 2025, 15:02",
+        "tanggal_ajuan_parse": "2025-06-03, 15:02",
+        "kode_layanan": "KK",
+        "jenis_ajuan": "KK BARU",
+        "jalur": "Online",
+        "pelapor": "Mandiri",
+        "status": "DITOLAK",
+        "tanggal": "03 Juni 2025, 15:02",
+        "tanggal_parse": "2025-06-03, 15:02",
+        "timeline": [
+            {
+                "id": 8,
+                "status": "BELUM DIVERIFIKASI",
+                "note": "",
+                "tanggal": "04 Juni 2025, 10:59",
+                "tanggal_parse": "2025-06-04, 10:59"
+            },
+            {
+                "id": 9,
+                "status": "PROSES VERIFIKASI",
+                "note": "Ajuan layanan KARTU KELUARGA proses verifikasi ",
+                "tanggal": "04 Juni 2025, 11:00",
+                "tanggal_parse": "2025-06-04, 11:00"
+            },
+            {
+                "id": 10,
+                "status": "DITOLAK",
+                "note": "Ajuan layanan KARTU KELUARGA ditolak Dengan catatan: <p>GAGAL<\/p>",
+                "tanggal": "04 Juni 2025, 11:01",
+                "tanggal_parse": "2025-06-04, 11:01"
+            }
+        ]
+    },
+    "lembar_kerja": {
+        "id": 1,
+        "no_regis": "KK-20250603000001",
+        "nama": "User Santi",
+        "nik": "1234567890123456",
+        "jenis_layanan": "KK",
+        "kecamatan": "BENDOSARI",
+        "kode_ajuan": "KK",
+        "kode_produk": null,
+        "jalur": "online",
+        "pelapor": "Mandiri",
+        "status": "DITOLAK",
+        "tanggal": "03 Juni 2025, 15:02",
+        "tanggal_parse": "2025-06-03, 15:02"
+    },
+    "produk": {
+        "id": 1,
+        "no_regis": "KK-20250604000001",
+        "nama": "User Santi",
+        "nik": "1234567890123456",
+        "jenis_layanan": "KK",
+        "kecamatan": "BENDOSARI",
+        "tanggal_ajuan": "04 Juni 2025, 10:02",
+        "tanggal_ajuan_parse": "2025-06-04, 10:02",
+        "kode_ajuan": "KK",
+        "nomor": "33022601010100001",
+        "nama_identitas": "User Santi",
+        "nama_identitas_produk": "TEST",
+        "status": "SIAP DIDOWNLOAD",
+        "tanggal": "04 Juni 2025, 10:02",
+        "tanggal_parse": "2025-06-04, 10:02",
+        "timeline": [
+            {
+                "id": 1,
+                "status": "DIAJUKAN TTE",
+                "note": "Produk KARTU KELUARGA bersatus DIAJUKAN TTE",
+                "tanggal": "04 Juni 2025, 10:02",
+                "tanggal_parse": "2025-06-04, 10:02"
+            },
+            {
+                "id": 2,
+                "status": "DIAJUKAN TTE",
+                "note": "Produk KARTU KELUARGA bersatus DIAJUKAN TTE",
+                "tanggal": "04 Juni 2025, 10:55",
+                "tanggal_parse": "2025-06-04, 10:55"
+            },
+            {
+                "id": 3,
+                "status": "SIAP DIDOWNLOAD",
+                "note": "Produk KARTU KELUARGA bersatus SIAP DIDOWNLOAD",
+                "tanggal": "04 Juni 2025, 10:55",
+                "tanggal_parse": "2025-06-04, 10:55"
+            },
+            {
+                "id": 4,
+                "status": "SIAP DIDOWNLOAD",
+                "note": "Produk KARTU KELUARGA bersatus SIAP DIDOWNLOAD",
+                "tanggal": "04 Juni 2025, 10:59",
+                "tanggal_parse": "2025-06-04, 10:59"
+            },
+            {
+                "id": 5,
+                "status": "SIAP DIDOWNLOAD",
+                "note": "Produk KARTU KELUARGA bersatus SIAP DIDOWNLOAD",
+                "tanggal": "04 Juni 2025, 11:01",
+                "tanggal_parse": "2025-06-04, 11:01"
+            }
+        ]
+    }
+}

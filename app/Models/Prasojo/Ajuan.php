@@ -68,6 +68,8 @@ final class Ajuan extends Model
     public const string STATUS_DITOLAK = 'DITOLAK';
     public const string STATUS_DIKOREKSI = 'DIKOREKSI';
     public const string STATUS_DIBATALKAN = 'DIBATALKAN';
+    public const string STATUS_DISETUJUI = 'DISETUJUI';
+    public const string STATUS_BELUM_DIVERIFIKASI = 'BELUM DIVERIFIKASI';
 
     public const array STATUSES = [
         self::STATUS_PENGAJUAN,
@@ -78,6 +80,8 @@ final class Ajuan extends Model
         self::STATUS_DITOLAK,
         self::STATUS_DIKOREKSI,
         self::STATUS_DIBATALKAN,
+        self::STATUS_DISETUJUI,
+        self::STATUS_BELUM_DIVERIFIKASI,
     ];
 
     /**
