@@ -229,17 +229,22 @@ class PengajuanService
     private function formatAjuan(Ajuan $ajuan): array
     {
         $layananNama = $ajuan->layanan ? $ajuan->layanan->layanan_nama : $ajuan->ajuan_layanan_kode;
-        $pelaporName = $ajuan->pelapor ? $ajuan->pelapor->fullname : 'Unknown';
-        $pelaporType = $ajuan->isOnline() ? 'Online' : 'Offline';
+        $pelaporName = $ajuan->pelapor ? ($ajuan->pelapor->fullname ?? $ajuan->pelapor->name ?? 'Unknown') : 'Unknown';
         
         return [
             'id' => $ajuan->ajuan_id,
-            'no_reg' => $ajuan->ajuan_no_reg,
-            'layanan' => $layananNama,
+            'no_regis' => $ajuan->ajuan_no_reg,
+            'nama' => $pelaporName,
+            'nik' => $ajuan->ajuan_pelapor_nik,
+            'jenis_layanan' => $layananNama,
             'kecamatan' => $ajuan->ajuan_kecamatan_name,
-            'pelapor' => sprintf('%s (%s)', $pelaporName, $pelaporType),
+            'kode_ajuan' => $ajuan->ajuan_layanan_kode,
+            'kode_produk' => null,
+            'jalur' => $ajuan->isOnline() ? 'online' : 'offline',
+            'pelapor' => $ajuan->ajuan_pelapor_role_name,
             'status' => $ajuan->ajuan_status,
-            'created_at' => $ajuan->ajuan_create_datetime ? $ajuan->ajuan_create_datetime->format('Y-m-d H:i:s') : null,
+            'tanggal' => $ajuan->ajuan_create_datetime ? $ajuan->ajuan_create_datetime->locale('id')->translatedFormat('d F Y, H:i') : null,
+            'tanggal_parse' => $ajuan->ajuan_create_datetime ? $ajuan->ajuan_create_datetime->format('Y-m-d, H:i') : null,
         ];
     }
 
