@@ -24,6 +24,14 @@ final class LembarKerjaDetailResource extends JsonResource
             'jenis_layanan' => $this->lk_layanan_kode,
 
             'kecamatan' => $this->ajuan?->ajuan_kecamatan_name,
+            
+            'kode_ajuan' => $this->lk_layanan_kode,
+            'kode_produk' => $this->produk?->prod_layanan_kode,
+            'jalur' => $this->lk_ajuan_is_online ? 'online' : 'offline',
+            'pelapor' => $this->lk_pelapor_role_name,
+            'status' => $this->lk_status,
+            'tanggal' => $this->lk_create_datetime ? $this->lk_create_datetime->locale('id')->translatedFormat('d F Y, H:i') : null,
+            'tanggal_parse' => $this->lk_create_datetime ? $this->lk_create_datetime->format('Y-m-d, H:i') : null,
         ];
     }
 }

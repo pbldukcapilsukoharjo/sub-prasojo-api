@@ -19,9 +19,11 @@ final class ProdukResource extends JsonResource
             'kode_ajuan' => $this->prod_layanan_kode,
             'no_kk' => $this->pelapor?->kk,
             'nama_identitas' => $this->pelapor?->fullname,
+            'nomor' => $this->prod_nomor,
+            'nama_identitas_produk' => $this->prod_nama,
             'kecamatan' => $this->ajuan?->ajuan_kecamatan_name,
-            'tanggal' => optional($this->prod_create_datetime)->format('Y-m-d'),
-            'waktu' => optional($this->prod_create_datetime)->format('H:i'),
+            'tanggal' => $this->prod_create_datetime ? $this->prod_create_datetime->locale('id')->translatedFormat('d F Y, H:i') : null,
+            'tanggal_parse' => $this->prod_create_datetime ? $this->prod_create_datetime->format('Y-m-d, H:i') : null,
             'status' => $this->prod_status,
         ];
     }

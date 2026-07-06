@@ -28,13 +28,8 @@ final class LembarKerjaListResource extends JsonResource
 
             'kecamatan' => $this->ajuan?->ajuan_kecamatan_name,
 
-            'tanggal' => optional(
-                $this->lk_create_datetime
-            )?->format('Y-m-d'),
-
-            'waktu' => optional(
-                $this->lk_create_datetime
-            )?->format('H:i'),
+            'tanggal' => $this->lk_create_datetime ? $this->lk_create_datetime->locale('id')->translatedFormat('d F Y, H:i') : null,
+            'tanggal_parse' => $this->lk_create_datetime ? $this->lk_create_datetime->format('Y-m-d, H:i') : null,
 
             'status' => $this->lk_status,
         ];
