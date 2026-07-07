@@ -1,17 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ForgotPasswordRequest;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\ResendRequest;
+use App\Http\Requests\ForgotPasswordRequest;
 use App\Http\Requests\ResetPasswordRequest;
 use App\Services\AuthService;
 use App\Services\PasetoService;
+use App\Http\Responses\ApiResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
-class AuthController extends Controller
+final class AuthController extends Controller
 {
     protected AuthService $authService;
     protected PasetoService $pasetoService;
@@ -28,17 +32,12 @@ class AuthController extends Controller
             $result = $this->authService->register($request->validated());
             $user = $result['user'];
 
-            return response()->json([
-                'code' => 201,
-                'message' => 'Registrasi berhasil',
-                'data' => $user
-            ], 201);
-        } catch (\Exception $e) {
-            return response()->json([
-                'code' => 400,
-                'message' => 'Registrasi gagal',
-                'error' => $e->getMessage()
-            ], 400);
+            return ApiResponse::success('Registrasi berhasil', $user, 201);
+        } catch (\Throwable $e) {
+            Log::error('[AuthController@register] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return ApiResponse::error('Registrasi gagal', 400, ['error' => $e->getMessage()]);
         }
     }
 
@@ -55,19 +54,14 @@ class AuthController extends Controller
 
             $this->authService->saveToken($parsed);
 
-            return response()->json([
-                'code' => 200,
-                'message' => 'Login berhasil',
-                'data' => [
-                    'access_token' => $access_token
-                ]
-            ], 200)->cookie('refresh_token', $refresh_token, 60 * 24 * 7, null, null, true, true);
-        } catch (\Exception $e) {
-            return response()->json([
-                'code' => 400,
-                'message' => 'Login gagal',
-                'error' => $e->getMessage()
-            ], 400);
+            return ApiResponse::success('Login berhasil', [
+                'access_token' => $access_token
+            ])->cookie('refresh_token', $refresh_token, 60 * 24 * 7, null, null, true, true);
+        } catch (\Throwable $e) {
+            Log::error('[AuthController@login] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return ApiResponse::error('Login gagal', 400, ['error' => $e->getMessage()]);
         }
     }
 
@@ -90,16 +84,12 @@ class AuthController extends Controller
                 throw new \Exception('Terjadi kesalahan pada token');
             }
 
-            return response()->json([
-                'code' => 200,
-                'message' => 'Logout berhasil'
-            ], 200)->withoutCookie('refresh_token');
-        } catch (\Exception $e) {
-            return response()->json([
-                'code' => 400,
-                'message' => 'Logout gagal',
-                'error' => $e->getMessage()
-            ], 400);
+            return ApiResponse::success('Logout berhasil')->withoutCookie('refresh_token');
+        } catch (\Throwable $e) {
+            Log::error('[AuthController@logout] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return ApiResponse::error('Logout gagal', 400, ['error' => $e->getMessage()]);
         }
 
     }
@@ -121,36 +111,29 @@ class AuthController extends Controller
 
             $result = $this->authService->refreshToken($parsed);
 
-            return response()->json([
-                'code' => 200,
-                'message' => 'Refresh berhasil',
-                'data' => [
-                    'access_token' => $result['access_token']
-                ]
-            ], 200)->cookie('refresh_token', $result['refresh_token'], 60 * 24 * 7, null, null, true, true);
-        } catch (\Exception $e) {
-            return response()->json([
-                'code' => 400,
-                'message' => 'Refresh gagal',
-                'error' => $e->getMessage()
-            ], 400);
+            return ApiResponse::success('Refresh berhasil', [
+                'access_token' => $result['access_token']
+            ])->cookie('refresh_token', $result['refresh_token'], 60 * 24 * 7, null, null, true, true);
+        } catch (\Throwable $e) {
+            Log::error('[AuthController@refresh] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return ApiResponse::error('Refresh gagal', 400, ['error' => $e->getMessage()]);
         }
     }
 
-    public function verifyEmail(string $id, string $hash, Request $request)
+    public function verifyEmail(Request $request, $id, $hash)
     {
-        $frontendUrl = config('app.frontend_url');
-
         try {
-            $this->authService->verifyEmail(
-                $id,
-                $hash,
-                $request->hasValidSignature()
-            );
+            $hasValidSignature = $request->hasValidSignature();
+            $this->authService->verifyEmail($id, $hash, $hasValidSignature);
 
-            return redirect()->away($frontendUrl . '/verify-success');
-        } catch (\Exception $e) {
-            return redirect()->away($frontendUrl . '/verify-failed?message=' . urlencode($e->getMessage()));
+            return ApiResponse::success('Email berhasil diverifikasi', [], 200);
+        } catch (\Throwable $e) {
+            Log::error('[AuthController@verifyEmail] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return ApiResponse::error('Gagal memverifikasi email', 400, ['error' => $e->getMessage()]);
         }
     }
 
@@ -159,24 +142,18 @@ class AuthController extends Controller
         try {
             $this->authService->resendVerification($request->validated());
 
-            return response()->json([
-                'code' => 200,
-                'message' => 'Email verifikasi telah dikirim ulang.'
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'code' => 400,
-                'message' => $e->getMessage()
-            ], 400);
+            return ApiResponse::success('Email verifikasi berhasil dikirim ulang', [], 200);
+        } catch (\Throwable $e) {
+            Log::error('[AuthController@resendVerification] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return ApiResponse::error('Gagal mengirim ulang email verifikasi', 400, ['error' => $e->getMessage()]);
         }
     }
 
     public function verificationNotice()
     {
-        return response()->json([
-            'code' => 403,
-            'message' => 'Email belum diverifikasi. Silakan periksa email Anda.'
-        ], 403);
+        return ApiResponse::error('Harap verifikasi email Anda terlebih dahulu.', 403);
     }
 
     public function forgotPassword(ForgotPasswordRequest $request)
@@ -184,16 +161,12 @@ class AuthController extends Controller
         try {
             $this->authService->forgotPassword($request->validated());
 
-            return response()->json([
-                'code' => 200,
-                'message' => 'Link reset password telah dikirim ke email Anda.'
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'code' => 400,
-                'message' => 'Gagal mengirim link reset password',
-                'error' => $e->getMessage()
-            ], 400);
+            return ApiResponse::success('Email reset password berhasil dikirim', [], 200);
+        } catch (\Throwable $e) {
+            Log::error('[AuthController@forgotPassword] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return ApiResponse::error('Gagal mengirim email reset password', 400, ['error' => $e->getMessage()]);
         }
     }
 
@@ -202,16 +175,12 @@ class AuthController extends Controller
         try {
             $this->authService->resetPassword($request->validated());
 
-            return response()->json([
-                'code' => 200,
-                'message' => 'Password berhasil direset.'
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'code' => 400,
-                'message' => 'Gagal reset password',
-                'error' => $e->getMessage()
-            ], 400);
+            return ApiResponse::success('Password berhasil direset', [], 200);
+        } catch (\Throwable $e) {
+            Log::error('[AuthController@resetPassword] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return ApiResponse::error('Gagal mereset password', 400, ['error' => $e->getMessage()]);
         }
     }
 }

@@ -1,14 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
-use App\Models\SubUser;
-use App\Models\RefreshToken;
+use App\Models\Monitoring\SubUser;
+use App\Models\Monitoring\RefreshToken;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Log;
 
-class AuthService
+final class AuthService
 {
     private PasetoService $pasetoService;
 
@@ -31,7 +34,10 @@ class AuthService
             \Illuminate\Support\Facades\RateLimiter::hit('resend-verification:' . $user->email, 180);
 
             return ['user' => $user];
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            Log::error('[AuthService@register] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
             throw ValidationException::withMessages([
                 'error' => ['Terjadi kesalahan saat pendaftaran. Silakan coba lagi.'],
             ]);
@@ -40,15 +46,22 @@ class AuthService
 
     public function login(array $validatedData)
     {
-        $user = SubUser::where('email', $validatedData['email'])->first();
+        try {
+            $user = SubUser::where('email', $validatedData['email'])->first();
 
-        if (!$user || !Hash::check($validatedData['password'], $user->hashed_password)) {
-            throw ValidationException::withMessages([
-                'email' => ['Email atau password salah.'],
+            if (!$user || !Hash::check($validatedData['password'], $user->hashed_password)) {
+                throw ValidationException::withMessages([
+                    'email' => ['Email atau password salah.'],
+                ]);
+            }
+
+            return ['user' => $user];
+        } catch (\Throwable $e) {
+            Log::error('[AuthService@login] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
             ]);
+            throw $e;
         }
-
-        return ['user' => $user];
     }
 
     public function saveToken(object $data)
@@ -60,7 +73,10 @@ class AuthService
                 'expires_at' => now()->addDays(7),
                 'revoked' => false,
             ]);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            Log::error('[AuthService@saveToken] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
             throw ValidationException::withMessages([
                 'error' => ['Terjadi kesalahan saat menyimpan token. Silakan coba lagi. ' . $e->getMessage()],
             ]);
@@ -96,7 +112,13 @@ class AuthService
                 'access_token' => $newAccessToken,
                 'refresh_token' => $newRefreshToken,
             ];
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            Log::error('[AuthService@refreshToken] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            if ($e instanceof ValidationException) {
+                throw $e;
+            }
             throw ValidationException::withMessages([
                 'error' => ['Gagal memperbarui token: ' . $e->getMessage()],
             ]);
@@ -124,90 +146,122 @@ class AuthService
             }
 
             return true;
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            Log::error('[AuthService@logout] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
             throw ValidationException::withMessages([
                 'error' => ['Gagal logout: ' . $e->getMessage()],
             ]);
         }
     }
+
     public function verifyEmail(string $id, string $hash, bool $hasValidSignature)
     {
-        $user = SubUser::findOrFail($id);
+        try {
+            $user = SubUser::findOrFail($id);
 
-        if (!hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
-            throw new \Exception('Invalid hash');
+            if (!hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
+                throw new \Exception('Invalid hash');
+            }
+
+            if (!$hasValidSignature) {
+                throw new \Exception('Invalid or expired url signature');
+            }
+
+            if ($user->hasVerifiedEmail()) {
+                throw new \Exception('Email sudah diverifikasi sebelumnya.');
+            }
+
+            if ($user->markEmailAsVerified()) {
+                event(new \Illuminate\Auth\Events\Verified($user));
+            }
+
+            return true;
+        } catch (\Throwable $e) {
+            Log::error('[AuthService@verifyEmail] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            throw $e;
         }
-
-        if (!$hasValidSignature) {
-            throw new \Exception('Invalid or expired url signature');
-        }
-
-        if ($user->hasVerifiedEmail()) {
-            throw new \Exception('Email sudah diverifikasi sebelumnya.');
-        }
-
-        if ($user->markEmailAsVerified()) {
-            event(new \Illuminate\Auth\Events\Verified($user));
-        }
-
-        return true;
     }
 
     public function resendVerification(array $validatedData)
     {
-        $email = $validatedData['email'];
-        
-        if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts('resend-verification:' . $email, 1)) {
-            $seconds = \Illuminate\Support\Facades\RateLimiter::availableIn('resend-verification:' . $email);
-            throw new \Exception('Harap tunggu ' . $seconds . ' detik sebelum meminta email verifikasi lagi.');
+        try {
+            $email = $validatedData['email'];
+
+            if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts('resend-verification:' . $email, 1)) {
+                $seconds = \Illuminate\Support\Facades\RateLimiter::availableIn('resend-verification:' . $email);
+                throw new \Exception('Harap tunggu ' . $seconds . ' detik sebelum meminta email verifikasi lagi.');
+            }
+
+            $user = SubUser::where('email', $email)->first();
+            if (!$user) {
+                throw new \Exception('Pengguna tidak ditemukan.');
+            }
+
+            if ($user->hasVerifiedEmail()) {
+                throw new \Exception('Email sudah diverifikasi sebelumnya.');
+            }
+
+            $user->sendEmailVerificationNotification();
+
+            \Illuminate\Support\Facades\RateLimiter::hit('resend-verification:' . $email, 180);
+
+            return true;
+        } catch (\Throwable $e) {
+            Log::error('[AuthService@resendVerification] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            throw $e;
         }
-
-        $user = SubUser::where('email', $email)->first();
-        if (!$user) {
-            throw new \Exception('Pengguna tidak ditemukan.');
-        }
-
-        if ($user->hasVerifiedEmail()) {
-            throw new \Exception('Email sudah diverifikasi sebelumnya.');
-        }
-
-        $user->sendEmailVerificationNotification();
-
-        \Illuminate\Support\Facades\RateLimiter::hit('resend-verification:' . $email, 180);
-
-        return true;
     }
 
     public function forgotPassword(array $validatedData)
     {
-        $status = \Illuminate\Support\Facades\Password::broker()->sendResetLink(
-            ['email' => $validatedData['email']]
-        );
+        try {
+            $status = \Illuminate\Support\Facades\Password::broker()->sendResetLink(
+                ['email' => $validatedData['email']]
+            );
 
-        if ($status !== \Illuminate\Support\Facades\Password::RESET_LINK_SENT) {
-            throw new \Exception(__($status));
+            if ($status !== \Illuminate\Support\Facades\Password::RESET_LINK_SENT) {
+                throw new \Exception(__($status));
+            }
+
+            return true;
+        } catch (\Throwable $e) {
+            Log::error('[AuthService@forgotPassword] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            throw $e;
         }
-
-        return true;
     }
 
     public function resetPassword(array $validatedData)
     {
-        $status = \Illuminate\Support\Facades\Password::broker()->reset(
-            $validatedData,
-            function ($user, $password) {
-                $user->forceFill([
-                    'hashed_password' => Hash::make($password)
-                ])->save();
+        try {
+            $status = \Illuminate\Support\Facades\Password::broker()->reset(
+                $validatedData,
+                function ($user, $password) {
+                    $user->forceFill([
+                        'hashed_password' => Hash::make($password)
+                    ])->save();
 
-                event(new \Illuminate\Auth\Events\PasswordReset($user));
+                    event(new \Illuminate\Auth\Events\PasswordReset($user));
+                }
+            );
+
+            if ($status !== \Illuminate\Support\Facades\Password::PASSWORD_RESET) {
+                throw new \Exception(__($status));
             }
-        );
 
-        if ($status !== \Illuminate\Support\Facades\Password::PASSWORD_RESET) {
-            throw new \Exception(__($status));
+            return true;
+        } catch (\Throwable $e) {
+            Log::error('[AuthService@resetPassword] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            throw $e;
         }
-
-        return true;
     }
 }

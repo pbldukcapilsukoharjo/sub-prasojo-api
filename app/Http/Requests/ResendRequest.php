@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class ResendRequest extends FormRequest
+final class ResendRequest extends FormRequest
 {
     public function rules(): array
     {
@@ -32,10 +34,11 @@ class ResendRequest extends FormRequest
     {
         throw new HttpResponseException(
             response()->json([
-                'code' => 422,
-                'message' => 'Validasi gagal',
-                'errors' => $validator->errors()
-            ], 422)
+                'status' => false,
+                'code' => 400,
+                'message' => 'Validasi gagal. Silakan periksa kembali input Anda.',
+                'data' => $validator->errors()
+            ], 400)
         );
     }
 }

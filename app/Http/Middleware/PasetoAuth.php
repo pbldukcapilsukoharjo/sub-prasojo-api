@@ -38,10 +38,10 @@ class PasetoAuth
                 return response()->json(['code' => 401, 'message' => 'Token Revoked'], 401);
             }
 
-            $request->attributes->set('auth_user_id', $parsed->get('user_id'));
-
-            $request->setUserResolver(function () use ($parsed) {
-                return \App\Models\SubUser::find($parsed->get('user_id'));
+            $userId = $parsed->get('user_id');
+            $request->attributes->set('auth_user_id', $userId);
+            $request->setUserResolver(function () use ($userId) {
+                return \App\Models\Monitoring\SubUser::find($userId);
             });
         } catch (\Exception $e) {
             return response()->json(['code' => 401, 'message' => $e->getMessage()], 401);

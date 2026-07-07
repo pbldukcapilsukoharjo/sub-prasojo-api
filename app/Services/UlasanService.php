@@ -1,0 +1,140 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Services;
+
+use App\Filters\UlasanFilter;
+use App\Models\Prasojo\AjuanReview;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
+class UlasanService
+{
+    public function getKpi(UlasanFilter $filter): array
+    {
+        try {
+            $cacheKey = 'ulasan:kpi:' . md5(json_encode($filter->request));
+
+            return Cache::remember($cacheKey, 600, function () use ($filter) {
+                $query = AjuanReview::query();
+                $query = $filter->apply($query);
+
+                $kpiData = (clone $query)->reorder()->select(
+                    DB::raw('AVG(review_rating) as rata_rata_bintang'),
+                    DB::raw('SUM(CASE WHEN review_rating = 5 THEN 1 ELSE 0 END) as bintang_5'),
+                    DB::raw('SUM(CASE WHEN review_rating = 4 THEN 1 ELSE 0 END) as bintang_4'),
+                    DB::raw('SUM(CASE WHEN review_rating = 3 THEN 1 ELSE 0 END) as bintang_3'),
+                    DB::raw('SUM(CASE WHEN review_rating = 2 THEN 1 ELSE 0 END) as bintang_2'),
+                    DB::raw('SUM(CASE WHEN review_rating = 1 THEN 1 ELSE 0 END) as bintang_1')
+                )->first();
+
+                return [
+                    'rata_rata_bintang' => round((float)($kpiData->rata_rata_bintang ?? 0), 1),
+                    'distribusi' => [
+                        'bintang_5' => (int)($kpiData->bintang_5 ?? 0),
+                        'bintang_4' => (int)($kpiData->bintang_4 ?? 0),
+                        'bintang_3' => (int)($kpiData->bintang_3 ?? 0),
+                        'bintang_2' => (int)($kpiData->bintang_2 ?? 0),
+                        'bintang_1' => (int)($kpiData->bintang_1 ?? 0),
+                    ]
+                ];
+            });
+        } catch (\Throwable $e) {
+            Log::error('[UlasanService@getKpi] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            throw $e;
+        }
+    }
+
+    public function getList(UlasanFilter $filter)
+    {
+        try {
+            $query = AjuanReview::query()->from('ajuan_review');
+            $query = $filter->apply($query);
+
+            $perPage = $filter->request['per_page'] ?? 10;
+
+            $data = $query->join('ajuan', 'ajuan.ajuan_id', '=', 'ajuan_review.review_ajuan_id')
+                ->leftJoin('layanan', 'layanan.layanan_kode', '=', 'ajuan.ajuan_layanan_kode')
+                ->select(
+                    'ajuan_review.review_id as id_review',
+                    DB::raw('DATE(ajuan_review.review_create_datetime) as tanggal'),
+                    'ajuan.ajuan_no_reg as no_reg',
+                    'layanan.layanan_nama as layanan',
+                    'ajuan_review.review_rating as rating',
+                    'ajuan_review.review_content as komentar'
+                )
+                ->paginate($perPage);
+
+            // --- KODE MILIK FALAH ---
+            /*
+            $data->getCollection()->transform(function ($item) {
+                return [
+                    'id_review' => $item->id_review,
+                    'tanggal' => $item->tanggal ? date('Y-m-d', strtotime((string)$item->tanggal)) : null,
+                    'no_reg' => $item->no_reg,
+                    'layanan' => $item->layanan,
+                    'rating' => $item->rating,
+                    'komentar' => $item->komentar,
+                ];
+            });
+            */
+
+            // --- POLESAN/TAMBAHAN DARI AMRU ---
+            // Menggunakan Resource agar struktur respons terpusat dan mudah di-maintain.
+            $data->getCollection()->transform(fn($item) => (new \App\Http\Resources\Ulasan\UlasanItemResource($item))->resolve());
+
+            return $data;
+        } catch (\Throwable $e) {
+            Log::error('[UlasanService@getList] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            throw $e;
+        }
+    }
+
+    public function getForExport()
+    {
+        try {
+            $query = AjuanReview::query()->from('ajuan_review');
+
+            $data = $query->join('ajuan', 'ajuan.ajuan_id', '=', 'ajuan_review.review_ajuan_id')
+                ->leftJoin('layanan', 'layanan.layanan_kode', '=', 'ajuan.ajuan_layanan_kode')
+                ->select(
+                    'ajuan_review.review_id as id_review',
+                    DB::raw('DATE(ajuan_review.review_create_datetime) as tanggal'),
+                    'ajuan.ajuan_no_reg as no_reg',
+                    'layanan.layanan_nama as layanan',
+                    'ajuan_review.review_rating as rating',
+                    'ajuan_review.review_content as komentar'
+                )
+                ->get();
+
+            // --- KODE MILIK FALAH ---
+            /*
+            return $data->map(function ($item) {
+                return [
+                    'id_review' => $item->id_review,
+                    'tanggal' => $item->tanggal ? date('Y-m-d', strtotime((string)$item->tanggal)) : null,
+                    'no_reg' => $item->no_reg,
+                    'layanan' => $item->layanan,
+                    'rating' => $item->rating,
+                    'komentar' => $item->komentar,
+                ];
+            });
+            */
+
+            // --- POLESAN/TAMBAHAN DARI AMRU ---
+            // Menggunakan Resource agar struktur respons konsisten dengan pagination
+            return $data->map(fn($item) => (new \App\Http\Resources\Ulasan\UlasanItemResource($item))->resolve());
+        } catch (\Throwable $e) {
+            Log::error('[UlasanService@getForExport] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            throw $e;
+        }
+    }
+}
