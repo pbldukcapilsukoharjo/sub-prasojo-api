@@ -28,15 +28,18 @@ class SLAService
                 $filter = new SLAFilter($filters);
                 $query = $filter->apply($query);
 
+                // Terapkan subquery SLA
+                $query = $this->applyLogSummarySubquery($query);
+
                 $statusSelesai = AjuanStatus::getStatusSelesai();
                 $targetSlaJam = config('sla.default_jam', 6);
                 $targetSlaMenit = $targetSlaJam * 60; // 360 menit
 
                 $kpiGlobal = (clone $query)->whereIn('ajuan_status', $statusSelesai)
                     ->select(
-                        DB::raw('COUNT(ajuan_id) as total_ajuan'),
-                        DB::raw("SUM(CASE WHEN TIMESTAMPDIFF(MINUTE, ajuan_create_datetime, ajuan_update_datetime) <= {$targetSlaMenit} THEN 1 ELSE 0 END) as total_memenuhi"),
-                        DB::raw('AVG(TIMESTAMPDIFF(MINUTE, ajuan_create_datetime, ajuan_update_datetime)) as rata_rata_menit')
+                        DB::raw('COUNT(ajuan.ajuan_id) as total_ajuan'),
+                        DB::raw("SUM(CASE WHEN TIMESTAMPDIFF(MINUTE, log_summary.waktu_mulai, log_summary.waktu_selesai) <= {$targetSlaMenit} THEN 1 ELSE 0 END) as total_memenuhi"),
+                        DB::raw('AVG(TIMESTAMPDIFF(MINUTE, log_summary.waktu_mulai, log_summary.waktu_selesai)) as rata_rata_menit')
                     )->first();
 
                 $rataRataMenit = (float)($kpiGlobal->rata_rata_menit ?? 0);
@@ -88,16 +91,19 @@ class SLAService
             $filter = new SLAFilter($filters);
             $query = $filter->apply($query);
 
+            // Terapkan subquery SLA
+            $query = $this->applyLogSummarySubquery($query);
+
             $statusSelesai = AjuanStatus::getStatusSelesai();
             $targetSlaMenit = config('sla.default_jam', 6) * 60; // 360 menit
             $targetSlaJam = config('sla.default_jam', 6);
 
             // -- KODE AMRU (Optimasi Agregasi Global, menggantikan iterasi Falah) -- //
-            $kpiGlobal = (clone $query)->whereIn('ajuan_status', $statusSelesai)
+            $kpiGlobal = (clone $query)->whereIn('ajuan.ajuan_status', $statusSelesai)
                 ->select(
-                    DB::raw('COUNT(ajuan_id) as total_ajuan'),
-                    DB::raw("SUM(CASE WHEN TIMESTAMPDIFF(MINUTE, ajuan_create_datetime, ajuan_update_datetime) <= {$targetSlaMenit} THEN 1 ELSE 0 END) as total_memenuhi"),
-                    DB::raw('AVG(TIMESTAMPDIFF(MINUTE, ajuan_create_datetime, ajuan_update_datetime)) as rata_rata_menit')
+                    DB::raw('COUNT(ajuan.ajuan_id) as total_ajuan'),
+                    DB::raw("SUM(CASE WHEN TIMESTAMPDIFF(MINUTE, log_summary.waktu_mulai, log_summary.waktu_selesai) <= {$targetSlaMenit} THEN 1 ELSE 0 END) as total_memenuhi"),
+                    DB::raw('AVG(TIMESTAMPDIFF(MINUTE, log_summary.waktu_mulai, log_summary.waktu_selesai)) as rata_rata_menit')
                 )->first();
 
             $averageProcessTime = round((float) ($kpiGlobal->rata_rata_menit ?? 0) / 60, 1);
@@ -129,13 +135,13 @@ class SLAService
 
             $layanans = $layanansQuery->get();
             
-            $agregatLayanan = (clone $query)->whereIn('ajuan_status', $statusSelesai)
+            $agregatLayanan = (clone $query)->whereIn('ajuan.ajuan_status', $statusSelesai)
                 ->select(
-                    'ajuan_layanan_kode',
-                    DB::raw('COUNT(ajuan_id) as jumlah_ajuan'),
-                    DB::raw('AVG(TIMESTAMPDIFF(MINUTE, ajuan_create_datetime, ajuan_update_datetime)) as rata_rata_menit')
+                    'ajuan.ajuan_layanan_kode',
+                    DB::raw('COUNT(ajuan.ajuan_id) as jumlah_ajuan'),
+                    DB::raw('AVG(TIMESTAMPDIFF(MINUTE, log_summary.waktu_mulai, log_summary.waktu_selesai)) as rata_rata_menit')
                 )
-                ->groupBy('ajuan_layanan_kode')
+                ->groupBy('ajuan.ajuan_layanan_kode')
                 ->get()
                 ->keyBy('ajuan_layanan_kode');
 
@@ -204,6 +210,9 @@ class SLAService
             $filter = new SLAFilter($filters);
             $query = $filter->apply($query);
 
+            // Terapkan subquery SLA
+            $query = $this->applyLogSummarySubquery($query);
+
             $statusSelesai = AjuanStatus::getStatusSelesai();
 
             $data = (clone $query)->join('layanan', 'layanan.layanan_kode', '=', 'ajuan.ajuan_layanan_kode')
@@ -211,7 +220,7 @@ class SLAService
                 ->select(
                     'layanan.layanan_kode',
                     'layanan.layanan_nama',
-                    DB::raw('AVG(TIMESTAMPDIFF(MINUTE, ajuan.ajuan_create_datetime, ajuan.ajuan_update_datetime)) as rata_rata_menit')
+                    DB::raw('AVG(TIMESTAMPDIFF(MINUTE, log_summary.waktu_mulai, log_summary.waktu_selesai)) as rata_rata_menit')
                 )
                 ->groupBy('layanan.layanan_kode', 'layanan.layanan_nama')
                 ->get();

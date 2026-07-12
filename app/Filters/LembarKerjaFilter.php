@@ -65,7 +65,7 @@ final class LembarKerjaFilter
         );
 
         $query->when(
-            !empty($filters['status']),
+            isset($filters['status']),
             fn (Builder $q)
                 => $q->where('lk_status', $filters['status'])
         );

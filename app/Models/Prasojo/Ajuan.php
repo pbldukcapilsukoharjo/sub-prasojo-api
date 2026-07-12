@@ -351,6 +351,21 @@ final class Ajuan extends Model
         return null;
     }
 
+    /**
+     * Get the first detail data from eager loaded relations without triggering N+1 query.
+     */
+    public function getDetailData(): ?Model
+    {
+        $method = self::DETAIL_RELATION_MAP[$this->ajuan_layanan_kode] ?? null;
+
+        if ($method !== null) {
+            $relation = $this->{$method};
+            return $relation ? $relation->first() : null;
+        }
+
+        return null;
+    }
+
     public function isSelesai(): bool
     {
         return in_array($this->ajuan_status, [self::STATUS_SELESAI, self::STATUS_SELESAI_DIPROSES], true);

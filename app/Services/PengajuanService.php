@@ -20,7 +20,12 @@ class PengajuanService
     public function getAjuanList(array $filters): LengthAwarePaginator
     {
         try {
-            $query = Ajuan::query()->with(['pelapor', 'layanan']);
+            $query = Ajuan::query()->with([
+                'pelapor', 
+                'layanan',
+                'aktaKelahiran', 'aktaKematian', 'datang', 'kia', 
+                'kk', 'ktpel', 'pindah', 'rekamJemput', 'updateData'
+            ]);
             
             $filter = new AjuanFilter();
             $query = $filter->apply($query, $filters);
@@ -90,7 +95,16 @@ class PengajuanService
     public function getLembarKerjaList(array $filters): LengthAwarePaginator
     {
         try {
-            $query = LembarKerja::query()->with(['ajuan.pelapor', 'ajuan.layanan']);
+            $query = LembarKerja::query()->with([
+                'ajuan.pelapor', 
+                'ajuan.layanan',
+                'ajuan' => function($q) {
+                    $q->with([
+                        'aktaKelahiran', 'aktaKematian', 'datang', 'kia', 
+                        'kk', 'ktpel', 'pindah', 'rekamJemput', 'updateData'
+                    ]);
+                }
+            ]);
             
             $filter = new LembarKerjaFilter();
             $query = $filter->apply($query, $filters);
@@ -114,6 +128,7 @@ class PengajuanService
                     'status' => $lk->lk_status,
                     'tanggal' => $lk->lk_create_datetime ? $lk->lk_create_datetime->format('Y-m-d H:i:s') : null,
                     'kecamatan' => $ajuan ? $ajuan->ajuan_kecamatan_name : null,
+                    'data_ajuan' => $ajuan ? $ajuan->getDetailData() : null,
                 ];
             });
 
@@ -161,7 +176,7 @@ class PengajuanService
                 $namaIdentitas = '-';
                 
                 if ($ajuan) {
-                    $detailModel = $ajuan->getDetailRelation()?->first();
+                    $detailModel = $ajuan->getDetailData();
                     if ($detailModel) {
                         $namaIdentitas = $detailModel->ajakel_nama_bayi 
                                       ?? $detailModel->ajakem_nama_jenazah 
@@ -184,6 +199,7 @@ class PengajuanService
                 
                 $data['nama_identitas_produk'] = $namaIdentitas;
                 $data['nomor'] = $produk->prod_nomor;
+                $data['data_ajuan'] = $ajuan ? $ajuan->getDetailData() : null;
                 
                 return $data;
             });
@@ -245,22 +261,35 @@ class PengajuanService
             'status' => $ajuan->ajuan_status,
             'tanggal' => $ajuan->ajuan_create_datetime ? $ajuan->ajuan_create_datetime->locale('id')->translatedFormat('d F Y, H:i') : null,
             'tanggal_parse' => $ajuan->ajuan_create_datetime ? $ajuan->ajuan_create_datetime->format('Y-m-d, H:i') : null,
+            'data_ajuan' => $ajuan->getDetailData(),
         ];
     }
 
-    /**
-     * Export master pengajuan to Excel.
-     */
     public function exportExcel(array $filters): \Symfony\Component\HttpFoundation\BinaryFileResponse
     {
         try {
-            $query = Ajuan::query()->with(['pelapor', 'layanan']);
+            $kategori = $filters['status_kategori'] ?? 'all';
+            
+            $query = Ajuan::query()->with([
+                'pelapor', 
+                'layanan',
+                'lembarKerjas',
+                'produks',
+                'aktaKelahiran', 'aktaKematian', 'datang', 'kia', 
+                'kk', 'ktpel', 'pindah', 'rekamJemput', 'updateData'
+            ]);
             
             $filter = new AjuanFilter();
             $query = $filter->applyMaster($query, $filters);
 
             $filename = 'export_pengajuan_' . date('Ymd_His') . '.xlsx';
-            return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\PengajuanExport($query), $filename);
+            if ($kategori === 'lembar_kerja') {
+                $filename = 'export_lembar_kerja_' . date('Ymd_His') . '.xlsx';
+            } elseif ($kategori === 'produk') {
+                $filename = 'export_produk_' . date('Ymd_His') . '.xlsx';
+            }
+            
+            return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\PengajuanExport($query, $kategori), $filename);
         } catch (\Throwable $e) {
             Log::error('[PengajuanService@exportExcel] ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),

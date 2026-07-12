@@ -73,11 +73,13 @@ class DashboardService
 
                     $prevQuery = Ajuan::query();
                     // Terapkan filter selain tanggal
-                    if (!empty($requestParams['id_kecamatan'])) {
-                        $prevQuery->where('ajuan_kecamatan_code', $requestParams['id_kecamatan']);
+                    $kecamatan = $requestParams['id_kecamatan'] ?? $requestParams['kecamatan'] ?? null;
+                    if (!empty($kecamatan)) {
+                        $prevQuery->where('ajuan_kecamatan_code', $kecamatan);
                     }
-                    if (!empty($requestParams['id_layanan'])) {
-                        $prevQuery->where('ajuan_layanan_kode', $requestParams['id_layanan']);
+                    $layanan = $requestParams['id_layanan'] ?? $requestParams['layanan'] ?? null;
+                    if (!empty($layanan)) {
+                        $prevQuery->where('ajuan_layanan_kode', $layanan);
                     }
                     $prevQuery->whereMonth('ajuan_create_datetime', $prevMonth)
                               ->whereYear('ajuan_create_datetime', $prevYear);

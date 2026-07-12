@@ -21,7 +21,12 @@ final class ProdukService
         try {
             $query = Produk::query()
                 ->with([
-                    'ajuan',
+                    'ajuan' => function($q) {
+                        $q->with([
+                            'aktaKelahiran', 'aktaKematian', 'datang', 'kia', 
+                            'kk', 'ktpel', 'pindah', 'rekamJemput', 'updateData'
+                        ]);
+                    },
                     'pelapor',
                 ]);
 
@@ -46,9 +51,16 @@ final class ProdukService
         try {
             return Produk::query()
                 ->with([
-                    'ajuan',
+                    'ajuan' => function($q) {
+                        $q->with([
+                            'aktaKelahiran', 'aktaKematian', 'datang', 'kia', 
+                            'kk', 'ktpel', 'pindah', 'rekamJemput', 'updateData'
+                        ]);
+                    },
                     'pelapor',
-                    'logStatuses'
+                    'logStatuses' => function($q) {
+                        $q->orderBy('log_create_datetime', 'asc');
+                    }
                 ])
                 ->findOrFail($produkId);
         } catch (\Throwable $e) {

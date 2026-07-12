@@ -28,14 +28,13 @@ final class ProdukDetailResource extends JsonResource
             'status' => $this->prod_status,
             'tanggal' => $this->prod_create_datetime ? $this->prod_create_datetime->locale('id')->translatedFormat('d F Y, H:i') : null,
             'tanggal_parse' => $this->prod_create_datetime ? $this->prod_create_datetime->format('Y-m-d, H:i') : null,
+            'data_ajuan' => $this->ajuan?->getDetailData(),
             'timeline' => $this->whenLoaded('logStatuses', function () {
                 return $this->logStatuses->map(function ($log) {
                     return [
-                        'id' => $log->log_id,
                         'status' => $log->log_status,
                         'note' => $log->log_note,
-                        'tanggal' => $log->log_create_datetime ? $log->log_create_datetime->locale('id')->translatedFormat('d F Y, H:i') : null,
-                        'tanggal_parse' => $log->log_create_datetime ? $log->log_create_datetime->format('Y-m-d, H:i') : null,
+                        'datetime' => $log->log_create_datetime ? $log->log_create_datetime->format('Y-m-d H:i:s') : null,
                     ];
                 });
             }),

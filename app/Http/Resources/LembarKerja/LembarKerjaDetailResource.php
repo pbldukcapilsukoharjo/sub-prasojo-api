@@ -32,6 +32,7 @@ final class LembarKerjaDetailResource extends JsonResource
             'status' => $this->lk_status,
             'tanggal' => $this->lk_create_datetime ? $this->lk_create_datetime->locale('id')->translatedFormat('d F Y, H:i') : null,
             'tanggal_parse' => $this->lk_create_datetime ? $this->lk_create_datetime->format('Y-m-d, H:i') : null,
+            'data_ajuan' => $this->ajuan?->getDetailData(),
         ];
     }
 }

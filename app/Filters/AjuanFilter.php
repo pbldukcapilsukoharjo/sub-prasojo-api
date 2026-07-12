@@ -32,7 +32,7 @@ final class AjuanFilter
         );
 
         $query->when(
-            !empty($filters['status']),
+            isset($filters['status']),
             fn (Builder $q) =>
                 $q->where('ajuan_status', $filters['status'])
         );
@@ -141,7 +141,7 @@ final class AjuanFilter
             $query->where('ajuan_layanan_kode', $filters['id_layanan']);
         }
 
-        if (!empty($filters['status'])) {
+        if (isset($filters['status'])) {
             $query->where('ajuan_status', $filters['status']);
         }
 

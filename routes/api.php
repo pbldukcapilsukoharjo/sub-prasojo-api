@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\FilterController;
 use App\Http\Controllers\Api\V1\OperatorController;
 use App\Http\Controllers\Api\V1\DashboardController;
 use App\Http\Controllers\Api\V1\PengajuanController;
+use App\Http\Controllers\Api\V1\ProdukController;
 use App\Http\Controllers\Api\V1\UlasanController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
@@ -66,13 +67,17 @@ Route::prefix('v1')->group(function () {
     | Pengajuan (Lembar Kerja, Ajuan, Produk)
     |--------------------------------------------------------------------------
     */
-    Route::prefix('pengajuan')->middleware('paseto.auth')->controller(PengajuanController::class)->group(function () {
-        Route::get('/export', 'export')->name('api.v1.pengajuan.export');
-        Route::get('/lembar-kerja', 'getLembarKerja');
-        Route::get('/ajuan', 'getAjuan');
-        Route::get('/ajuan/chart', 'getAjuanChart');
-        Route::get('/produk', 'getProduk');
-        Route::get('/{ajuan_id}/detail', 'getDetailTimeline');
+    Route::prefix('pengajuan')->middleware('paseto.auth')->group(function () {
+        Route::controller(PengajuanController::class)->group(function () {
+            Route::get('/export', 'export')->name('api.v1.pengajuan.export');
+            Route::get('/lembar-kerja', 'getLembarKerja');
+            Route::get('/ajuan', 'getAjuan');
+            Route::get('/ajuan/chart', 'getAjuanChart');
+            Route::get('/produk', 'getProduk');
+            Route::get('/{ajuan_id}/detail', 'getDetailTimeline');
+        });
+
+        Route::get('/produk/{produk_id}/detail', [ProdukController::class, 'show']);
     });
 
     /*
