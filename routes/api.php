@@ -13,11 +13,11 @@ use App\Http\Controllers\WilayahController;
 
 Route::prefix('v1')->group(function () {
     Route::prefix('auth')->middleware('throttle:10,1')->controller(AuthController::class)->group(function () {
-        Route::post('/register', 'register'); 
+        Route::post('/register', 'register');
         Route::post('/login', 'login');
         Route::post('/logout', 'logout');
         Route::post('/refresh', 'refresh');
-        
+
         Route::post('/forgot-password', 'forgotPassword')->middleware('throttle:3,1')->name('password.email');
         Route::post('/reset-password', 'resetPassword')->name('password.update');
     });
@@ -95,7 +95,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/distribusi', 'distribusi');
         Route::get('/export', 'export');
     });
-    
+
     /*
     |--------------------------------------------------------------------------
     | SLA

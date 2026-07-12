@@ -19,7 +19,7 @@ final class AuthService
     {
         $this->pasetoService = $pasetoService;
     }
-    
+
     public function register(array $validatedData)
     {
         try {
@@ -88,13 +88,13 @@ final class AuthService
         try {
             $jti = $data->get('jti');
             $refreshToken = RefreshToken::where('jti', $jti)->where('revoked', false)->first();
-            
+
             if (!$refreshToken) {
                 throw ValidationException::withMessages([
                     'error' => ['Token tidak ditemukan atau sudah di-revoke.'],
                 ]);
             }
-            
+
             RefreshToken::where('jti', $jti)->update(['revoked' => true, 'updated_at' => now()]);
 
             $user = SubUser::find($data->get('user_id'));
@@ -190,7 +190,7 @@ final class AuthService
     {
         try {
             $email = $validatedData['email'];
-            
+
             if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts('resend-verification:' . $email, 1)) {
                 $seconds = \Illuminate\Support\Facades\RateLimiter::availableIn('resend-verification:' . $email);
                 throw new \Exception('Harap tunggu ' . $seconds . ' detik sebelum meminta email verifikasi lagi.');

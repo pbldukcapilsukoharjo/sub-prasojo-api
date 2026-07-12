@@ -16,7 +16,7 @@ final class ForgotPasswordRequest extends FormRequest
             'email' => ['required', 'email', 'exists:sub_users,email']
         ];
     }
-    
+
     public function authorize(): bool
     {
         return true;
@@ -43,3 +43,4 @@ final class ForgotPasswordRequest extends FormRequest
         );
     }
 }
+

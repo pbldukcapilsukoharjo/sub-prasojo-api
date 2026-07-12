@@ -54,9 +54,11 @@ final class AuthController extends Controller
 
             $this->authService->saveToken($parsed);
 
+            $options = $this->cookieOptions();
+
             return ApiResponse::success('Login berhasil', [
                 'access_token' => $access_token
-            ])->cookie('refresh_token', $refresh_token, 60 * 24 * 7, null, null, true, true);
+            ])->cookie('refresh_token', $refresh_token, 60 * 24 * 7, '/', null, $options['secure'], true, false, $options['sameSite']);
         } catch (\Throwable $e) {
             Log::error('[AuthController@login] ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
@@ -111,9 +113,11 @@ final class AuthController extends Controller
 
             $result = $this->authService->refreshToken($parsed);
 
+            $options = $this->cookieOptions();
+
             return ApiResponse::success('Refresh berhasil', [
                 'access_token' => $result['access_token']
-            ])->cookie('refresh_token', $result['refresh_token'], 60 * 24 * 7, null, null, true, true);
+            ])->cookie('refresh_token', $result['refresh_token'], 60 * 24 * 7, '/', null, $options['secure'], true, false, $options['sameSite']);
         } catch (\Throwable $e) {
             Log::error('[AuthController@refresh] ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
@@ -124,16 +128,18 @@ final class AuthController extends Controller
 
     public function verifyEmail(Request $request, $id, $hash)
     {
+        $frontendUrl = config('app.frontend_url');
+
         try {
             $hasValidSignature = $request->hasValidSignature();
             $this->authService->verifyEmail($id, $hash, $hasValidSignature);
 
-            return ApiResponse::success('Email berhasil diverifikasi', [], 200);
+            return redirect()->away($frontendUrl . '/verify-success');
         } catch (\Throwable $e) {
             Log::error('[AuthController@verifyEmail] ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
             ]);
-            return ApiResponse::error('Gagal memverifikasi email', 400, ['error' => $e->getMessage()]);
+            return redirect()->away($frontendUrl . '/verify-failed?message=' . urlencode($e->getMessage()));
         }
     }
 
@@ -183,4 +189,15 @@ final class AuthController extends Controller
             return ApiResponse::error('Gagal mereset password', 400, ['error' => $e->getMessage()]);
         }
     }
+
+    protected function cookieOptions(): array
+    {
+        $isProduction = config('app.env') === 'production';
+
+        return [
+            'secure' => $isProduction,
+            'sameSite' => $isProduction ? 'None' : 'Lax',
+        ];
+    }
 }
+
