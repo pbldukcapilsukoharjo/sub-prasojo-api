@@ -38,7 +38,7 @@ final class FilterController extends Controller
     {
         // Berdasarkan IlokasiKecamatan
         $data = IlokasiKecamatan::select('kecamatan_code as id', 'kecamatan_name as name')
-            ->byKabupaten(3311)
+            ->where('kecamatan_kabupaten_id', '3311')
             ->orderBy('kecamatan_name')
             ->get();
 
