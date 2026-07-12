@@ -128,16 +128,18 @@ final class AuthController extends Controller
 
     public function verifyEmail(Request $request, $id, $hash)
     {
+        $frontendUrl = config('app.frontend_url');
+
         try {
             $hasValidSignature = $request->hasValidSignature();
             $this->authService->verifyEmail($id, $hash, $hasValidSignature);
 
-            return ApiResponse::success('Email berhasil diverifikasi', [], 200);
+            return redirect()->away($frontendUrl . '/verify-success');
         } catch (\Throwable $e) {
             Log::error('[AuthController@verifyEmail] ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
             ]);
-            return ApiResponse::error('Gagal memverifikasi email', 400, ['error' => $e->getMessage()]);
+            return redirect()->away($frontendUrl . '/verify-failed?message=' . urlencode($e->getMessage()));
         }
     }
 
@@ -191,7 +193,7 @@ final class AuthController extends Controller
     protected function cookieOptions(): array
     {
         $isProduction = config('app.env') === 'production';
-    
+
         return [
             'secure' => $isProduction,
             'sameSite' => $isProduction ? 'None' : 'Lax',
