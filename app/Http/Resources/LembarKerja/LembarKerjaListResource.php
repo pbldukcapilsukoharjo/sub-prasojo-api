@@ -32,6 +32,7 @@ final class LembarKerjaListResource extends JsonResource
             'tanggal_parse' => $this->lk_create_datetime ? $this->lk_create_datetime->format('Y-m-d, H:i') : null,
 
             'status' => $this->lk_status,
+            'data_ajuan' => $this->ajuan?->getDetailData(),
         ];
     }
 }

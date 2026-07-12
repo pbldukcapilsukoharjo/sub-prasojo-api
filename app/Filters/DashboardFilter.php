@@ -14,12 +14,14 @@ final class DashboardFilter extends BaseFilter
     {
         parent::apply($query);
 
-        if (!empty($this->request['id_kecamatan'])) {
-            $query->where('ajuan_kecamatan_code', $this->request['id_kecamatan']);
+        $kecamatan = $this->request['id_kecamatan'] ?? $this->request['kecamatan'] ?? null;
+        if (!empty($kecamatan)) {
+            $query->where('ajuan_kecamatan_code', $kecamatan);
         }
 
-        if (!empty($this->request['id_layanan'])) {
-            $query->where('ajuan_layanan_kode', $this->request['id_layanan']);
+        $layanan = $this->request['id_layanan'] ?? $this->request['layanan'] ?? null;
+        if (!empty($layanan)) {
+            $query->where('ajuan_layanan_kode', $layanan);
         }
 
         return $query;

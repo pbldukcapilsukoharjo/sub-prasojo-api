@@ -19,7 +19,7 @@ final class FilterController extends Controller
     public function layanan(): JsonResponse
     {
         $data = Layanan::select('layanan_kode as id', 'layanan_nama as name')
-            ->where('layanan_is_active', true)
+            ->where('layanan_is_active', 1)
             ->orderBy('layanan_pos')
             ->get();
 
@@ -38,6 +38,7 @@ final class FilterController extends Controller
     {
         // Berdasarkan IlokasiKecamatan
         $data = IlokasiKecamatan::select('kecamatan_code as id', 'kecamatan_name as name')
+            ->byKabupaten(3311)
             ->orderBy('kecamatan_name')
             ->get();
 

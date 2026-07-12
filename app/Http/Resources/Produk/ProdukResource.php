@@ -25,6 +25,7 @@ final class ProdukResource extends JsonResource
             'tanggal' => $this->prod_create_datetime ? $this->prod_create_datetime->locale('id')->translatedFormat('d F Y, H:i') : null,
             'tanggal_parse' => $this->prod_create_datetime ? $this->prod_create_datetime->format('Y-m-d, H:i') : null,
             'status' => $this->prod_status,
+            'data_ajuan' => $this->ajuan?->getDetailData(),
         ];
     }
 }

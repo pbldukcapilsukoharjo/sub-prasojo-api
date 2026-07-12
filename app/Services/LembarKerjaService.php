@@ -22,6 +22,12 @@ final class LembarKerjaService
             $query = LembarKerja::query()
                 ->with([
                     'ajuan.pelapor',
+                    'ajuan' => function($q) {
+                        $q->with([
+                            'aktaKelahiran', 'aktaKematian', 'datang', 'kia', 
+                            'kk', 'ktpel', 'pindah', 'rekamJemput', 'updateData'
+                        ]);
+                    },
                     'produk',
                 ]);
 
@@ -63,6 +69,12 @@ final class LembarKerjaService
             return LembarKerja::query()
                 ->with([
                     'ajuan.pelapor',
+                    'ajuan' => function($q) {
+                        $q->with([
+                            'aktaKelahiran', 'aktaKematian', 'datang', 'kia', 
+                            'kk', 'ktpel', 'pindah', 'rekamJemput', 'updateData'
+                        ]);
+                    },
                     'produk',
                 ])
                 ->findOrFail($lkId);
