@@ -263,4 +263,22 @@ class SLAService
             throw $e;
         }
     }
+
+    /**
+     * Terapkan subquery untuk menghitung waktu mulai dan waktu selesai dari tabel log_ajuan_status
+     */
+    protected function applyLogSummarySubquery(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
+    {
+        $subquery = DB::connection('mysql_prasojo')->table('log_ajuan_status')
+            ->select(
+                'log_ajuan_id',
+                DB::raw('MIN(log_create_datetime) as waktu_mulai'),
+                DB::raw('MAX(log_create_datetime) as waktu_selesai')
+            )
+            ->groupBy('log_ajuan_id');
+
+        return $query->joinSub($subquery, 'log_summary', function ($join) {
+            $join->on('ajuan.ajuan_id', '=', 'log_summary.log_ajuan_id');
+        });
+    }
 }
