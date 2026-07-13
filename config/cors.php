@@ -19,9 +19,11 @@ return [
 
     'allowed_methods' => ['OPTIONS', 'GET', 'POST', 'PUT'],
 
-    'allowed_origins' => ['http://localhost:3000', 'https://sub-prasojo-web.vercel.app'],
-
-    'allowed_origins_patterns' => [],
+    'allowed_origins' => [
+        'http://localhost:3000', 
+        'https://sub-prasojo-web.vercel.app',
+        'https://sub-prasojo-docs.vercel.app'
+    ],
 
     'allowed_headers' => ['*'],
 
