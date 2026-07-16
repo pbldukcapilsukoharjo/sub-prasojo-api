@@ -38,8 +38,8 @@ class SLAService
                 $kpiGlobal = (clone $query)->whereIn('ajuan_status', $statusSelesai)
                     ->select(
                         DB::raw('COUNT(ajuan.ajuan_id) as total_ajuan'),
-                        DB::raw("SUM(CASE WHEN TIMESTAMPDIFF(MINUTE, log_summary.waktu_mulai, log_summary.waktu_selesai) <= {$targetSlaMenit} THEN 1 ELSE 0 END) as total_memenuhi"),
-                        DB::raw('AVG(TIMESTAMPDIFF(MINUTE, log_summary.waktu_mulai, log_summary.waktu_selesai)) as rata_rata_menit')
+                        DB::raw("SUM(CASE WHEN sla_summary.durasi_sla_menit <= {$targetSlaMenit} THEN 1 ELSE 0 END) as total_memenuhi"),
+                        DB::raw('AVG(sla_summary.durasi_sla_menit) as rata_rata_menit')
                     )->first();
 
                 $rataRataMenit = (float)($kpiGlobal->rata_rata_menit ?? 0);
@@ -102,8 +102,8 @@ class SLAService
             $kpiGlobal = (clone $query)->whereIn('ajuan.ajuan_status', $statusSelesai)
                 ->select(
                     DB::raw('COUNT(ajuan.ajuan_id) as total_ajuan'),
-                    DB::raw("SUM(CASE WHEN TIMESTAMPDIFF(MINUTE, log_summary.waktu_mulai, log_summary.waktu_selesai) <= {$targetSlaMenit} THEN 1 ELSE 0 END) as total_memenuhi"),
-                    DB::raw('AVG(TIMESTAMPDIFF(MINUTE, log_summary.waktu_mulai, log_summary.waktu_selesai)) as rata_rata_menit')
+                    DB::raw("SUM(CASE WHEN sla_summary.durasi_sla_menit <= {$targetSlaMenit} THEN 1 ELSE 0 END) as total_memenuhi"),
+                    DB::raw('AVG(sla_summary.durasi_sla_menit) as rata_rata_menit')
                 )->first();
 
             $averageProcessTime = round((float) ($kpiGlobal->rata_rata_menit ?? 0) / 60, 1);
@@ -139,7 +139,7 @@ class SLAService
                 ->select(
                     'ajuan.ajuan_layanan_kode',
                     DB::raw('COUNT(ajuan.ajuan_id) as jumlah_ajuan'),
-                    DB::raw('AVG(TIMESTAMPDIFF(MINUTE, log_summary.waktu_mulai, log_summary.waktu_selesai)) as rata_rata_menit')
+                    DB::raw('AVG(sla_summary.durasi_sla_menit) as rata_rata_menit')
                 )
                 ->groupBy('ajuan.ajuan_layanan_kode')
                 ->get()
@@ -220,7 +220,7 @@ class SLAService
                 ->select(
                     'layanan.layanan_kode',
                     'layanan.layanan_nama',
-                    DB::raw('AVG(TIMESTAMPDIFF(MINUTE, log_summary.waktu_mulai, log_summary.waktu_selesai)) as rata_rata_menit')
+                    DB::raw('AVG(sla_summary.durasi_sla_menit) as rata_rata_menit')
                 )
                 ->groupBy('layanan.layanan_kode', 'layanan.layanan_nama')
                 ->get();
@@ -269,16 +269,8 @@ class SLAService
      */
     protected function applyLogSummarySubquery(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
     {
-        $subquery = DB::connection('mysql_prasojo')->table('log_ajuan_status')
-            ->select(
-                'log_ajuan_id',
-                DB::raw('MIN(log_create_datetime) as waktu_mulai'),
-                DB::raw('MAX(log_create_datetime) as waktu_selesai')
-            )
-            ->groupBy('log_ajuan_id');
-
-        return $query->joinSub($subquery, 'log_summary', function ($join) {
-            $join->on('ajuan.ajuan_id', '=', 'log_summary.log_ajuan_id');
-        });
+        $defaultDb = config('database.connections.mysql.database');
+        
+        return $query->join(DB::raw("`{$defaultDb}`.`ajuan_sla_summaries` as sla_summary"), 'sla_summary.ajuan_id', '=', 'ajuan.ajuan_id');
     }
 }
