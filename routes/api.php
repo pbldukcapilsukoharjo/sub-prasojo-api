@@ -46,7 +46,6 @@ Route::prefix('v1')->group(function () {
             Route::get('/kpi-global', 'kpiGlobal')->name('api.v1.operator.kpi-global');
             Route::get('/export', 'export')->name('api.v1.operator.export');
             Route::get('/peringkat', 'peringkat')->name('api.v1.operator.peringkat');
-            Route::get('/ranking', 'peringkat')->name('api.v1.operator.ranking');
             Route::get('/{id}/kpi', 'kpi')->name('api.v1.operator.kpi');
             Route::get('/{id}/riwayat', 'riwayat')->name('api.v1.operator.riwayat');
         });
@@ -98,7 +97,7 @@ Route::prefix('v1')->group(function () {
     */
     Route::prefix('wilayah')->middleware('paseto.auth')->controller(\App\Http\Controllers\Api\V1\WilayahController::class)->group(function () {
         Route::get('/distribusi', 'distribusi');
-        Route::get('/matriks', 'matriks');
+        Route::get('/kpi', 'kpi');
         Route::get('/export', 'export');
     });
 

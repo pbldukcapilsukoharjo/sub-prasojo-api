@@ -36,7 +36,7 @@ final class WilayahController extends Controller
 
             $data = $this->wilayahService->getDistribusi($filter, $perPage);
 
-            return ApiResponse::paginated('Berhasil', $data);
+            return ApiResponse::paginated('Berhasil mengambil data distribusi wilayah', $data);
         } catch (\Throwable $e) {
             Log::error('[WilayahController@distribusi] ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
@@ -49,20 +49,20 @@ final class WilayahController extends Controller
      * @param WilayahRequest $request
      * @return JsonResponse
      */
-    public function matriks(WilayahRequest $request): JsonResponse
+    public function kpi(WilayahRequest $request): JsonResponse
     {
         try {
             $validated = $request->validated();
             $filter = new WilayahFilter($validated);
 
-            $data = $this->wilayahService->getMatriks($filter);
+            $data = $this->wilayahService->getKpi($filter);
 
-            return ApiResponse::success('Berhasil', $data);
+            return ApiResponse::success('Berhasil mengambil data KPI wilayah', $data);
         } catch (\Throwable $e) {
-            Log::error('[WilayahController@matriks] ' . $e->getMessage(), [
+            Log::error('[WilayahController@kpi] ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
             ]);
-            return ApiResponse::error('Gagal mengambil data matriks wilayah', 500, ['error' => $e->getMessage()]);
+            return ApiResponse::error('Gagal mengambil data KPI wilayah', 500, ['error' => $e->getMessage()]);
         }
     }
 

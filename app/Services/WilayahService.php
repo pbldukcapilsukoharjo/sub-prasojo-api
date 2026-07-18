@@ -31,6 +31,45 @@ class WilayahService
                 return $this->formatDistribusiItem($item);
             });
 
+            $items = $paginator->items();
+            if (!empty($items)) {
+                $isFilteredByKecamatan = request()->has('id_kecamatan') && request()->get('id_kecamatan') != '';
+                $wilayahCol = $isFilteredByKecamatan ? 'ajuan_kelurahan_code' : 'ajuan_kecamatan_code';
+                $wilayahKey = $isFilteredByKecamatan ? 'id_desa' : 'id_kecamatan';
+
+                $wilayahIds = array_map(function($item) use ($wilayahKey) {
+                    return $item[$wilayahKey];
+                }, $items);
+
+                $layananQuery = Ajuan::query();
+                $layananQuery = $filter->apply($layananQuery);
+                
+                $layananCounts = $layananQuery->whereIn("ajuan.{$wilayahCol}", $wilayahIds)
+                    ->select("ajuan.{$wilayahCol}", 'ajuan.ajuan_layanan_kode', DB::raw('COUNT(ajuan.ajuan_id) as total'))
+                    ->groupBy("ajuan.{$wilayahCol}", 'ajuan.ajuan_layanan_kode')
+                    ->get();
+
+                $layananMap = [];
+                foreach ($layananCounts as $row) {
+                    $wId = $row->{$wilayahCol};
+                    if (!isset($layananMap[$wId])) {
+                        $layananMap[$wId] = [];
+                    }
+                    $layananMap[$wId][$row->ajuan_layanan_kode] = $row->total;
+                }
+
+                $layanans = Layanan::orderBy('layanan_pos')->pluck('layanan_kode')->toArray();
+
+                $paginator->getCollection()->transform(function ($item) use ($layananMap, $layanans, $wilayahKey) {
+                    $wId = $item[$wilayahKey];
+                    $item['layanan'] = [];
+                    foreach ($layanans as $layananKode) {
+                        $item['layanan'][$layananKode] = $layananMap[$wId][$layananKode] ?? 0;
+                    }
+                    return $item;
+                });
+            }
+
             return $paginator;
         } catch (\Throwable $e) {
             Log::error('[WilayahService@getDistribusi] ' . $e->getMessage(), [
@@ -41,58 +80,46 @@ class WilayahService
     }
 
     /**
-     * Get Matrix Tabel Distribusi (Baris: Wilayah, Kolom: Layanan)
+     * Get KPI Wilayah
      *
      * @param WilayahFilter $filter
      * @return array
      */
-    public function getMatriks(WilayahFilter $filter): array
+    public function getKpi(WilayahFilter $filter): array
     {
         try {
             $query = Ajuan::query();
             $query = $filter->apply($query);
-
-            $layanans = Layanan::orderBy('layanan_pos')->get();
+            $totalAjuan = $query->count('ajuan_id');
 
             $isFilteredByKecamatan = request()->has('id_kecamatan') && request()->get('id_kecamatan') != '';
 
+            $wilayahQuery = Ajuan::query();
+            $wilayahQuery = $filter->apply($wilayahQuery);
+
             if ($isFilteredByKecamatan) {
-                $query->whereNotNull('ajuan_kelurahan_code')->where('ajuan_kelurahan_code', '!=', '');
-                $groupBy = ['ajuan_kelurahan_code', 'ajuan_kelurahan_name'];
-                $select = ['ajuan_kelurahan_code as id_wilayah', 'ajuan_kelurahan_name as nama_wilayah', 'ajuan_layanan_kode'];
+                $jumlahWilayah = $wilayahQuery->whereNotNull('ajuan_kelurahan_code')
+                                              ->where('ajuan_kelurahan_code', '!=', '')
+                                              ->distinct('ajuan_kelurahan_code')
+                                              ->count('ajuan_kelurahan_code');
+                $labelWilayah = 'jumlah_desa';
             } else {
-                $query->whereNotNull('ajuan_kecamatan_code')->where('ajuan_kecamatan_code', '!=', '');
-                $groupBy = ['ajuan_kecamatan_code', 'ajuan_kecamatan_name'];
-                $select = ['ajuan_kecamatan_code as id_wilayah', 'ajuan_kecamatan_name as nama_wilayah', 'ajuan_layanan_kode'];
+                $jumlahWilayah = $wilayahQuery->whereNotNull('ajuan_kecamatan_code')
+                                              ->where('ajuan_kecamatan_code', '!=', '')
+                                              ->distinct('ajuan_kecamatan_code')
+                                              ->count('ajuan_kecamatan_code');
+                $labelWilayah = 'jumlah_kecamatan';
             }
 
-            $query->select(array_merge($select, [
-                DB::raw('COUNT(ajuan_id) as total_ajuan')
-            ]))
-            ->groupBy(array_merge($groupBy, ['ajuan_layanan_kode']));
+            $rataRata = $jumlahWilayah > 0 ? $totalAjuan / $jumlahWilayah : 0;
 
-            $rawData = $query->get();
-
-            $matrix = [];
-            foreach ($rawData as $row) {
-                $wilayahId = $row->id_wilayah;
-                if (!isset($matrix[$wilayahId])) {
-                    $matrix[$wilayahId] = [
-                        'id_wilayah' => $row->id_wilayah,
-                        'nama_wilayah' => $row->nama_wilayah,
-                        'layanan' => []
-                    ];
-                    // inisiasi 0
-                    foreach ($layanans as $l) {
-                        $matrix[$wilayahId]['layanan'][$l->layanan_kode] = 0;
-                    }
-                }
-                $matrix[$wilayahId]['layanan'][$row->ajuan_layanan_kode] = $row->total_ajuan;
-            }
-
-            return array_values($matrix);
+            return [
+                $labelWilayah => $jumlahWilayah,
+                'total_ajuan' => $totalAjuan,
+                'rata_rata_ajuan' => (int) round($rataRata)
+            ];
         } catch (\Throwable $e) {
-            Log::error('[WilayahService@getMatriks] ' . $e->getMessage(), [
+            Log::error('[WilayahService@getKpi] ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
             ]);
             throw $e;
