@@ -17,31 +17,8 @@ class SLAResource extends JsonResource
     ): array {
 
         return [
-
-            'rata_rata_waktu_proses' =>
-                $this['rata_rata_waktu_proses'],
-
-            'pencapaian_sla' =>
-                $this['pencapaian_sla'],
-
-            'target_sla' =>
-                $this['target_sla'],
-
-            'jumlah_ajuan' =>
-                $this['jumlah_ajuan'],
-
-            'daftar_rincian' => [
-
-                'list' =>
-                    SLADetailResource::collection(
-                        collect(
-                            $this['daftar_rincian']['list']
-                        )
-                    ),
-
-                'meta' =>
-                    $this['daftar_rincian']['meta'],
-            ],
+            'list' => SLADetailResource::collection(collect($this['list'])),
+            'meta' => $this['meta'],
         ];
     }
 }

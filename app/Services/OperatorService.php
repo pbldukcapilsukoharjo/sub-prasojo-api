@@ -29,10 +29,13 @@ class OperatorService
 
             $query = $filter->apply($query);
 
+            $defaultDb = config('database.connections.mysql.database');
+            $query->leftJoin(DB::raw("`{$defaultDb}`.`ajuan_sla_summaries` as sla_summary"), 'sla_summary.ajuan_id', '=', 'ajuan.ajuan_id');
+
             $stats = $query->select(
                 DB::raw('COUNT(log_ajuan_status.log_id) as total_layanan'),
                 DB::raw("SUM(CASE WHEN UPPER(log_ajuan_status.log_status) = 'SELESAI DIPROSES' THEN 1 ELSE 0 END) as total_selesai"),
-                DB::raw("AVG(CASE WHEN UPPER(log_ajuan_status.log_status) = 'SELESAI DIPROSES' THEN TIMESTAMPDIFF(MINUTE, ajuan.ajuan_create_datetime, log_ajuan_status.log_create_datetime) ELSE NULL END) as rata_rata_durasi_menit")
+                DB::raw("AVG(CASE WHEN UPPER(log_ajuan_status.log_status) = 'SELESAI DIPROSES' THEN sla_summary.durasi_sla_menit ELSE NULL END) as rata_rata_durasi_menit")
             )->first();
 
             $totalLayanan = (int) ($stats->total_layanan ?? 0);
@@ -118,11 +121,14 @@ class OperatorService
 
         $query = $filter->apply($query);
 
+        $defaultDb = config('database.connections.mysql.database');
+        $query->leftJoin(DB::raw("`{$defaultDb}`.`ajuan_sla_summaries` as sla_summary"), 'sla_summary.ajuan_id', '=', 'ajuan.ajuan_id');
+
         return $query->select(
             'admin.id as id_operator',
             'admin.fullname as nama',
             DB::raw('COUNT(log_ajuan_status.log_id) as total_berkas'),
-            DB::raw("AVG(CASE WHEN UPPER(log_ajuan_status.log_status) = 'SELESAI DIPROSES' THEN TIMESTAMPDIFF(MINUTE, ajuan.ajuan_create_datetime, log_ajuan_status.log_create_datetime) ELSE NULL END) as rata_rata_waktu_menit")
+            DB::raw("AVG(CASE WHEN UPPER(log_ajuan_status.log_status) = 'SELESAI DIPROSES' THEN sla_summary.durasi_sla_menit ELSE NULL END) as rata_rata_waktu_menit")
         )
         ->groupBy('admin.id', 'admin.fullname')
         ->orderBy('total_berkas', 'desc');
@@ -266,6 +272,34 @@ class OperatorService
             return $paginator;
         } catch (\Throwable $e) {
             Log::error('[OperatorService@getRiwayat] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            throw $e;
+        }
+    }
+
+    /**
+     * Update target SLA for a specific operator.
+     */
+    public function updateSlaTarget(int|string $operatorId, array $data): array
+    {
+        try {
+            // Kita pakai string type karena id dari sub_users adalah UUID
+            $subUser = \App\Models\Monitoring\SubUser::findOrFail($operatorId);
+
+            $subUser->update([
+                'sla_target_value' => $data['sla_target_value'],
+                'sla_target_unit' => $data['sla_target_unit'],
+            ]);
+
+            return [
+                'id' => $subUser->id,
+                'name' => $subUser->fullname,
+                'sla_target_value' => $subUser->sla_target_value,
+                'sla_target_unit' => $subUser->sla_target_unit,
+            ];
+        } catch (\Throwable $e) {
+            Log::error('[OperatorService@updateSlaTarget] ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
             ]);
             throw $e;

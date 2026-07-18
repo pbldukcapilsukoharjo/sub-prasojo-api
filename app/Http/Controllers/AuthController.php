@@ -82,7 +82,7 @@ final class AuthController extends Controller
 
             $result = $this->authService->logout($parsed, $access_parsed);
 
-            if(!$result) {
+            if (!$result) {
                 throw new \Exception('Terjadi kesalahan pada token');
             }
 

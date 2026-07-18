@@ -45,7 +45,7 @@ final class PasetoService
         }
     }
 
-    public function generateRefreshToken($user) 
+    public function generateRefreshToken($user)
     {
         try {
             return (new Builder())

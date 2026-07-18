@@ -16,6 +16,8 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             SubUserSeeder::class,
+            SlaConfigSeeder::class,
+            MasterLiburNasionalSeeder::class,
         ]);
     }
 }

@@ -43,11 +43,14 @@ class DashboardService
                 $statusSelesai = "'" . implode("','", AjuanStatus::getStatusSelesai()) . "'";
                 $statusDitolak = "'" . implode("','", AjuanStatus::getStatusDitolak()) . "'";
 
+                $defaultDb = config('database.connections.mysql.database');
+                $query->leftJoin(DB::raw("`{$defaultDb}`.`ajuan_sla_summaries` as sla_summary"), 'sla_summary.ajuan_id', '=', 'ajuan.ajuan_id');
+
                 $kpi = $query->select(
-                    DB::raw('COUNT(ajuan_id) as total_pengajuan'),
-                    DB::raw("SUM(CASE WHEN ajuan_status IN ($statusSelesai) THEN 1 ELSE 0 END) as total_selesai"),
-                    DB::raw("SUM(CASE WHEN ajuan_status IN ($statusDitolak) THEN 1 ELSE 0 END) as total_ditolak"),
-                    DB::raw("AVG(CASE WHEN ajuan_status IN ($statusSelesai) THEN TIMESTAMPDIFF(MINUTE, ajuan_create_datetime, ajuan_update_datetime) ELSE NULL END) as rata_rata_sla")
+                    DB::raw('COUNT(ajuan.ajuan_id) as total_pengajuan'),
+                    DB::raw("SUM(CASE WHEN ajuan.ajuan_status IN ($statusSelesai) THEN 1 ELSE 0 END) as total_selesai"),
+                    DB::raw("SUM(CASE WHEN ajuan.ajuan_status IN ($statusDitolak) THEN 1 ELSE 0 END) as total_ditolak"),
+                    DB::raw("AVG(CASE WHEN ajuan.ajuan_status IN ($statusSelesai) THEN sla_summary.durasi_sla_menit ELSE NULL END) as rata_rata_sla")
                 )->first();
 
                 $total_pengajuan = (int) ($kpi->total_pengajuan ?? 0);
@@ -84,11 +87,13 @@ class DashboardService
                     $prevQuery->whereMonth('ajuan_create_datetime', $prevMonth)
                               ->whereYear('ajuan_create_datetime', $prevYear);
 
+                    $prevQuery->leftJoin(DB::raw("`{$defaultDb}`.`ajuan_sla_summaries` as sla_summary"), 'sla_summary.ajuan_id', '=', 'ajuan.ajuan_id');
+
                     $prevKpi = $prevQuery->select(
-                        DB::raw('COUNT(ajuan_id) as total_pengajuan'),
-                        DB::raw("SUM(CASE WHEN ajuan_status IN ($statusSelesai) THEN 1 ELSE 0 END) as total_selesai"),
-                        DB::raw("SUM(CASE WHEN ajuan_status IN ($statusDitolak) THEN 1 ELSE 0 END) as total_ditolak"),
-                        DB::raw("AVG(CASE WHEN ajuan_status IN ($statusSelesai) THEN TIMESTAMPDIFF(MINUTE, ajuan_create_datetime, ajuan_update_datetime) ELSE NULL END) as rata_rata_sla")
+                        DB::raw('COUNT(ajuan.ajuan_id) as total_pengajuan'),
+                        DB::raw("SUM(CASE WHEN ajuan.ajuan_status IN ($statusSelesai) THEN 1 ELSE 0 END) as total_selesai"),
+                        DB::raw("SUM(CASE WHEN ajuan.ajuan_status IN ($statusDitolak) THEN 1 ELSE 0 END) as total_ditolak"),
+                        DB::raw("AVG(CASE WHEN ajuan.ajuan_status IN ($statusSelesai) THEN sla_summary.durasi_sla_menit ELSE NULL END) as rata_rata_sla")
                     )->first();
 
                     $prevTotalPengajuan = (int) ($prevKpi->total_pengajuan ?? 0);

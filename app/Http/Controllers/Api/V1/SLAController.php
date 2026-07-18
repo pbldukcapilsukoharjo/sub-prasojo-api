@@ -34,10 +34,9 @@ class SLAController extends Controller
                 'success' => true,
                 'code' => 200,
                 'message' => 'Berhasil mendapatkan data SLA',
-                // Gunakan Resource jika ada, namun karena response Falah cukup kompleks
-                // (termasuk list dan meta), kita langsung me-return hasil atau membungkus di Resource.
-                // Sesuai kode Falah sebelumnya, SLAResource digunakan:
-                'data' => new SLAResource($data),
+                // Kita langsung pisahkan list (item) ke dalam 'data' dan informasi halaman ke dalam 'meta'
+                'data' => \App\Http\Resources\SLA\SLADetailResource::collection(collect($data['list']))->resolve(),
+                'meta' => $data['meta'],
             ]);
         } catch (\Throwable $e) {
             Log::error('[SLAController@index] ' . $e->getMessage(), [
@@ -86,6 +85,30 @@ class SLAController extends Controller
                 'trace' => $e->getTraceAsString(),
             ]);
             return ApiResponse::error('Gagal mengekspor data SLA', 500, ['error' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Trigger SLA recalculation manually.
+     */
+    public function recalculate(): JsonResponse
+    {
+        try {
+            \Illuminate\Support\Facades\Artisan::call('sla:recalculate');
+            $output = \Illuminate\Support\Facades\Artisan::output();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Proses kalkulasi ulang SLA berhasil dijalankan.',
+                'data' => [
+                    'output' => trim($output),
+                ],
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('[SLAController@recalculate] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return ApiResponse::error('Gagal menjalankan kalkulasi ulang SLA', 500, ['error' => $e->getMessage()]);
         }
     }
 }

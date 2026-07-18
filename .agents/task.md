@@ -21,3 +21,18 @@
 - [x] 8. Testing & Verifikasi
   - [x] Jalankan manual `artisan app:calculate-sla` dan pastikan tabel agregasi terisi benar.
   - [x] Cek tidak terjadi N+1 Query pada laporan.
+
+- [x] 9. Implementasi SLA Dinamis Per Akun
+  - [x] Migration untuk tambah kolom `sla_target_hours` di `sub_users`
+  - [x] Migration untuk tambah `operator_user_id`, `target_sla_menit_aktual`, `durasi_kondisi_a_menit`, `durasi_kondisi_b_menit` di `ajuan_sla_summaries`
+  - [x] Update Model `AjuanSlaSummary`
+- [x] 10. Implementasi Jam Kerja Operasional Dinamis
+  - [x] Migration & Model untuk tabel `master_jam_operasional`
+  - [x] Seeder untuk `master_jam_operasional` (Senin-Minggu default hours)
+  - [x] Update `SLACalculator.php` untuk load data `master_jam_operasional`
+- [x] 11. Refactor SLA Calculator Command
+  - [x] Hitung Mode A (Full) dan Mode B (Verifikasi Terbaru)
+  - [x] Ambil `operator_user_id` dari log `SELESAI DIPROSES`
+  - [x] Simpan snapshot `target_sla_menit_aktual`
+- [x] 12. Refactor UI/API Distribusi Wilayah per Layanan
+  - [x] Tambahkan API endpoint / parameter untuk visualisasi per layanan

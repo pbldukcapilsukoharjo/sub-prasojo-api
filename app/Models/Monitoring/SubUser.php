@@ -21,6 +21,8 @@ class SubUser extends Authenticatable implements MustVerifyEmail, CanResetPasswo
         'fullname',
         'email',
         'hashed_password',
+        'sla_target_value',
+        'sla_target_unit',
         'verified_at',
     ];
 
@@ -30,6 +32,8 @@ class SubUser extends Authenticatable implements MustVerifyEmail, CanResetPasswo
 
     protected $casts = [
         'verified_at' => 'datetime',
+        'sla_target_value' => 'integer',
+        'sla_target_unit' => 'string',
     ];
 
     public function getAuthPasswordName()

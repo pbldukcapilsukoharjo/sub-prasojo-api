@@ -30,12 +30,16 @@ class CalculateSLACommand extends Command
     {
         $this->info('Starting SLA calculation...');
 
-        // Get all ajuan_id that are 'SELESAI DIPROSES'
+        // Get all ajuan_id that are 'SELESAI DIPROSES', taking the latest row per ajuan_id
         $completedAjuans = DB::connection('mysql_prasojo')
             ->table('log_ajuan_status')
             ->where('log_status', 'SELESAI DIPROSES')
-            ->select('log_ajuan_id', DB::raw('MAX(log_create_datetime) as end_time'))
-            ->groupBy('log_ajuan_id')
+            ->whereIn('log_id', function ($query) {
+                $query->select(DB::raw('MAX(log_id)'))
+                      ->from('log_ajuan_status')
+                      ->where('log_status', 'SELESAI DIPROSES')
+                      ->groupBy('log_ajuan_id');
+            })
             ->get();
 
         $bar = $this->output->createProgressBar(count($completedAjuans));
@@ -44,14 +48,14 @@ class CalculateSLACommand extends Command
         $processedCount = 0;
 
         foreach ($completedAjuans as $ajuan) {
-            // Check if already calculated
-            $exists = AjuanSlaSummary::where('ajuan_id', $ajuan->log_ajuan_id)->exists();
-            if ($exists) {
-                $bar->advance();
-                continue;
-            }
+            $endTime = $ajuan->log_create_datetime;
+            $operatorId = $ajuan->log_admin_id;
 
-            // Find start time
+            // Target SLA snapshot (menggunakan default global)
+            // Evaluasi sebenarnya dilakukan secara dinamis di SLAService berdasarkan user yang sedang login.
+            $targetMenit = config('sla.default_jam', 6) * 60; 
+
+            // Find start time Mode B (PROSES VERIFIKASI terakhir)
             $startTimeRow = DB::connection('mysql_prasojo')
                 ->table('log_ajuan_status')
                 ->where('log_ajuan_id', $ajuan->log_ajuan_id)
@@ -59,24 +63,44 @@ class CalculateSLACommand extends Command
                 ->orderBy('log_create_datetime', 'desc')
                 ->first();
 
-            if (!$startTimeRow) {
+            // Find start time Mode A (Log pertama kali ajuan dibuat)
+            $startTimeFullRow = DB::connection('mysql_prasojo')
+                ->table('log_ajuan_status')
+                ->where('log_ajuan_id', $ajuan->log_ajuan_id)
+                ->orderBy('log_create_datetime', 'asc')
+                ->first();
+
+            if (!$startTimeFullRow) {
                 $bar->advance();
                 continue;
             }
 
-            $startTime = $startTimeRow->log_create_datetime;
-            $endTime = $ajuan->end_time;
+            $waktuMulaiModeB = $startTimeRow ? $startTimeRow->log_create_datetime : $startTimeFullRow->log_create_datetime;
+            $waktuMulaiModeA = $startTimeFullRow->log_create_datetime;
 
             // Calculate business minutes
-            $minutes = SLACalculator::calculateMinutes($startTime, $endTime);
+            $minutesB = SLACalculator::calculateMinutes($waktuMulaiModeB, $endTime);
+            $minutesA = SLACalculator::calculateMinutes($waktuMulaiModeA, $endTime);
 
-            // Save to summary table
-            AjuanSlaSummary::create([
-                'ajuan_id' => $ajuan->log_ajuan_id,
-                'waktu_mulai' => $startTime,
-                'waktu_selesai' => $endTime,
-                'durasi_sla_menit' => $minutes,
-            ]);
+            // Calculate target datetimes
+            $targetDatetimeB = SLACalculator::calculateTargetDatetime($waktuMulaiModeB, $targetMenit);
+            $targetDatetimeA = SLACalculator::calculateTargetDatetime($waktuMulaiModeA, $targetMenit);
+
+            // Save to summary table (use updateOrCreate to update existing historical data)
+            AjuanSlaSummary::updateOrCreate(
+                ['ajuan_id' => $ajuan->log_ajuan_id],
+                [
+                    'operator_user_id' => $operatorId,
+                    'target_sla_menit_aktual' => $targetMenit,
+                    'waktu_mulai' => $waktuMulaiModeB, // Default legacy
+                    'waktu_selesai' => $endTime,
+                    'durasi_sla_menit' => $minutesB, // Default legacy
+                    'durasi_kondisi_a_menit' => $minutesA,
+                    'durasi_kondisi_b_menit' => $minutesB,
+                    'target_waktu_selesai_kondisi_a' => $targetDatetimeA,
+                    'target_waktu_selesai_kondisi_b' => $targetDatetimeB,
+                ]
+            );
 
             $processedCount++;
             $bar->advance();

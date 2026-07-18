@@ -50,6 +50,14 @@ Route::prefix('v1')->group(function () {
             Route::get('/{id}/kpi', 'kpi')->name('api.v1.operator.kpi');
             Route::get('/{id}/riwayat', 'riwayat')->name('api.v1.operator.riwayat');
         });
+        
+    Route::prefix('operator')
+        ->middleware('paseto.auth')
+        ->controller(OperatorController::class)
+        ->group(function (): void {
+            Route::put('/sla-target', 'updateSlaTarget');
+            Route::patch('/sla-target', 'updateSlaTarget');
+        });
 
     /*
     |--------------------------------------------------------------------------
@@ -98,6 +106,7 @@ Route::prefix('v1')->group(function () {
     */
     Route::prefix('wilayah')->middleware('paseto.auth')->controller(\App\Http\Controllers\Api\V1\WilayahController::class)->group(function () {
         Route::get('/distribusi', 'distribusi');
+        Route::get('/matriks', 'matriks');
         Route::get('/export', 'export');
     });
 
@@ -108,9 +117,20 @@ Route::prefix('v1')->group(function () {
     */
     Route::prefix('sla')->middleware('paseto.auth')->controller(\App\Http\Controllers\Api\V1\SLAController::class)->group(function () {
         Route::get('/', 'index');
-        Route::get('/layanan', 'index');
         Route::get('/kpi', 'kpi');
         Route::get('/export', 'export');
+        Route::post('/recalculate', 'recalculate');
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Jam Operasional
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('operational-hours')->middleware('paseto.auth')->controller(\App\Http\Controllers\Api\V1\OperationalHourController::class)->group(function () {
+        Route::get('/', 'index');
+        Route::put('/{id}', 'update');
+        Route::patch('/{id}', 'update');
     });
 
     /*

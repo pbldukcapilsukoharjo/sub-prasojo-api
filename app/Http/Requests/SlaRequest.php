@@ -66,6 +66,11 @@ class SlaRequest extends FormRequest
                 'integer',
             ],
 
+            'operator_id' => [
+                'nullable',
+                'integer',
+            ],
+
             'periode_bulan' => [
                 'nullable',
                 'integer',

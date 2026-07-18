@@ -1,1 +1,4 @@
-<?php require "vendor/autoload.php"; require "bootstrap/app.php"; $app->make("Illuminate\Contracts\Console\Kernel")->bootstrap(); echo optional(null)?->format("Y-m-d"); echo "Done";
+<?php
+$service = app(App\Services\SLAService::class);
+$result = $service->getLaporanSLA(["tahun" => 2025, "bulan" => 6]);
+dump($result);

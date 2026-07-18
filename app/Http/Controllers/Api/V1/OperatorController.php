@@ -137,4 +137,28 @@ final class OperatorController extends Controller
             return ApiResponse::error('Gagal mengekspor data operator', 500, ['error' => $e->getMessage()]);
         }
     }
+
+    /**
+     * Update Target SLA Operator
+     */
+    public function updateSlaTarget(\App\Http\Requests\Operator\UpdateSlaTargetRequest $request): JsonResponse
+    {
+        try {
+            $id = auth()->id();
+            $data = $this->service->updateSlaTarget($id, $request->validated());
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Target SLA operator berhasil diperbarui.',
+                'data' => $data,
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['status' => 'error', 'message' => 'Operator tidak ditemukan'], 404);
+        } catch (\Throwable $e) {
+            Log::error('[OperatorController@updateSlaTarget] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return response()->json(['status' => 'error', 'message' => 'Gagal memperbarui target SLA operator', 'error' => $e->getMessage()], 500);
+        }
+    }
 }

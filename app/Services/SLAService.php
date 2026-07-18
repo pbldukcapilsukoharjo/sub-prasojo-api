@@ -31,9 +31,30 @@ class SLAService
                 // Terapkan subquery SLA
                 $query = $this->applyLogSummarySubquery($query);
 
+                if (!empty($filters['max_sla_minutes'])) {
+                    $query->where('sla_summary.durasi_sla_menit', '<=', (int) $filters['max_sla_minutes']);
+                }
+
+                if (!empty($filters['operator_id'])) {
+                    $query->where('sla_summary.operator_user_id', $filters['operator_id']);
+                }
+
                 $statusSelesai = AjuanStatus::getStatusSelesai();
+                
+                $user = auth()->user();
+                $targetSlaMenit = config('sla.default_jam', 6) * 60; // default 360 menit
                 $targetSlaJam = config('sla.default_jam', 6);
-                $targetSlaMenit = $targetSlaJam * 60; // 360 menit
+                
+                if ($user && $user->sla_target_value && $user->sla_target_unit) {
+                    if ($user->sla_target_unit === 'menit') {
+                        $targetSlaMenit = $user->sla_target_value;
+                    } elseif ($user->sla_target_unit === 'jam') {
+                        $targetSlaMenit = $user->sla_target_value * 60;
+                    } elseif ($user->sla_target_unit === 'hari') {
+                        $targetSlaMenit = $user->sla_target_value * 1440;
+                    }
+                    $targetSlaJam = round($targetSlaMenit / 60, 2);
+                }
 
                 $kpiGlobal = (clone $query)->whereIn('ajuan_status', $statusSelesai)
                     ->select(
@@ -94,36 +115,34 @@ class SLAService
             // Terapkan subquery SLA
             $query = $this->applyLogSummarySubquery($query);
 
+            if (!empty($filters['max_sla_minutes'])) {
+                $query->where('sla_summary.durasi_sla_menit', '<=', (int) $filters['max_sla_minutes']);
+            }
+
+            if (!empty($filters['operator_id'])) {
+                $query->where('sla_summary.operator_user_id', $filters['operator_id']);
+            }
+
             $statusSelesai = AjuanStatus::getStatusSelesai();
+            
+            $user = auth()->user();
             $targetSlaMenit = config('sla.default_jam', 6) * 60; // 360 menit
             $targetSlaJam = config('sla.default_jam', 6);
-
-            // -- KODE AMRU (Optimasi Agregasi Global, menggantikan iterasi Falah) -- //
-            $kpiGlobal = (clone $query)->whereIn('ajuan.ajuan_status', $statusSelesai)
-                ->select(
-                    DB::raw('COUNT(ajuan.ajuan_id) as total_ajuan'),
-                    DB::raw("SUM(CASE WHEN sla_summary.durasi_sla_menit <= {$targetSlaMenit} THEN 1 ELSE 0 END) as total_memenuhi"),
-                    DB::raw('AVG(sla_summary.durasi_sla_menit) as rata_rata_menit')
-                )->first();
-
-            $averageProcessTime = round((float) ($kpiGlobal->rata_rata_menit ?? 0) / 60, 1);
             
-            $totalAjuan = (int) ($kpiGlobal->total_ajuan ?? 0);
-            $totalMemenuhi = (int) ($kpiGlobal->total_memenuhi ?? 0);
-            
-            // -- KODE FALAH (Logika Pencapaian SLA) -- //
-            $slaAchievement = $totalAjuan > 0 ? round(($totalMemenuhi / $totalAjuan) * 100) : 0;
+            if ($user && $user->sla_target_value && $user->sla_target_unit) {
+                if ($user->sla_target_unit === 'menit') {
+                    $targetSlaMenit = $user->sla_target_value;
+                } elseif ($user->sla_target_unit === 'jam') {
+                    $targetSlaMenit = $user->sla_target_value * 60;
+                } elseif ($user->sla_target_unit === 'hari') {
+                    $targetSlaMenit = $user->sla_target_value * 1440;
+                }
+                $targetSlaJam = round($targetSlaMenit / 60, 2);
+            }
 
             // -- KODE FALAH (Detail per layanan) -- //
             $details = [];
 
-            // KODE FALAH: Total Ajuan Row
-            $details[] = [
-                'id' => 1,
-                'jenis_layanan' => 'TOTAL AJUAN',
-                'jumlah_ajuan' => $totalAjuan,
-                'rata_rata_waktu' => $averageProcessTime,
-            ];
 
             // -- KODE AMRU (Optimasi: Ambil semua layanan, lalu fetch agregat 1x query untuk menghindari N+1) -- //
             $layanansQuery = Layanan::query()->orderBy('layanan_pos');
@@ -175,18 +194,12 @@ class SLAService
             $list = $detailsCollection->forPage($page, $perPage)->values();
 
             return [
-                'rata_rata_waktu_proses' => $averageProcessTime,
-                'pencapaian_sla' => $slaAchievement,
-                'target_sla' => $targetSlaJam,
-                'jumlah_ajuan' => $totalAjuan,
-                'daftar_rincian' => [
-                    'list' => $list->toArray(),
-                    'meta' => [
-                        'page' => $page,
-                        'per_page' => $perPage,
-                        'total' => $total,
-                        'total_page' => (int) ceil($total / $perPage),
-                    ],
+                'list' => $list->toArray(),
+                'meta' => [
+                    'page' => $page,
+                    'per_page' => $perPage,
+                    'total' => $total,
+                    'total_page' => (int) ceil($total / $perPage),
                 ],
             ];
         } catch (\Throwable $e) {
@@ -213,6 +226,14 @@ class SLAService
             // Terapkan subquery SLA
             $query = $this->applyLogSummarySubquery($query);
 
+            if (!empty($filters['max_sla_minutes'])) {
+                $query->where('sla_summary.durasi_sla_menit', '<=', (int) $filters['max_sla_minutes']);
+            }
+
+            if (!empty($filters['operator_id'])) {
+                $query->where('sla_summary.operator_user_id', $filters['operator_id']);
+            }
+
             $statusSelesai = AjuanStatus::getStatusSelesai();
 
             $data = (clone $query)->join('layanan', 'layanan.layanan_kode', '=', 'ajuan.ajuan_layanan_kode')
@@ -225,7 +246,19 @@ class SLAService
                 ->groupBy('layanan.layanan_kode', 'layanan.layanan_nama')
                 ->get();
 
+            $user = auth()->user();
             $defaultSla = config('sla.default_jam', 6) * 60;
+            
+            if ($user && $user->sla_target_value && $user->sla_target_unit) {
+                if ($user->sla_target_unit === 'menit') {
+                    $defaultSla = $user->sla_target_value;
+                } elseif ($user->sla_target_unit === 'jam') {
+                    $defaultSla = $user->sla_target_value * 60;
+                } elseif ($user->sla_target_unit === 'hari') {
+                    $defaultSla = $user->sla_target_value * 1440;
+                }
+            }
+            
             $perLayanan = config('sla.per_layanan', []);
 
             return $data->map(function ($item) use ($defaultSla, $perLayanan) {
@@ -273,4 +306,6 @@ class SLAService
         
         return $query->join(DB::raw("`{$defaultDb}`.`ajuan_sla_summaries` as sla_summary"), 'sla_summary.ajuan_id', '=', 'ajuan.ajuan_id');
     }
+
+
 }

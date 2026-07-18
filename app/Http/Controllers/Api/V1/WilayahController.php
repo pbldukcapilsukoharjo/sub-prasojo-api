@@ -47,6 +47,27 @@ final class WilayahController extends Controller
 
     /**
      * @param WilayahRequest $request
+     * @return JsonResponse
+     */
+    public function matriks(WilayahRequest $request): JsonResponse
+    {
+        try {
+            $validated = $request->validated();
+            $filter = new WilayahFilter($validated);
+
+            $data = $this->wilayahService->getMatriks($filter);
+
+            return ApiResponse::success('Berhasil', $data);
+        } catch (\Throwable $e) {
+            Log::error('[WilayahController@matriks] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return ApiResponse::error('Gagal mengambil data matriks wilayah', 500, ['error' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * @param WilayahRequest $request
      */
     public function export(WilayahRequest $request)
     {

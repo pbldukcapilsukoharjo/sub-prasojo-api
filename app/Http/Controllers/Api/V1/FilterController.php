@@ -55,13 +55,25 @@ final class FilterController extends Controller
      */
     public function pelapor(): JsonResponse
     {
-        // Opsi statis yang di-support oleh AjuanFilter & LembarKerjaFilter
-        $data = [
-            ['id' => 'online', 'name' => 'Online'],
-            ['id' => 'offline', 'name' => 'Offline'],
-            ['id' => 'mandiri', 'name' => 'Mandiri'],
-            ['id' => 'operator', 'name' => 'Operator'],
-        ];
+        $dbRoles = Ajuan::query()
+            ->whereNotNull('ajuan_pelapor_role_name')
+            ->where('ajuan_pelapor_role_name', '!=', '')
+            ->distinct()
+            ->pluck('ajuan_pelapor_role_name')
+            ->toArray();
+
+        if (!in_array('TAMAT', $dbRoles)) {
+            $dbRoles[] = 'TAMAT';
+        }
+
+        sort($dbRoles);
+
+        $data = array_map(function ($role) {
+            return [
+                'id' => $role,
+                'name' => $role,
+            ];
+        }, $dbRoles);
 
         return response()->json([
             'status' => true,

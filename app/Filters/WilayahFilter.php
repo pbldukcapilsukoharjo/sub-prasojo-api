@@ -18,6 +18,10 @@ final class WilayahFilter extends BaseFilter
             $query->where('ajuan_kecamatan_code', $this->request['id_kecamatan']);
         }
 
+        if (!empty($this->request['layanan_kode'])) {
+            $query->where('ajuan_layanan_kode', $this->request['layanan_kode']);
+        }
+
         return $query;
     }
 
@@ -27,7 +31,7 @@ final class WilayahFilter extends BaseFilter
             $search = strtolower($this->request['search']);
             $query->where(function ($q) use ($search) {
                 $q->whereRaw('LOWER(ajuan_kecamatan_name) LIKE ?', ["%{$search}%"])
-                  ->orWhereRaw('LOWER(ajuan_desa_name) LIKE ?', ["%{$search}%"]);
+                  ->orWhereRaw('LOWER(ajuan_kelurahan_name) LIKE ?', ["%{$search}%"]);
             });
         }
     }

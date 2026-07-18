@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\MasterLiburNasional;
+use App\Models\MasterJamOperasional;
 use Carbon\Carbon;
 use Spatie\Holidays\Holidays;
 
@@ -10,9 +11,7 @@ class SLACalculator
 {
     /**
      * Calculate SLA duration in minutes between two timestamps.
-     * Business Hours:
-     * - Monday-Thursday: 08:00 - 15:00
-     * - Friday: 08:00 - 13:00
+     * Business Hours are fetched dynamically from MasterJamOperasional.
      * 
      * @param string|Carbon $startTime
      * @param string|Carbon $endTime
@@ -51,17 +50,23 @@ class SLACalculator
                                          
         $allHolidays = array_unique(array_merge($holidays, $dbHolidays));
 
-        while ($current->lessThan($end)) {
-            $isWeekend = $current->isWeekend();
-            $isHoliday = in_array($current->format('Y-m-d'), $allHolidays);
+        // Ambil master jam operasional
+        $masterJam = MasterJamOperasional::all()->keyBy('hari_kode');
 
-            if (!$isWeekend && (!$isHoliday)) {
+        while ($current->lessThan($end)) {
+            $hariKode = $current->dayOfWeekIso; // 1 = Senin, 7 = Minggu
+            $jamOp = $masterJam->get($hariKode);
+            
+            $isLiburNasional = in_array($current->format('Y-m-d'), $allHolidays);
+            $isLiburHari = $jamOp ? $jamOp->is_libur : $current->isWeekend();
+
+            if (!$isLiburNasional && !$isLiburHari && $jamOp && $jamOp->jam_buka && $jamOp->jam_tutup) {
                 // Determine business hours for current day
-                $startHour = 8;
-                $endHour = $current->isFriday() ? 13 : 15;
+                $partsBuka = explode(':', $jamOp->jam_buka);
+                $partsTutup = explode(':', $jamOp->jam_tutup);
                 
-                $businessStart = $current->copy()->setTime($startHour, 0, 0);
-                $businessEnd = $current->copy()->setTime($endHour, 0, 0);
+                $businessStart = $current->copy()->setTime((int)$partsBuka[0], (int)$partsBuka[1], 0);
+                $businessEnd = $current->copy()->setTime((int)$partsTutup[0], (int)$partsTutup[1], 0);
 
                 if ($current->isSameDay($start) && $current->isSameDay($end)) {
                     // Both start and end on the same day
@@ -93,5 +98,78 @@ class SLACalculator
         }
 
         return $totalMinutes;
+    }
+
+    /**
+     * Calculate target datetime given a start time and target SLA duration in minutes.
+     * Skips non-business hours and holidays dynamically.
+     * 
+     * @param string|Carbon $startTime
+     * @param int $targetMinutes
+     * @return Carbon|null
+     */
+    public static function calculateTargetDatetime($startTime, int $targetMinutes): ?Carbon
+    {
+        if ($targetMinutes <= 0) {
+            return Carbon::parse($startTime);
+        }
+
+        $current = Carbon::parse($startTime);
+        $masterJam = MasterJamOperasional::all()->keyBy('hari_kode');
+
+        $currentYear = null;
+        $allHolidays = [];
+
+        while ($targetMinutes > 0) {
+            if ($currentYear !== $current->year) {
+                $currentYear = $current->year;
+                $spatieHolidays = Holidays::for('id', $currentYear)->get();
+                $holidays = [];
+                foreach ($spatieHolidays as $holiday) {
+                    $holidays[] = Carbon::parse($holiday->date)->format('Y-m-d');
+                }
+                
+                $dbHolidays = MasterLiburNasional::whereYear('tanggal', $currentYear)
+                    ->pluck('tanggal')
+                    ->map(function($date) {
+                        return Carbon::parse($date)->format('Y-m-d');
+                    })
+                    ->toArray();
+
+                $allHolidays = array_unique(array_merge($allHolidays, $holidays, $dbHolidays));
+            }
+
+            $hariKode = $current->dayOfWeekIso;
+            $jamOp = $masterJam->get($hariKode);
+            
+            $isLiburNasional = in_array($current->format('Y-m-d'), $allHolidays);
+            $isLiburHari = $jamOp ? $jamOp->is_libur : $current->isWeekend();
+
+            if (!$isLiburNasional && !$isLiburHari && $jamOp && $jamOp->jam_buka && $jamOp->jam_tutup) {
+                $partsBuka = explode(':', $jamOp->jam_buka);
+                $partsTutup = explode(':', $jamOp->jam_tutup);
+                
+                $businessStart = $current->copy()->setTime((int)$partsBuka[0], (int)$partsBuka[1], 0);
+                $businessEnd = $current->copy()->setTime((int)$partsTutup[0], (int)$partsTutup[1], 0);
+
+                if ($current->lessThan($businessStart)) {
+                    $current = $businessStart->copy();
+                }
+
+                if ($current->lessThan($businessEnd)) {
+                    $availableMinutes = $current->diffInMinutes($businessEnd);
+
+                    if ($availableMinutes >= $targetMinutes) {
+                        return $current->copy()->addMinutes($targetMinutes);
+                    } else {
+                        $targetMinutes -= $availableMinutes;
+                    }
+                }
+            }
+
+            $current->addDay()->startOfDay();
+        }
+
+        return $current;
     }
 }
