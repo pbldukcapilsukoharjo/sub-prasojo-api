@@ -51,14 +51,6 @@ Route::prefix('v1')->group(function () {
             Route::get('/{id}/riwayat', 'riwayat')->name('api.v1.operator.riwayat');
         });
         
-    Route::prefix('operator')
-        ->middleware('paseto.auth')
-        ->controller(OperatorController::class)
-        ->group(function (): void {
-            Route::put('/sla-target', 'updateSlaTarget');
-            Route::patch('/sla-target', 'updateSlaTarget');
-        });
-
     /*
     |--------------------------------------------------------------------------
     | Dashboard
@@ -120,6 +112,8 @@ Route::prefix('v1')->group(function () {
         Route::get('/kpi', 'kpi');
         Route::get('/export', 'export');
         Route::post('/recalculate', 'recalculate');
+        Route::put('/target', 'updateSlaTarget');
+        Route::patch('/target', 'updateSlaTarget');
     });
 
     /*

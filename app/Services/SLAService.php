@@ -307,5 +307,31 @@ class SLAService
         return $query->join(DB::raw("`{$defaultDb}`.`ajuan_sla_summaries` as sla_summary"), 'sla_summary.ajuan_id', '=', 'ajuan.ajuan_id');
     }
 
+    /**
+     * Update target SLA for a specific operator.
+     */
+    public function updateSlaTarget(int|string $operatorId, array $data): array
+    {
+        try {
+            // Kita pakai string type karena id dari sub_users adalah UUID
+            $subUser = \App\Models\Monitoring\SubUser::findOrFail($operatorId);
 
+            $subUser->update([
+                'sla_target_value' => $data['sla_target_value'],
+                'sla_target_unit' => $data['sla_target_unit'],
+            ]);
+
+            return [
+                'id' => $subUser->id,
+                'name' => $subUser->fullname,
+                'sla_target_value' => $subUser->sla_target_value,
+                'sla_target_unit' => $subUser->sla_target_unit,
+            ];
+        } catch (\Throwable $e) {
+            Log::error('[SLAService@updateSlaTarget] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            throw $e;
+        }
+    }
 }
