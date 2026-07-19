@@ -99,6 +99,9 @@ class SLAService
     /**
      * Mendapatkan data SLA.
      * Menggabungkan struktur output Falah dengan optimasi query SQL Amru.
+     * 
+     * @param array $filters
+     * @return array{list: array, meta: array}
      */
     public function index(array $filters): array
     {
@@ -169,11 +172,24 @@ class SLAService
                 $jml = $agregat ? (int) $agregat->jumlah_ajuan : 0;
                 $rataMenit = $agregat ? (float) $agregat->rata_rata_menit : 0;
 
+                $jam = floor($rataMenit / 60);
+                $menit = round($rataMenit % 60);
+                $waktuText = "";
+                if ($jam > 0) {
+                    $waktuText .= $jam . " Jam ";
+                }
+                $waktuText .= $menit . " Menit";
+                $waktuText = trim($waktuText);
+                if ($waktuText === "0 Menit" || $waktuText === "") {
+                    $waktuText = "0 Menit";
+                }
+
                 $details[] = [
                     'id' => $index + 2,
                     'jenis_layanan' => strtoupper($layanan->layanan_nama),
                     'jumlah_ajuan' => $jml,
-                    'rata_rata_waktu' => round($rataMenit / 60, 1),
+                    'rata_rata_menit' => $rataMenit,
+                    'rata_rata_waktu' => $waktuText,
                 ];
             }
 
@@ -183,15 +199,22 @@ class SLAService
             |--------------------------------------------------------------------------
             |
             */
+            /** @var \Illuminate\Support\Collection $detailsCollection */
             $detailsCollection = collect($details);
 
-            match ($filters['sort_by'] ?? 'newest') {
-                'oldest' => $detailsCollection = $detailsCollection->sortBy('rata_rata_waktu')->values(),
-                default => $detailsCollection = $detailsCollection->sortByDesc('rata_rata_waktu')->values(),
-            };
+            if (($filters['sort_by'] ?? 'newest') === 'oldest') {
+                $sortedCollection = $detailsCollection->sortBy('rata_rata_menit')->values();
+            } else {
+                $sortedCollection = $detailsCollection->sortByDesc('rata_rata_menit')->values();
+            }
 
-            $total = $detailsCollection->count();
-            $list = $detailsCollection->forPage($page, $perPage)->values();
+            $total = $sortedCollection->count();
+            
+            /** @var \Illuminate\Support\Collection $list */
+            $list = $sortedCollection->forPage($page, $perPage)->map(function($item) {
+                unset($item['rata_rata_menit']);
+                return $item;
+            })->values();
 
             return [
                 'list' => $list->toArray(),

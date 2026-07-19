@@ -28,7 +28,7 @@ class SLADetailResource extends JsonResource
                 (int) $this['jumlah_ajuan'],
 
             'rata_rata_waktu' =>
-                (float) $this['rata_rata_waktu'],
+                $this['rata_rata_waktu'],
         ];
     }
 }

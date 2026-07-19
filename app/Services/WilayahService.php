@@ -33,7 +33,7 @@ class WilayahService
 
             $items = $paginator->items();
             if (!empty($items)) {
-                $isFilteredByKecamatan = request()->has('id_kecamatan') && request()->get('id_kecamatan') != '';
+                $isFilteredByKecamatan = request()->has('id_kecamatan') && request()->input('id_kecamatan') != '';
                 $wilayahCol = $isFilteredByKecamatan ? 'ajuan_kelurahan_code' : 'ajuan_kecamatan_code';
                 $wilayahKey = $isFilteredByKecamatan ? 'id_desa' : 'id_kecamatan';
 
@@ -92,7 +92,7 @@ class WilayahService
             $query = $filter->apply($query);
             $totalAjuan = $query->count('ajuan_id');
 
-            $isFilteredByKecamatan = request()->has('id_kecamatan') && request()->get('id_kecamatan') != '';
+            $isFilteredByKecamatan = request()->has('id_kecamatan') && request()->input('id_kecamatan') != '';
 
             $wilayahQuery = Ajuan::query();
             $wilayahQuery = $filter->apply($wilayahQuery);
@@ -144,7 +144,7 @@ class WilayahService
             $query->leftJoin(DB::raw("`{$defaultDb}`.`ajuan_sla_summaries` as sla_summary"), 'sla_summary.ajuan_id', '=', 'ajuan.ajuan_id');
 
             // Cek apakah filter id_kecamatan diterapkan
-            $isFilteredByKecamatan = request()->has('id_kecamatan') && request()->get('id_kecamatan') != '';
+            $isFilteredByKecamatan = request()->has('id_kecamatan') && request()->input('id_kecamatan') != '';
 
             if ($isFilteredByKecamatan) {
                 $query->whereNotNull('ajuan.ajuan_kelurahan_code')
@@ -206,7 +206,7 @@ class WilayahService
         $textWaktu .= $menit . " Menit";
         if (trim($textWaktu) === "0 Menit") $textWaktu = "0 Menit";
 
-        $isFilteredByKecamatan = request()->has('id_kecamatan') && request()->get('id_kecamatan') != '';
+        $isFilteredByKecamatan = request()->has('id_kecamatan') && request()->input('id_kecamatan') != '';
 
         $response = [
             'total_ajuan' => $totalAjuan,
