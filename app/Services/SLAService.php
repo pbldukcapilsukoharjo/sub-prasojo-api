@@ -21,9 +21,27 @@ class SLAService
     {
         try {
             $requestParams = request()->all();
-            $cacheKey = 'sla:kpi:' . md5(json_encode($requestParams));
+            $userId = request()->attributes->get('auth_user_id');
+            
+            $user = $userId ? \App\Models\Monitoring\SubUser::find($userId) : null;
+            $defaultJam = config('sla.default_jam', 6);
+            $targetSlaMenit = $defaultJam * 60; // default 360 menit
+            $targetSlaText = "{$defaultJam} Jam";
+            
+            if ($user && $user->sla_target_value && $user->sla_target_unit) {
+                if ($user->sla_target_unit === 'menit') {
+                    $targetSlaMenit = $user->sla_target_value;
+                } elseif ($user->sla_target_unit === 'jam') {
+                    $targetSlaMenit = $user->sla_target_value * 60;
+                } elseif ($user->sla_target_unit === 'hari') {
+                    $targetSlaMenit = $user->sla_target_value * 1440;
+                }
+                $targetSlaText = $user->sla_target_value . " " . ucfirst($user->sla_target_unit);
+            }
 
-            return Cache::remember($cacheKey, 600, function () use ($filters) {
+            $cacheKey = 'sla:kpi:' . md5(json_encode($requestParams) . ':' . $userId . ':' . $targetSlaMenit);
+
+            return Cache::remember($cacheKey, 600, function () use ($filters, $targetSlaMenit, $targetSlaText) {
                 $query = Ajuan::query()->from('ajuan');
                 $filter = new SLAFilter($filters);
                 $query = $filter->apply($query);
@@ -40,21 +58,6 @@ class SLAService
                 }
 
                 $statusSelesai = AjuanStatus::getStatusSelesai();
-                
-                $user = auth()->user();
-                $targetSlaMenit = config('sla.default_jam', 6) * 60; // default 360 menit
-                $targetSlaJam = config('sla.default_jam', 6);
-                
-                if ($user && $user->sla_target_value && $user->sla_target_unit) {
-                    if ($user->sla_target_unit === 'menit') {
-                        $targetSlaMenit = $user->sla_target_value;
-                    } elseif ($user->sla_target_unit === 'jam') {
-                        $targetSlaMenit = $user->sla_target_value * 60;
-                    } elseif ($user->sla_target_unit === 'hari') {
-                        $targetSlaMenit = $user->sla_target_value * 1440;
-                    }
-                    $targetSlaJam = round($targetSlaMenit / 60, 2);
-                }
 
                 $kpiGlobal = (clone $query)->whereIn('ajuan_status', $statusSelesai)
                     ->select(
@@ -84,7 +87,7 @@ class SLAService
                 return [
                     'rata_rata_global_text' => $slaText,
                     'capaian_sla_persen' => $capaianPersen,
-                    'target_sla' => $targetSlaJam,
+                    'target_sla' => $targetSlaText,
                     'jumlah_ajuan' => $totalAjuan,
                 ];
             });
@@ -356,5 +359,18 @@ class SLAService
             ]);
             throw $e;
         }
+    }
+
+    /**
+     * Get Target SLA Operator
+     */
+    public function getSlaTarget(int|string $operatorId): array
+    {
+        $user = \App\Models\Monitoring\SubUser::findOrFail($operatorId);
+
+        return [
+            'sla_target_value' => $user->sla_target_value ?? config('sla.default_jam', 6),
+            'sla_target_unit' => $user->sla_target_unit ?? 'jam',
+        ];
     }
 }
