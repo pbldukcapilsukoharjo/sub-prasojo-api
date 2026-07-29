@@ -118,7 +118,7 @@ class SLAController extends Controller
     public function updateSlaTarget(\App\Http\Requests\Operator\UpdateSlaTargetRequest $request): JsonResponse
     {
         try {
-            $id = auth()->id();
+            $id = (string) $request->attributes->get('auth_user_id');
             $data = $this->service->updateSlaTarget($id, $request->validated());
 
             return response()->json([
