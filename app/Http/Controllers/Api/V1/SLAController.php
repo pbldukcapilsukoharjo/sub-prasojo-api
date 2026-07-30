@@ -135,4 +135,28 @@ class SLAController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Gagal memperbarui target SLA operator', 'error' => $e->getMessage()], 500);
         }
     }
+
+    /**
+     * Get Target SLA Operator
+     */
+    public function getSlaTarget(): JsonResponse
+    {
+        try {
+            $id = request()->attributes->get('auth_user_id');
+            $data = $this->service->getSlaTarget($id);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Berhasil mengambil data target SLA operator',
+                'data' => $data,
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['status' => 'error', 'message' => 'Operator tidak ditemukan'], 404);
+        } catch (\Throwable $e) {
+            Log::error('[SLAController@getSlaTarget] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return response()->json(['status' => 'error', 'message' => 'Gagal mengambil target SLA operator', 'error' => $e->getMessage()], 500);
+        }
+    }
 }

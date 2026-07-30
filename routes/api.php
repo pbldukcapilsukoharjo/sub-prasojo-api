@@ -111,6 +111,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/kpi', 'kpi');
         Route::get('/export', 'export');
         Route::post('/recalculate', 'recalculate');
+        Route::get('/target', 'getSlaTarget');
         Route::put('/target', 'updateSlaTarget');
         Route::patch('/target', 'updateSlaTarget');
     });
