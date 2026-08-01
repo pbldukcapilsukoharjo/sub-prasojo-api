@@ -4,11 +4,16 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Exports\HolidayTemplateExport;
+use App\Imports\HolidayImport;
 use App\Models\MasterLiburNasional;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use InvalidArgumentException;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 final class HolidayService
 {
@@ -168,6 +173,96 @@ final class HolidayService
             });
         } catch (\Throwable $e) {
             Log::error('[HolidayService@destroyBulk] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            throw $e;
+        }
+    }
+
+    /**
+     * Import holiday data from uploaded Excel file.
+     * Full rollback if any validation or duplicate check fails.
+     */
+    public function importFromExcel(UploadedFile $file): array
+    {
+        try {
+            $import = new HolidayImport();
+            Excel::import($import, $file);
+
+            if (!empty($import->getErrors())) {
+                throw new InvalidArgumentException(implode(' ', $import->getErrors()));
+            }
+
+            $rows = $import->getRows();
+
+            if (empty($rows)) {
+                throw new InvalidArgumentException('File Excel tidak berisi data hari libur yang valid.');
+            }
+
+            $dates = array_column($rows, 'tanggal');
+
+            // Check duplicate dates inside Excel file
+            $counts = array_count_values($dates);
+            $duplicates = array_keys(array_filter($counts, fn ($count) => $count > 1));
+
+            if (!empty($duplicates)) {
+                throw new InvalidArgumentException(
+                    'Terdapat tanggal duplikat dalam file Excel: ' . implode(', ', $duplicates)
+                );
+            }
+
+            // Check existing dates in database
+            $existing = MasterLiburNasional::whereIn('tanggal', $dates)
+                ->pluck('tanggal')
+                ->map(fn ($d) => is_string($d) ? $d : $d->format('Y-m-d'))
+                ->toArray();
+
+            if (count($existing) > 0) {
+                throw new InvalidArgumentException(
+                    'Tanggal berikut dalam file Excel sudah terdaftar di database: ' . implode(', ', $existing)
+                );
+            }
+
+            return DB::transaction(function () use ($rows, $dates) {
+                $now = now();
+                $insertData = array_map(function ($item) use ($now) {
+                    return [
+                        'tanggal' => $item['tanggal'],
+                        'keterangan' => $item['keterangan'],
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ];
+                }, $rows);
+
+                MasterLiburNasional::insert($insertData);
+
+                $inserted = MasterLiburNasional::whereIn('tanggal', $dates)
+                    ->orderBy('tanggal', 'asc')
+                    ->get()
+                    ->toArray();
+
+                return [
+                    'total_imported' => count($inserted),
+                    'holidays' => $inserted,
+                ];
+            });
+        } catch (\Throwable $e) {
+            Log::error('[HolidayService@importFromExcel] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            throw $e;
+        }
+    }
+
+    /**
+     * Generate template Excel file download for holiday import.
+     */
+    public function generateTemplate(): BinaryFileResponse
+    {
+        try {
+            return Excel::download(new HolidayTemplateExport(), 'template_hari_libur.xlsx');
+        } catch (\Throwable $e) {
+            Log::error('[HolidayService@generateTemplate] ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
             ]);
             throw $e;
