@@ -11,6 +11,12 @@ class SLACalculatorTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->seed(\Database\Seeders\SlaConfigSeeder::class);
+    }
+
     public function test_normal_monday_to_thursday()
     {
         // Monday 08:00 - 15:00 is 7 hours = 420 mins
