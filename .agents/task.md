@@ -85,15 +85,15 @@
   - `git commit -m "test: tambah pengujian fitur CRUD dan import hari libur"`
 
 ## Fase 5 — Dokumentasi & Finalisasi
-- [ ] 5.1 Update `docs/api_documentation.md`
-  - [ ] Tambahkan section "8. Modul Master Hari Libur" dengan spec lengkap semua endpoint
-- [ ] 5.2 Update `docs/api_endpoints_sla.md`
-  - [ ] Tambahkan referensi endpoint holidays
-- [ ] 5.3 Review akhir
-  - [ ] Pastikan SLACalculator.php masih bekerja normal (tidak ada breaking change)
-  - [ ] Pastikan tidak ada N+1 query
-  - [ ] Jalankan `php artisan test` full suite
-- [ ] 5.4 Commit fase 5
+- [x] 5.1 Update `docs/api_documentation.md`
+  - [x] Tambahkan section "8. Modul Master Hari Libur" dengan spec lengkap semua endpoint
+- [x] 5.2 Update `docs/api_endpoints_sla.md`
+  - [x] Tambahkan referensi endpoint holidays
+- [x] 5.3 Review akhir
+  - [x] Pastikan SLACalculator.php masih bekerja normal (tidak ada breaking change)
+  - [x] Pastikan tidak ada N+1 query
+  - [x] Jalankan `php artisan test` full suite
+- [x] 5.4 Commit fase 5
   - `git add .`
   - `git commit -m "docs: tambah dokumentasi endpoint master hari libur"`
 

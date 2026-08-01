@@ -697,4 +697,197 @@ Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
 Content-Disposition: attachment; filename="export_ulasan_20240101_20240131.xlsx"
 
 <binary_data>
+
+---
+
+## 8. Modul Master Hari Libur
+
+### 8.1 List Hari Libur 🟡 [BARU] ✅ [BERFUNGSI]
+**Endpoint:** `GET /api/v1/holidays`
+**Deskripsi:** Menampilkan daftar hari libur nasional dengan filter tahun dan pencarian keterangan.
+**Headers:** `Authorization: Bearer {PASETO_TOKEN}`
+
+**Query Parameters:**
+| Parameter | Tipe | Wajib | Keterangan |
+| :--- | :--- | :--- | :--- |
+| `tahun` | `integer` | Tidak | Filter berdasarkan tahun (contoh: `2027`) |
+| `search` | `string` | Tidak | Pencarian berdasarkan keterangan |
+| `page` | `integer` | Tidak | Halaman paginasi (default: 1) |
+| `per_page` | `integer` | Tidak | Jumlah item per halaman (default: 15, max: 100) |
+
+**Response Sukses (200 OK):**
+```json
+{
+  "status": true,
+  "code": 200,
+  "message": "Berhasil mengambil data hari libur",
+  "data": [
+    {
+      "id": 1,
+      "tanggal": "2027-01-01",
+      "keterangan": "Tahun Baru 2027 Masehi",
+      "created_at": "2026-08-01T09:00:00.000000Z",
+      "updated_at": "2026-08-01T09:00:00.000000Z"
+    }
+  ],
+  "meta": {
+    "page": 1,
+    "per_page": 15,
+    "total": 1,
+    "total_page": 1
+  }
+}
+```
+
+### 8.2 Tambah Hari Libur (Single & Bulk) 🟡 [BARU] ✅ [BERFUNGSI]
+**Endpoint:** `POST /api/v1/holidays`
+**Deskripsi:** Menambahkan satu atau beberapa data hari libur nasional sekaligus (bulk insert).
+**Headers:** `Authorization: Bearer {PASETO_TOKEN}`
+
+**Body Parameters (JSON):**
+| Parameter | Tipe | Wajib | Keterangan |
+| :--- | :--- | :--- | :--- |
+| `holidays` | `array` | Ya | Array objek hari libur (minimal 1 item) |
+| `holidays.*.tanggal` | `string` | Ya | Tanggal libur (format `YYYY-MM-DD`, harus unik & belum ada di DB) |
+| `holidays.*.keterangan` | `string` | Ya | Keterangan hari libur (max: 255) |
+
+**Response Sukses (201 Created):**
+```json
+{
+  "status": true,
+  "code": 201,
+  "message": "Berhasil menambahkan data hari libur",
+  "data": [
+    {
+      "id": 1,
+      "tanggal": "2027-01-01",
+      "keterangan": "Tahun Baru 2027 Masehi",
+      "created_at": "2026-08-01T09:00:00.000000Z",
+      "updated_at": "2026-08-01T09:00:00.000000Z"
+    }
+  ]
+}
+```
+
+### 8.3 Download Template Excel 🟡 [BARU] ✅ [BERFUNGSI]
+**Endpoint:** `GET /api/v1/holidays/template`
+**Deskripsi:** Mengunduh template file Excel (.xlsx) untuk panduan pengisian data hari libur.
+**Headers:** `Authorization: Bearer {PASETO_TOKEN}`
+
+**Response Sukses (200 OK):**
+Header response:
+```http
+HTTP/1.1 200 OK
+Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+Content-Disposition: attachment; filename="template_hari_libur.xlsx"
+```
+
+### 8.4 Import Hari Libur dari Excel 🟡 [BARU] ✅ [BERFUNGSI]
+**Endpoint:** `POST /api/v1/holidays/import`
+**Deskripsi:** Mengimpor data hari libur nasional dari file Excel. Menggunakan transaksi **full rollback** apabila terdapat duplikasi tanggal (internal dalam file maupun dengan data di database).
+**Headers:** `Authorization: Bearer {PASETO_TOKEN}`
+
+**Body Parameters (multipart/form-data):**
+| Parameter | Tipe | Wajib | Keterangan |
+| :--- | :--- | :--- | :--- |
+| `file` | `file` | Ya | File Excel (.xlsx, .xls, max: 2048 KB) |
+
+**Response Sukses (200 OK):**
+```json
+{
+  "status": true,
+  "code": 200,
+  "message": "Berhasil mengimpor 2 data hari libur",
+  "data": [
+    {
+      "id": 1,
+      "tanggal": "2027-01-01",
+      "keterangan": "Tahun Baru 2027 Masehi"
+    }
+  ]
+}
+```
+
+### 8.5 Detail Hari Libur 🟡 [BARU] ✅ [BERFUNGSI]
+**Endpoint:** `GET /api/v1/holidays/{id}`
+**Deskripsi:** Menampilkan detail satu data hari libur berdasarkan ID.
+**Headers:** `Authorization: Bearer {PASETO_TOKEN}`
+
+**Response Sukses (200 OK):**
+```json
+{
+  "status": true,
+  "code": 200,
+  "message": "Berhasil mengambil detail hari libur",
+  "data": {
+    "id": 1,
+    "tanggal": "2027-01-01",
+    "keterangan": "Tahun Baru 2027 Masehi",
+    "created_at": "2026-08-01T09:00:00.000000Z",
+    "updated_at": "2026-08-01T09:00:00.000000Z"
+  }
+}
+```
+
+### 8.6 Update Hari Libur 🟡 [BARU] ✅ [BERFUNGSI]
+**Endpoint:** `PUT /api/v1/holidays/{id}` / `PATCH /api/v1/holidays/{id}`
+**Deskripsi:** Memperbarui tanggal atau keterangan satu data hari libur.
+**Headers:** `Authorization: Bearer {PASETO_TOKEN}`
+
+**Body Parameters (JSON):**
+| Parameter | Tipe | Wajib | Keterangan |
+| :--- | :--- | :--- | :--- |
+| `tanggal` | `string` | Ya | Tanggal libur baru (format `YYYY-MM-DD`, harus unik) |
+| `keterangan` | `string` | Ya | Keterangan hari libur (max: 255) |
+
+**Response Sukses (200 OK):**
+```json
+{
+  "status": true,
+  "code": 200,
+  "message": "Berhasil memperbarui data hari libur",
+  "data": {
+    "id": 1,
+    "tanggal": "2027-01-02",
+    "keterangan": "Cuti Bersama Tahun Baru",
+    "created_at": "2026-08-01T09:00:00.000000Z",
+    "updated_at": "2026-08-01T09:05:00.000000Z"
+  }
+}
+```
+
+### 8.7 Hapus Hari Libur Single 🟡 [BARU] ✅ [BERFUNGSI]
+**Endpoint:** `DELETE /api/v1/holidays/{id}`
+**Deskripsi:** Menghapus satu data hari libur berdasarkan ID.
+**Headers:** `Authorization: Bearer {PASETO_TOKEN}`
+
+**Response Sukses (200 OK):**
+```json
+{
+  "status": true,
+  "code": 200,
+  "message": "Berhasil menghapus data hari libur",
+  "data": null
+}
+```
+
+### 8.8 Hapus Hari Libur Bulk 🟡 [BARU] ✅ [BERFUNGSI]
+**Endpoint:** `DELETE /api/v1/holidays/bulk`
+**Deskripsi:** Menghapus banyak data hari libur sekaligus berdasarkan array ID.
+**Headers:** `Authorization: Bearer {PASETO_TOKEN}`
+
+**Body Parameters (JSON):**
+| Parameter | Tipe | Wajib | Keterangan |
+| :--- | :--- | :--- | :--- |
+| `ids` | `array` | Ya | Array ID hari libur yang akan dihapus (minimal 1 ID, harus ada di DB) |
+
+**Response Sukses (200 OK):**
+```json
+{
+  "status": true,
+  "code": 200,
+  "message": "Berhasil menghapus 3 data hari libur",
+  "data": null
+}
+```
 ```
