@@ -49,25 +49,19 @@ class SlaKpiTest extends TestCase
             SLAService::class,
             Mockery::mock(SLAService::class, function (MockInterface $mock) {
                 $mock->shouldReceive('index')->once()->andReturn([
-                    'rata_rata_waktu_proses' => 2.5,
-                    'pencapaian_sla' => 85,
-                    'target_sla' => 6,
-                    'jumlah_ajuan' => 100,
-                    'daftar_rincian' => [
-                        'list' => [
-                            [
-                                'id' => 1,
-                                'jenis_layanan' => 'KTP',
-                                'jumlah_ajuan' => 10,
-                                'rata_rata_waktu' => 2.0
-                            ]
-                        ],
-                        'meta' => [
-                            'page' => 1,
-                            'per_page' => 10,
-                            'total' => 1,
-                            'total_page' => 1
+                    'list' => [
+                        [
+                            'id' => 1,
+                            'jenis_layanan' => 'KTP',
+                            'jumlah_ajuan' => 10,
+                            'rata_rata_waktu' => '2 Jam'
                         ]
+                    ],
+                    'meta' => [
+                        'page' => 1,
+                        'per_page' => 10,
+                        'total' => 1,
+                        'total_page' => 1
                     ]
                 ]);
             })
@@ -79,30 +73,22 @@ class SlaKpiTest extends TestCase
 
         $response->assertStatus(200)
                  ->assertJsonStructure([
-                     'success',
+                     'status',
                      'code',
                      'message',
                      'data' => [
-                         'rata_rata_waktu_proses',
-                         'pencapaian_sla',
-                         'target_sla',
-                         'jumlah_ajuan',
-                         'daftar_rincian' => [
-                             'list' => [
-                                 '*' => [
-                                     'id',
-                                     'jenis_layanan',
-                                     'jumlah_ajuan',
-                                     'rata_rata_waktu'
-                                 ]
-                             ],
-                             'meta' => [
-                                 'page',
-                                 'per_page',
-                                 'total',
-                                 'total_page'
-                             ]
+                         '*' => [
+                             'id',
+                             'jenis_layanan',
+                             'jumlah_ajuan',
+                             'rata_rata_waktu'
                          ]
+                     ],
+                     'meta' => [
+                         'page',
+                         'per_page',
+                         'total',
+                         'total_page'
                      ]
                  ]);
     }
