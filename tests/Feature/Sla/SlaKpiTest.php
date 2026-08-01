@@ -54,7 +54,7 @@ class SlaKpiTest extends TestCase
                             'id' => 1,
                             'jenis_layanan' => 'KTP',
                             'jumlah_ajuan' => 10,
-                            'rata_rata_waktu' => 2.0
+                            'rata_rata_waktu' => '2 Jam'
                         ]
                     ],
                     'meta' => [
@@ -73,7 +73,7 @@ class SlaKpiTest extends TestCase
 
         $response->assertStatus(200)
                  ->assertJsonStructure([
-                     'success',
+                     'status',
                      'code',
                      'message',
                      'data' => [

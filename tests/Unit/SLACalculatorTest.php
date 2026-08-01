@@ -14,14 +14,7 @@ class SLACalculatorTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
-        \App\Models\MasterJamOperasional::create(['hari_kode' => 1, 'hari_nama' => 'Senin', 'jam_buka' => '08:00', 'jam_tutup' => '15:00', 'is_libur' => 0]);
-        \App\Models\MasterJamOperasional::create(['hari_kode' => 2, 'hari_nama' => 'Selasa', 'jam_buka' => '08:00', 'jam_tutup' => '15:00', 'is_libur' => 0]);
-        \App\Models\MasterJamOperasional::create(['hari_kode' => 3, 'hari_nama' => 'Rabu', 'jam_buka' => '08:00', 'jam_tutup' => '15:00', 'is_libur' => 0]);
-        \App\Models\MasterJamOperasional::create(['hari_kode' => 4, 'hari_nama' => 'Kamis', 'jam_buka' => '08:00', 'jam_tutup' => '15:00', 'is_libur' => 0]);
-        \App\Models\MasterJamOperasional::create(['hari_kode' => 5, 'hari_nama' => 'Jumat', 'jam_buka' => '08:00', 'jam_tutup' => '13:00', 'is_libur' => 0]);
-        \App\Models\MasterJamOperasional::create(['hari_kode' => 6, 'hari_nama' => 'Sabtu', 'jam_buka' => '08:00', 'jam_tutup' => '13:00', 'is_libur' => 1]);
-        \App\Models\MasterJamOperasional::create(['hari_kode' => 7, 'hari_nama' => 'Minggu', 'jam_buka' => '08:00', 'jam_tutup' => '13:00', 'is_libur' => 1]);
+        $this->seed(\Database\Seeders\SlaConfigSeeder::class);
     }
 
     public function test_normal_monday_to_thursday()

@@ -31,7 +31,7 @@ class SLAController extends Controller
             $data = $this->service->index($request->validated());
 
             return response()->json([
-                'success' => true,
+                'status' => true,
                 'code' => 200,
                 'message' => 'Berhasil mendapatkan data SLA',
                 // Kita langsung pisahkan list (item) ke dalam 'data' dan informasi halaman ke dalam 'meta'
