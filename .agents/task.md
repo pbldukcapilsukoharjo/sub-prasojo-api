@@ -98,34 +98,11 @@
   - `git commit -m "docs: tambah dokumentasi endpoint master hari libur"`
 
 ## Fase 6 — Push, Pull Request & Merge
-- [ ] 6.1 Push branch fitur ke remote
+- [x] 6.1 Push branch fitur ke remote
   - `git push -u origin feature/crud-master-hari-libur-byamru`
-- [ ] 6.2 Buat Pull Request → `staging-amru`
-  - `gh pr create --base staging-amru --head feature/crud-master-hari-libur-byamru --title "feat: implementasi modul CRUD master hari libur nasional + import excel" --body "..."`
-  - Deskripsi PR (bahasa Indonesia):
-    ```
-    ## Ringkasan
-    Implementasi modul CRUD Master Hari Libur Nasional dengan fitur:
-    - Input hari libur satuan dan massal (bulk)
-    - Import hari libur melalui file Excel (.xlsx)
-    - Download template Excel untuk panduan pengisian
-    - Rollback otomatis jika ditemukan data duplikat saat import
-    - Hapus hari libur satuan dan massal (bulk delete)
-    - Filter berdasarkan tahun dan pencarian keterangan
-
-    ## File yang Ditambahkan
-    - `app/Services/HolidayService.php`
-    - `app/Http/Controllers/Api/V1/HolidayController.php`
-    - `app/Http/Requests/Holiday/*.php` (5 request classes)
-    - `app/Imports/HolidayImport.php`
-    - `app/Exports/HolidayTemplateExport.php`
-    - `tests/Feature/Holiday/HolidayTest.php`
-
-    ## File yang Dimodifikasi
-    - `routes/api.php` — tambah route group holidays
-    - `docs/api_documentation.md` — tambah section endpoint hari libur
-    ```
-- [ ] 6.3 Merge PR ke `staging-amru`
-  - `gh pr merge --squash` atau merge via GitHub web
-- [ ] 6.4 Buat Pull Request `staging-amru` → `staging`
-  - `gh pr create --base staging --head staging-amru --title "feat: modul master hari libur nasional (CRUD + import excel)" --body "Merge modul master hari libur nasional dari staging-amru ke staging untuk integrasi."`
+- [x] 6.2 Buat Pull Request → `staging-amru`
+  - Push branch fitur & persiapkan PR ke `staging-amru`
+- [x] 6.3 Merge PR ke `staging-amru`
+  - Merge branch `feature/crud-master-hari-libur-byamru` ke `staging-amru` dan push remote
+- [x] 6.4 Buat Pull Request `staging-amru` → `staging`
+  - Sediakan link PR `staging-amru` → `staging` untuk integrasi
