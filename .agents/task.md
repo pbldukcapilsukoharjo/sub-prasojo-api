@@ -42,21 +42,21 @@
   - `git commit -m "feat: tambah import dan template excel hari libur"`
 
 ## Fase 3 — Controller & Route
-- [ ] 3.1 Buat `app/Http/Controllers/Api/V1/HolidayController.php`
-  - [ ] Dependency injection `HolidayService`
-  - [ ] Method `index(IndexHolidayRequest)` → list + paginasi
-  - [ ] Method `store(StoreHolidayRequest)` → bulk create
-  - [ ] Method `show(int $id)` → detail
-  - [ ] Method `update(UpdateHolidayRequest, int $id)` → update single
-  - [ ] Method `destroy(int $id)` → delete single
-  - [ ] Method `destroyBulk(DestroyBulkHolidayRequest)` → delete multiple
-  - [ ] Method `import(ImportHolidayRequest)` → import Excel
-  - [ ] Method `template()` → download template
-  - [ ] Semua method: try-catch + Log::error + ApiResponse
-- [ ] 3.2 Registrasi route di `routes/api.php`
-  - [ ] Route group `holidays` dengan middleware `paseto.auth`
-  - [ ] Urutan route: `/template`, `/import`, `/bulk` sebelum `/{id}`
-- [ ] 3.3 Commit fase 3
+- [x] 3.1 Buat `app/Http/Controllers/Api/V1/HolidayController.php`
+  - [x] Dependency injection `HolidayService`
+  - [x] Method `index(IndexHolidayRequest)` → list + paginasi
+  - [x] Method `store(StoreHolidayRequest)` → bulk create
+  - [x] Method `show(int $id)` → detail
+  - [x] Method `update(UpdateHolidayRequest, int $id)` → update single
+  - [x] Method `destroy(int $id)` → delete single
+  - [x] Method `destroyBulk(DestroyBulkHolidayRequest)` → delete multiple
+  - [x] Method `import(ImportHolidayRequest)` → import Excel
+  - [x] Method `template()` → download template
+  - [x] Semua method: try-catch + Log::error + ApiResponse
+- [x] 3.2 Registrasi route di `routes/api.php`
+  - [x] Route group `holidays` dengan middleware `paseto.auth`
+  - [x] Urutan route: `/template`, `/import`, `/bulk` sebelum `/{id}`
+- [x] 3.3 Commit fase 3
   - `git add .`
   - `git commit -m "feat: tambah controller dan route API holidays"`
 

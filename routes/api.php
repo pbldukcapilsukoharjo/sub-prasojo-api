@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\DashboardController;
 use App\Http\Controllers\Api\V1\PengajuanController;
 use App\Http\Controllers\Api\V1\ProdukController;
 use App\Http\Controllers\Api\V1\UlasanController;
+use App\Http\Controllers\Api\V1\HolidayController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WilayahController;
@@ -125,6 +126,25 @@ Route::prefix('v1')->group(function () {
         Route::put('/{id}', 'update');
         Route::patch('/{id}', 'update');
     });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Master Hari Libur Nasional
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('holidays')->middleware('paseto.auth')
+        ->controller(HolidayController::class)
+        ->group(function () {
+            Route::get('/', 'index');
+            Route::post('/', 'store');
+            Route::get('/template', 'template');
+            Route::post('/import', 'import');
+            Route::delete('/bulk', 'destroyBulk');
+            Route::get('/{id}', 'show');
+            Route::put('/{id}', 'update');
+            Route::patch('/{id}', 'update');
+            Route::delete('/{id}', 'destroy');
+        });
 
     /*
     |--------------------------------------------------------------------------
