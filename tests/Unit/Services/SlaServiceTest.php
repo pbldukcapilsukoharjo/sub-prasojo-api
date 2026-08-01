@@ -3,7 +3,7 @@
 namespace Tests\Unit\Services;
 
 use App\Filters\SlaFilter;
-use App\Services\SlaService;
+use App\Services\SLAService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Tests\TestCase;
@@ -19,7 +19,7 @@ class SlaServiceTest extends TestCase
                 'capaian_sla_persen' => 85.5,
             ]);
 
-        $service = new SlaService();
+        $service = new SLAService();
 
         $result = $service->getKpi([]);
 
