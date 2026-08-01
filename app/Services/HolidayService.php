@@ -101,20 +101,6 @@ final class HolidayService
         }
     }
 
-    /**
-     * Show single holiday entry by ID.
-     */
-    public function show(int $id): MasterLiburNasional
-    {
-        try {
-            return MasterLiburNasional::findOrFail($id);
-        } catch (\Throwable $e) {
-            Log::error('[HolidayService@show] ' . $e->getMessage(), [
-                'trace' => $e->getTraceAsString(),
-            ]);
-            throw $e;
-        }
-    }
 
     /**
      * Update a single holiday entry.
