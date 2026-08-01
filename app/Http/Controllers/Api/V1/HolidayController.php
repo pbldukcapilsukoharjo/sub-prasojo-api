@@ -49,7 +49,7 @@ final class HolidayController extends Controller
             $data = $this->service->store($request->validated());
             return ApiResponse::success('Berhasil menambahkan data hari libur', $data, 201);
         } catch (InvalidArgumentException $e) {
-            return ApiResponse::error($e->getMessage(), 422);
+            return ApiResponse::error($e->getMessage(), 400);
         } catch (\Throwable $e) {
             Log::error('[HolidayController@store] ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
@@ -83,7 +83,7 @@ final class HolidayController extends Controller
             $data = $this->service->importFromExcel($file);
             return ApiResponse::success('Berhasil mengimpor data hari libur', $data, 201);
         } catch (InvalidArgumentException $e) {
-            return ApiResponse::error($e->getMessage(), 422);
+            return ApiResponse::error($e->getMessage(), 400);
         } catch (\Throwable $e) {
             Log::error('[HolidayController@import] ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
@@ -137,7 +137,7 @@ final class HolidayController extends Controller
         } catch (ModelNotFoundException $e) {
             return ApiResponse::error('Hari libur tidak ditemukan', 404);
         } catch (InvalidArgumentException $e) {
-            return ApiResponse::error($e->getMessage(), 422);
+            return ApiResponse::error($e->getMessage(), 400);
         } catch (\Throwable $e) {
             Log::error('[HolidayController@update] ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),

@@ -61,26 +61,26 @@
   - `git commit -m "feat: tambah controller dan route API holidays"`
 
 ## Fase 4 — Testing
-- [ ] 4.1 Buat `tests/Feature/Holiday/HolidayTest.php`
-  - [ ] Test list holidays (GET /) — 200 OK + paginasi
-  - [ ] Test filter by tahun
-  - [ ] Test search by keterangan
-  - [ ] Test create single holiday (POST /)
-  - [ ] Test create bulk holidays (POST /)
-  - [ ] Test create gagal karena tanggal duplikat di DB
-  - [ ] Test create gagal karena tanggal duplikat di dalam request body
-  - [ ] Test show detail (GET /{id})
-  - [ ] Test update (PUT /{id})
-  - [ ] Test update gagal karena tanggal duplikat
-  - [ ] Test delete single (DELETE /{id})
-  - [ ] Test delete bulk (DELETE /bulk)
-  - [ ] Test download template (GET /template) — assert header content-type xlsx
-  - [ ] Test import Excel sukses
-  - [ ] Test import Excel gagal — duplikat internal dalam file
-  - [ ] Test import Excel gagal — duplikat terhadap data DB existing → assert rollback (0 rows added)
-  - [ ] Test import Excel gagal — format file salah (bukan xlsx)
-- [ ] 4.2 Jalankan `php artisan test --filter=HolidayTest` → pastikan semua hijau
-- [ ] 4.3 Commit fase 4
+- [x] 4.1 Buat `tests/Feature/Holiday/HolidayTest.php`
+  - [x] Test list holidays (GET /) — 200 OK + paginasi
+  - [x] Test filter by tahun
+  - [x] Test search by keterangan
+  - [x] Test create single holiday (POST /)
+  - [x] Test create bulk holidays (POST /)
+  - [x] Test create gagal karena tanggal duplikat di DB
+  - [x] Test create gagal karena tanggal duplikat di dalam request body
+  - [x] Test show detail (GET /{id})
+  - [x] Test update (PUT /{id})
+  - [x] Test update gagal karena tanggal duplikat
+  - [x] Test delete single (DELETE /{id})
+  - [x] Test delete bulk (DELETE /bulk)
+  - [x] Test download template (GET /template) — assert header content-type xlsx
+  - [x] Test import Excel sukses
+  - [x] Test import Excel gagal — duplikat internal dalam file
+  - [x] Test import Excel gagal — duplikat terhadap data DB existing → assert rollback (0 rows added)
+  - [x] Test import Excel gagal — format file salah (bukan xlsx)
+- [x] 4.2 Jalankan `php artisan test --filter=HolidayTest` → pastikan semua hijau
+- [x] 4.3 Commit fase 4
   - `git add .`
   - `git commit -m "test: tambah pengujian fitur CRUD dan import hari libur"`
 

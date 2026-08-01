@@ -61,9 +61,13 @@ final class HolidayService
                 }
 
                 // Check existing dates in database
-                $existing = MasterLiburNasional::whereIn('tanggal', $dates)
-                    ->pluck('tanggal')
-                    ->map(fn ($d) => is_string($d) ? $d : $d->format('Y-m-d'))
+                $existing = MasterLiburNasional::where(function ($q) use ($dates) {
+                    foreach ($dates as $d) {
+                        $q->orWhereDate('tanggal', $d);
+                    }
+                })
+                    ->get()
+                    ->map(fn ($item) => is_string($item->tanggal) ? substr($item->tanggal, 0, 10) : $item->tanggal->format('Y-m-d'))
                     ->toArray();
 
                 if (count($existing) > 0) {
@@ -125,7 +129,7 @@ final class HolidayService
                 : $holiday->tanggal->format('Y-m-d');
 
             if (isset($data['tanggal']) && $data['tanggal'] !== $currentTanggal) {
-                $exists = MasterLiburNasional::where('tanggal', $data['tanggal'])
+                $exists = MasterLiburNasional::whereDate('tanggal', $data['tanggal'])
                     ->where('id', '!=', $id)
                     ->exists();
 
@@ -212,9 +216,13 @@ final class HolidayService
             }
 
             // Check existing dates in database
-            $existing = MasterLiburNasional::whereIn('tanggal', $dates)
-                ->pluck('tanggal')
-                ->map(fn ($d) => is_string($d) ? $d : $d->format('Y-m-d'))
+            $existing = MasterLiburNasional::where(function ($q) use ($dates) {
+                foreach ($dates as $d) {
+                    $q->orWhereDate('tanggal', $d);
+                }
+            })
+                ->get()
+                ->map(fn ($item) => is_string($item->tanggal) ? substr($item->tanggal, 0, 10) : $item->tanggal->format('Y-m-d'))
                 ->toArray();
 
             if (count($existing) > 0) {
