@@ -63,5 +63,67 @@ class WilayahDistribusiTest extends TestCase
                      ]
                  ]);
     }
+
+    public function test_distribusi_endpoint_with_search_parameter()
+    {
+        $this->authenticateWithPaseto();
+
+        $mockService = Mockery::mock(WilayahService::class);
+        $items = [
+            [
+                'id_kecamatan' => '35.73.01',
+                'nama_kecamatan' => 'Klojen',
+                'total_ajuan' => 10,
+                'rata_rata_waktu' => '1 Jam',
+                'rasio_selesai_persen' => 100.0
+            ]
+        ];
+        $paginator = new LengthAwarePaginator($items, 1, 10, 1);
+
+        $mockService->shouldReceive('getDistribusi')
+            ->once()
+            ->withArgs(function ($filter, $perPage) {
+                return isset($filter->request['search']) && $filter->request['search'] === 'Klojen';
+            })
+            ->andReturn($paginator);
+
+        $this->app->instance(WilayahService::class, $mockService);
+
+        $response = $this->getJson('/api/v1/wilayah/distribusi?search=Klojen');
+
+        $response->assertStatus(200)
+                 ->assertJsonPath('data.0.nama_kecamatan', 'Klojen');
+    }
+
+    public function test_distribusi_endpoint_with_q_parameter()
+    {
+        $this->authenticateWithPaseto();
+
+        $mockService = Mockery::mock(WilayahService::class);
+        $items = [
+            [
+                'id_kecamatan' => '35.73.01',
+                'nama_kecamatan' => 'Klojen',
+                'total_ajuan' => 10,
+                'rata_rata_waktu' => '1 Jam',
+                'rasio_selesai_persen' => 100.0
+            ]
+        ];
+        $paginator = new LengthAwarePaginator($items, 1, 10, 1);
+
+        $mockService->shouldReceive('getDistribusi')
+            ->once()
+            ->withArgs(function ($filter, $perPage) {
+                return isset($filter->request['search']) && $filter->request['search'] === 'Klojen';
+            })
+            ->andReturn($paginator);
+
+        $this->app->instance(WilayahService::class, $mockService);
+
+        $response = $this->getJson('/api/v1/wilayah/distribusi?q=Klojen');
+
+        $response->assertStatus(200)
+                 ->assertJsonPath('data.0.nama_kecamatan', 'Klojen');
+    }
 }
 

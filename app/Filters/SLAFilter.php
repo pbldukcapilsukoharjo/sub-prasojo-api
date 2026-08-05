@@ -22,12 +22,35 @@ final class SLAFilter extends BaseFilter
             $query->where('ajuan_layanan_kode', $this->request['id_layanan']);
         }
 
+        if (!empty($this->request['pelapor'])) {
+            $pelapor = strtolower((string) $this->request['pelapor']);
+            if ($pelapor === 'online') {
+                $query->where('ajuan_is_online', 1);
+            } elseif ($pelapor === 'offline') {
+                $query->where('ajuan_is_online', 0);
+            } elseif ($pelapor === 'mandiri') {
+                $query->where('ajuan_is_mandiri', 1);
+            } elseif ($pelapor === 'operator') {
+                $query->where('ajuan_is_mandiri', 0);
+            } elseif ($pelapor === 'tamat') {
+                $query->where('ajuan_keterangan', 'LIKE', '%TAMAT%');
+            } else {
+                $query->where('ajuan_pelapor_role_name', 'LIKE', '%' . $this->request['pelapor'] . '%');
+            }
+        }
+
         return $query;
     }
 
     protected function applySearch(Builder $query): void
     {
-        // Search spesifik tidak didefinisikan untuk SLA
+        if (!empty($this->request['search'])) {
+            $search = $this->request['search'];
+            $query->where(function (Builder $q) use ($search): void {
+                $q->where('ajuan_no_reg', 'like', "%{$search}%")
+                  ->orWhere('ajuan_pelapor_nik', 'like', "%{$search}%");
+            });
+        }
     }
 
     protected function applySorting(Builder $query): void
