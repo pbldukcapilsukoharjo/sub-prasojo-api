@@ -6,7 +6,9 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SlaRequest;
+use App\Http\Requests\SlaSampleRequest;
 use App\Http\Resources\SLA\SLAResource;
+use App\Http\Resources\SLA\SLASampleResource;
 use App\Exports\SlaLayananExport;
 use App\Services\SLAService;
 use Illuminate\Http\JsonResponse;
@@ -65,6 +67,29 @@ class SLAController extends Controller
                 'trace' => $e->getTraceAsString(),
             ]);
             return ApiResponse::error('Gagal mendapatkan KPI SLA', 500, ['error' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Menampilkan Sample SLA (untuk audit dan verifikasi SLA)
+     */
+    public function samples(SlaSampleRequest $request): JsonResponse
+    {
+        try {
+            $data = $this->service->getSamples($request->validated());
+
+            return response()->json([
+                'status' => true,
+                'code' => 200,
+                'message' => 'Berhasil mendapatkan data sample SLA',
+                'data' => SLASampleResource::collection(collect($data['list']))->resolve(),
+                'meta' => $data['meta'],
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('[SLAController@samples] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return ApiResponse::error('Gagal mendapatkan data sample SLA', 500, ['error' => $e->getMessage()]);
         }
     }
 

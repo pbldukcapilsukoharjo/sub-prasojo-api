@@ -110,6 +110,7 @@ Route::prefix('v1')->group(function () {
     Route::prefix('sla')->middleware('paseto.auth')->controller(\App\Http\Controllers\Api\V1\SLAController::class)->group(function () {
         Route::get('/', 'index');
         Route::get('/kpi', 'kpi');
+        Route::get('/samples', 'samples');
         Route::get('/export', 'export');
         Route::post('/recalculate', 'recalculate');
         Route::get('/target', 'getSlaTarget');
@@ -141,7 +142,6 @@ Route::prefix('v1')->group(function () {
             Route::get('/template', 'template');
             Route::post('/import', 'import');
             Route::delete('/bulk', 'destroyBulk');
-            Route::get('/{id}', 'show');
             Route::put('/{id}', 'update');
             Route::patch('/{id}', 'update');
             Route::delete('/{id}', 'destroy');

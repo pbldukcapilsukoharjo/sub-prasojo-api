@@ -191,26 +191,6 @@ class HolidayTest extends TestCase
         $response->assertStatus(400);
     }
 
-    public function test_show_holiday_detail_successfully()
-    {
-        $this->authenticateWithPaseto();
-
-        $holiday = MasterLiburNasional::create([
-            'tanggal' => '2026-03-22',
-            'keterangan' => 'Hari Raya Nyepi',
-        ]);
-
-        $response = $this->getJson("/api/v1/holidays/{$holiday->id}");
-
-        $response->assertStatus(200)
-            ->assertJson([
-                'code' => 200,
-                'data' => [
-                    'id' => $holiday->id,
-                    'keterangan' => 'Hari Raya Nyepi',
-                ],
-            ]);
-    }
 
     public function test_update_holiday_successfully()
     {

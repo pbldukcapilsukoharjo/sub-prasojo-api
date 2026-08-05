@@ -78,6 +78,11 @@ class SlaRequest extends FormRequest
                 'max:12',
             ],
 
+            'pelapor' => [
+                'nullable',
+                'string',
+            ],
+
             /*
             |--------------------------------------------------------------------------
             | Date Range
