@@ -8,6 +8,9 @@ use App\Enums\AjuanStatus;
 use App\Filters\SLAFilter;
 use App\Models\Prasojo\Ajuan;
 use App\Models\Prasojo\Layanan;
+use App\Models\Monitoring\SubUser;
+use App\Models\AjuanSlaSummary;
+use App\Services\SLAPrecalculator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -41,13 +44,13 @@ class SLAService
 
             $cacheKey = 'sla:kpi:' . md5(json_encode($filters) . ':' . $userId . ':' . $targetSlaMenit);
 
-            return Cache::remember($cacheKey, 600, function () use ($filters, $targetSlaMenit, $targetSlaText) {
+            return Cache::remember($cacheKey, 600, function () use ($filters, $targetSlaMenit, $targetSlaText, $user) {
                 $query = Ajuan::query()->from('ajuan');
                 $filter = new SLAFilter($filters);
                 $query = $filter->apply($query);
 
                 // Terapkan subquery SLA
-                $query = $this->applyLogSummarySubquery($query);
+                $query = $this->applyLogSummarySubquery($query, $user);
 
                 if (!empty($filters['max_sla_minutes'])) {
                     $query->where('sla_summary.durasi_sla_menit', '<=', (int) $filters['max_sla_minutes']);
@@ -58,13 +61,24 @@ class SLAService
                 }
 
                 $statusSelesai = AjuanStatus::getStatusSelesai();
+                $defaultDb = config('database.connections.mysql.database');
 
-                $kpiGlobal = (clone $query)->whereIn('ajuan_status', $statusSelesai)
-                    ->select(
-                        DB::raw('COUNT(ajuan.ajuan_id) as total_ajuan'),
-                        DB::raw("SUM(CASE WHEN sla_summary.durasi_sla_menit <= {$targetSlaMenit} THEN 1 ELSE 0 END) as total_memenuhi"),
-                        DB::raw('AVG(sla_summary.durasi_sla_menit) as rata_rata_menit')
-                    )->first();
+                if ($user && ($user->sla_start_status || $user->sla_end_status)) {
+                    $kpiGlobal = (clone $query)->whereIn('ajuan_status', $statusSelesai)
+                        ->leftJoin(DB::raw("`{$defaultDb}`.`ajuan_sla_summaries` as default_summary"), 'default_summary.ajuan_id', '=', 'ajuan.ajuan_id')
+                        ->select(
+                            DB::raw('COUNT(ajuan.ajuan_id) as total_ajuan'),
+                            DB::raw("SUM(CASE WHEN sla_summary.durasi_sla_menit <= COALESCE(default_summary.target_sla_menit, 360) THEN 1 ELSE 0 END) as total_memenuhi"),
+                            DB::raw('AVG(sla_summary.durasi_sla_menit) as rata_rata_menit')
+                        )->first();
+                } else {
+                    $kpiGlobal = (clone $query)->whereIn('ajuan_status', $statusSelesai)
+                        ->select(
+                            DB::raw('COUNT(ajuan.ajuan_id) as total_ajuan'),
+                            DB::raw("SUM(CASE WHEN sla_summary.target_sla_menit IS NOT NULL AND sla_summary.durasi_sla_menit <= sla_summary.target_sla_menit THEN 1 ELSE 0 END) as total_memenuhi"),
+                            DB::raw('AVG(sla_summary.durasi_sla_menit) as rata_rata_menit')
+                        )->first();
+                }
 
                 $rataRataMenit = (float)($kpiGlobal->rata_rata_menit ?? 0);
                 $totalAjuan = (int)($kpiGlobal->total_ajuan ?? 0);
@@ -119,7 +133,9 @@ class SLAService
             $query = $filter->apply($query);
 
             // Terapkan subquery SLA
-            $query = $this->applyLogSummarySubquery($query);
+            $userId = request()->attributes->get('auth_user_id') ?: (auth()->user()?->id);
+            $user = $userId ? \App\Models\Monitoring\SubUser::find($userId) : null;
+            $query = $this->applyLogSummarySubquery($query, $user);
 
             if (!empty($filters['max_sla_minutes'])) {
                 $query->where('sla_summary.durasi_sla_menit', '<=', (int) $filters['max_sla_minutes']);
@@ -258,7 +274,9 @@ class SLAService
             $query = $filter->apply($query);
 
             // Terapkan subquery SLA
-            $query = $this->applyLogSummarySubquery($query);
+            $userId = request()->attributes->get('auth_user_id') ?: (auth()->user()?->id);
+            $user = $userId ? \App\Models\Monitoring\SubUser::find($userId) : null;
+            $query = $this->applyLogSummarySubquery($query, $user);
 
             if (!empty($filters['max_sla_minutes'])) {
                 $query->where('sla_summary.durasi_sla_menit', '<=', (int) $filters['max_sla_minutes']);
@@ -334,9 +352,16 @@ class SLAService
     /**
      * Terapkan subquery untuk menghitung waktu mulai dan waktu selesai dari tabel log_ajuan_status
      */
-    protected function applyLogSummarySubquery(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
+    protected function applyLogSummarySubquery(\Illuminate\Database\Eloquent\Builder $query, ?SubUser $user = null): \Illuminate\Database\Eloquent\Builder
     {
         $defaultDb = config('database.connections.mysql.database');
+        
+        if ($user && ($user->sla_start_status || $user->sla_end_status)) {
+            return $query->join(DB::raw("`{$defaultDb}`.`user_ajuan_sla_summaries` as sla_summary"), function ($join) use ($user) {
+                $join->on('sla_summary.ajuan_id', '=', 'ajuan.ajuan_id')
+                     ->where('sla_summary.user_id', '=', $user->id);
+            });
+        }
         
         return $query->join(DB::raw("`{$defaultDb}`.`ajuan_sla_summaries` as sla_summary"), 'sla_summary.ajuan_id', '=', 'ajuan.ajuan_id');
     }
@@ -418,7 +443,7 @@ class SLAService
             $query = $filter->apply($query);
 
             // Join summary SLA (precalculated times & durations)
-            $query = $this->applyLogSummarySubquery($query);
+            $query = $this->applyLogSummarySubquery($query, $user);
 
             // Hanya ajuan yang sudah selesai
             $statusSelesai = AjuanStatus::getStatusSelesai();
@@ -468,14 +493,27 @@ class SLAService
                 $query->orderBy('ajuan.ajuan_create_datetime', 'desc');
             }
 
-            $query->select(
-                'ajuan.*',
-                'sla_summary.waktu_mulai',
-                'sla_summary.waktu_selesai',
-                'sla_summary.durasi_sla_menit',
-                'sla_summary.target_sla_menit_aktual',
-                'sla_summary.operator_user_id'
-            );
+            $defaultDb = config('database.connections.mysql.database');
+            if ($user && ($user->sla_start_status || $user->sla_end_status)) {
+                $query->leftJoin(DB::raw("`{$defaultDb}`.`ajuan_sla_summaries` as default_summary"), 'default_summary.ajuan_id', '=', 'ajuan.ajuan_id')
+                    ->select(
+                        'ajuan.*',
+                        'sla_summary.waktu_mulai',
+                        'sla_summary.waktu_selesai',
+                        'sla_summary.durasi_sla_menit',
+                        'default_summary.target_sla_menit',
+                        'sla_summary.operator_user_id'
+                    );
+            } else {
+                $query->select(
+                    'ajuan.*',
+                    'sla_summary.waktu_mulai',
+                    'sla_summary.waktu_selesai',
+                    'sla_summary.durasi_sla_menit',
+                    'sla_summary.target_sla_menit',
+                    'sla_summary.operator_user_id'
+                );
+            }
 
             $paginator = $query->paginate($perPage, ['*'], 'page', $page);
 
@@ -494,5 +532,164 @@ class SLAService
             ]);
             throw $e;
         }
+    }
+
+    /**
+     * Get user SLA status configuration settings.
+     */
+    public function getUserSettings(string|int $userId): array
+    {
+        $user = SubUser::findOrFail($userId);
+        return [
+            'sla_start_status' => $user->sla_start_status,
+            'sla_end_status' => $user->sla_end_status,
+        ];
+    }
+
+    /**
+     * Update user SLA status configuration settings and trigger pre-calculations.
+     */
+    public function updateUserSettings(string|int $userId, array $data): array
+    {
+        $user = SubUser::findOrFail($userId);
+        
+        $user->update([
+            'sla_start_status' => $data['sla_start_status'] ?? null,
+            'sla_end_status' => $data['sla_end_status'] ?? null,
+        ]);
+
+        // Precalculate SLA for the user
+        SLAPrecalculator::recalculateForUser($user);
+
+        return [
+            'sla_start_status' => $user->sla_start_status,
+            'sla_end_status' => $user->sla_end_status,
+        ];
+    }
+
+    /**
+     * Get target SLA for a specific ajuan.
+     */
+    public function getAjuanTarget(int|string $ajuanId): array
+    {
+        // First check if the ajuan actually exists in prasojo
+        $ajuanExists = DB::connection('mysql_prasojo')
+            ->table('ajuan')
+            ->where('ajuan_id', $ajuanId)
+            ->exists();
+
+        if (!$ajuanExists) {
+            throw new \Illuminate\Database\Eloquent\ModelNotFoundException("Ajuan tidak ditemukan.");
+        }
+
+        $summary = AjuanSlaSummary::where('ajuan_id', $ajuanId)->first();
+        $targetMenit = $summary ? ($summary->target_sla_menit ?? 360) : 360;
+
+        // Convert back to value/unit (default to jam if divisible by 60, else menit)
+        if ($targetMenit % 1440 === 0) {
+            $value = (int) ($targetMenit / 1440);
+            $unit = 'hari';
+        } elseif ($targetMenit % 60 === 0) {
+            $value = (int) ($targetMenit / 60);
+            $unit = 'jam';
+        } else {
+            $value = $targetMenit;
+            $unit = 'menit';
+        }
+
+        return [
+            'target_sla_value' => $value,
+            'target_sla_unit' => $unit,
+            'target_sla_menit' => $targetMenit,
+        ];
+    }
+
+    /**
+     * Update target SLA for a specific ajuan and recalculate deadlines.
+     */
+    public function updateAjuanTarget(int|string $ajuanId, array $data): array
+    {
+        // Check if ajuan exists in read-only prasojo
+        $ajuan = DB::connection('mysql_prasojo')
+            ->table('ajuan')
+            ->where('ajuan_id', $ajuanId)
+            ->first();
+
+        if (!$ajuan) {
+            throw new \Illuminate\Database\Eloquent\ModelNotFoundException("Ajuan tidak ditemukan.");
+        }
+
+        $value = (int) $data['target_sla_value'];
+        $unit = $data['target_sla_unit'];
+
+        // Convert to minutes
+        $minutes = match ($unit) {
+            'menit' => $value,
+            'jam' => $value * 60,
+            'hari' => $value * 1440,
+            default => 360,
+        };
+
+        // Find or create summary in default DB
+        $summary = AjuanSlaSummary::firstOrCreate(
+            ['ajuan_id' => $ajuanId],
+            [
+                'waktu_mulai' => $ajuan->ajuan_create_datetime,
+                'waktu_selesai' => $ajuan->ajuan_update_datetime,
+                'durasi_sla_menit' => 0,
+                'durasi_kondisi_a_menit' => 0,
+                'durasi_kondisi_b_menit' => 0,
+            ]
+        );
+
+        $summary->target_sla_menit = $minutes;
+        
+        // Recalculate target datetimes based on new target minutes
+        // Mode A
+        $startTimeFullRow = DB::connection('mysql_prasojo')
+            ->table('log_ajuan_status')
+            ->where('log_ajuan_id', $ajuanId)
+            ->orderBy('log_create_datetime', 'asc')
+            ->first();
+        $waktuMulaiModeA = $startTimeFullRow ? $startTimeFullRow->log_create_datetime : $ajuan->ajuan_create_datetime;
+
+        // Mode B
+        $startTimeRow = DB::connection('mysql_prasojo')
+            ->table('log_ajuan_status')
+            ->where('log_ajuan_id', $ajuanId)
+            ->where('log_status', 'PROSES VERIFIKASI')
+            ->orderBy('log_create_datetime', 'desc')
+            ->first();
+        $waktuMulaiModeB = $startTimeRow ? $startTimeRow->log_create_datetime : $waktuMulaiModeA;
+
+        $summary->target_waktu_selesai_kondisi_a = SLACalculator::calculateTargetDatetime($waktuMulaiModeA, $minutes);
+        $summary->target_waktu_selesai_kondisi_b = SLACalculator::calculateTargetDatetime($waktuMulaiModeB, $minutes);
+        
+        // If waktu_mulai is set, sync that as well
+        if ($summary->waktu_mulai) {
+            // Keep existing target_sla_menit_aktual sync
+            $summary->target_sla_menit_aktual = $minutes;
+        }
+
+        $summary->save();
+
+        // Sync custom user summaries
+        $endLog = DB::connection('mysql_prasojo')
+            ->table('log_ajuan_status')
+            ->where('log_ajuan_id', $ajuanId)
+            ->where('log_status', 'SELESAI DIPROSES')
+            ->orderBy('log_create_datetime', 'desc')
+            ->first();
+
+        $endTime = $endLog ? $endLog->log_create_datetime : $ajuan->ajuan_update_datetime;
+        $operatorId = $endLog ? $endLog->log_admin_id : 0;
+
+        SLAPrecalculator::syncAjuanForCustomUsers($ajuanId, (string)$endTime, (int)$operatorId);
+
+        return [
+            'target_sla_value' => $value,
+            'target_sla_unit' => $unit,
+            'target_sla_menit' => $minutes,
+        ];
     }
 }

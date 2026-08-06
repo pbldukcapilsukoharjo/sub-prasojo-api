@@ -113,9 +113,21 @@ Route::prefix('v1')->group(function () {
         Route::get('/samples', 'samples');
         Route::get('/export', 'export');
         Route::post('/recalculate', 'recalculate');
+        
+        // User custom status configuration settings
+        Route::get('/settings', 'getSettings');
+        Route::put('/settings', 'updateSettings');
+        Route::patch('/settings', 'updateSettings');
+
+        // Operator level target SLA
         Route::get('/target', 'getSlaTarget');
         Route::put('/target', 'updateSlaTarget');
         Route::patch('/target', 'updateSlaTarget');
+
+        // Specific Ajuan level target SLA
+        Route::get('/ajuan/{ajuan_id}/target', 'getAjuanTarget');
+        Route::put('/ajuan/{ajuan_id}/target', 'updateAjuanTarget');
+        Route::patch('/ajuan/{ajuan_id}/target', 'updateAjuanTarget');
     });
 
     /*

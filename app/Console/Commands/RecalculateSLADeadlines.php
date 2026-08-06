@@ -32,19 +32,49 @@ class RecalculateSLADeadlines extends Command
         // Ambil semua ajuan yang belum selesai (waktu_selesai masih null)
         $activeAjuans = AjuanSlaSummary::whereNull('waktu_selesai')
             ->whereNotNull('waktu_mulai')
-            ->whereNotNull('target_sla_menit_aktual')
             ->get();
 
         $count = 0;
         foreach ($activeAjuans as $summary) {
-            $targetDatetime = SLACalculator::calculateTargetDatetime($summary->waktu_mulai, $summary->target_sla_menit_aktual);
-            
-            // Kita asumsikan saat ini target waktu kondisi A (End-to-End) disamakan dengan target keseluruhan.
-            // Jika ada logika berbeda untuk kondisi B, dapat ditambahkan di sini.
-            $summary->target_waktu_selesai_kondisi_a = $targetDatetime;
-            $summary->target_waktu_selesai_kondisi_b = $targetDatetime; // Bisa disesuaikan logicnya nanti
+            $targetMenit = $summary->target_sla_menit ?? $summary->target_sla_menit_aktual ?? 360;
+
+            // Mode A
+            $startTimeFullRow = \Illuminate\Support\Facades\DB::connection('mysql_prasojo')
+                ->table('log_ajuan_status')
+                ->where('log_ajuan_id', $summary->ajuan_id)
+                ->orderBy('log_create_datetime', 'asc')
+                ->first();
+            $waktuMulaiModeA = $startTimeFullRow ? $startTimeFullRow->log_create_datetime : $summary->waktu_mulai;
+
+            // Mode B (PROSES VERIFIKASI terakhir)
+            $startTimeRow = \Illuminate\Support\Facades\DB::connection('mysql_prasojo')
+                ->table('log_ajuan_status')
+                ->where('log_ajuan_id', $summary->ajuan_id)
+                ->where('log_status', 'PROSES VERIFIKASI')
+                ->orderBy('log_create_datetime', 'desc')
+                ->first();
+            $waktuMulaiModeB = $startTimeRow ? $startTimeRow->log_create_datetime : $waktuMulaiModeA;
+
+            $summary->target_waktu_selesai_kondisi_a = SLACalculator::calculateTargetDatetime($waktuMulaiModeA, $targetMenit);
+            $summary->target_waktu_selesai_kondisi_b = SLACalculator::calculateTargetDatetime($waktuMulaiModeB, $targetMenit);
             
             $summary->save();
+
+            // Sync custom user summaries
+            $endLog = \Illuminate\Support\Facades\DB::connection('mysql_prasojo')
+                ->table('log_ajuan_status')
+                ->where('log_ajuan_id', $summary->ajuan_id)
+                ->where('log_status', 'SELESAI DIPROSES')
+                ->orderBy('log_create_datetime', 'desc')
+                ->first();
+
+            $endTime = $endLog ? $endLog->log_create_datetime : null;
+            $operatorId = $endLog ? $endLog->log_admin_id : 0;
+
+            if ($endTime) {
+                \App\Services\SLAPrecalculator::syncAjuanForCustomUsers($summary->ajuan_id, (string)$endTime, (int)$operatorId);
+            }
+
             $count++;
         }
 
