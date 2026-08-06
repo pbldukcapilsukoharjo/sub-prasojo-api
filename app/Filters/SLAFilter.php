@@ -14,12 +14,35 @@ final class SLAFilter extends BaseFilter
     {
         parent::apply($query);
 
-        if (!empty($this->request['id_kecamatan'])) {
-            $query->where('ajuan_kecamatan_code', $this->request['id_kecamatan']);
+        $kecamatan = $this->request['id_kecamatan'] ?? $this->request['kecamatan'] ?? null;
+        if (!empty($kecamatan)) {
+            $query->where(function (Builder $q) use ($kecamatan): void {
+                $q->where('ajuan_kecamatan_code', $kecamatan)
+                  ->orWhere('ajuan_kecamatan_name', $kecamatan);
+            });
         }
 
-        if (!empty($this->request['id_layanan'])) {
-            $query->where('ajuan_layanan_kode', $this->request['id_layanan']);
+        $layanan = $this->request['id_layanan'] ?? $this->request['layanan'] ?? null;
+        if (!empty($layanan)) {
+            $query->where('ajuan_layanan_kode', $layanan);
+        }
+
+        if (!empty($this->request['jenis_ajuan'])) {
+            $query->where('ajuan_jenis_ajuan_id', $this->request['jenis_ajuan']);
+        }
+
+        if (isset($this->request['jalur'])) {
+            $jalur = $this->request['jalur'];
+            if (is_numeric($jalur)) {
+                $query->where('ajuan_is_online', $jalur);
+            } else {
+                $jalurLower = strtolower((string) $jalur);
+                if ($jalurLower === 'online') {
+                    $query->where('ajuan_is_online', 1);
+                } elseif ($jalurLower === 'offline') {
+                    $query->where('ajuan_is_online', 0);
+                }
+            }
         }
 
         if (!empty($this->request['pelapor'])) {

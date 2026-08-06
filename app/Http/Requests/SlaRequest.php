@@ -61,14 +61,34 @@ class SlaRequest extends FormRequest
                 'string',
             ],
 
+            'kecamatan' => [
+                'nullable',
+                'string',
+            ],
+
             'id_layanan' => [
                 'nullable',
-                'integer',
+                'string',
+            ],
+
+            'layanan' => [
+                'nullable',
+                'string',
+            ],
+
+            'jenis_ajuan' => [
+                'nullable',
+                'string',
+            ],
+
+            'jalur' => [
+                'nullable',
+                'string',
             ],
 
             'operator_id' => [
                 'nullable',
-                'integer',
+                'string',
             ],
 
             'periode_bulan' => [
