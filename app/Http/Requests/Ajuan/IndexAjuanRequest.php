@@ -20,6 +20,7 @@ final class IndexAjuanRequest extends FormRequest
             'search' => ['nullable', 'string'],
             'district' => ['nullable', 'string'],
             'kecamatan' => ['nullable', 'string'],
+            'id_kecamatan' => ['nullable', 'string'],
             'period' => ['nullable', 'string'],
             'periode' => ['nullable', 'integer'],
             'sort_by' => ['nullable', 'string'],
@@ -28,8 +29,12 @@ final class IndexAjuanRequest extends FormRequest
             'end_date' => ['nullable', 'date'],
             'reporter' => ['nullable', 'string'],
             'pelapor' => ['nullable', 'string'],
+            'id_pelapor' => ['nullable', 'string'],
             'status' => ['nullable', 'string'],
             'layanan' => ['nullable', 'string'],
+            'id_layanan' => ['nullable', 'string'],
+            'jenis_ajuan' => ['nullable'],
+            'jalur' => ['nullable'],
         ];
     }
 }
