@@ -23,7 +23,7 @@ final class AjuanFilter
             }
         );
 
-        $kecamatan = $filters['kecamatan'] ?? $filters['district'] ?? null;
+        $kecamatan = $filters['kecamatan'] ?? $filters['district'] ?? $filters['id_kecamatan'] ?? null;
         $query->when(
             !empty($kecamatan),
             fn (Builder $q) =>
@@ -37,10 +37,11 @@ final class AjuanFilter
                 $q->where('ajuan_status', $filters['status'])
         );
 
+        $layanan = $filters['layanan'] ?? $filters['id_layanan'] ?? null;
         $query->when(
-            !empty($filters['layanan']),
+            !empty($layanan),
             fn (Builder $q) =>
-                $q->where('ajuan_layanan_kode', $filters['layanan'])
+                $q->where('ajuan_layanan_kode', $layanan)
         );
 
         $query->when(
@@ -66,7 +67,7 @@ final class AjuanFilter
             }
         );
 
-        $pelapor = $filters['pelapor'] ?? $filters['reporter'] ?? null;
+        $pelapor = $filters['pelapor'] ?? $filters['reporter'] ?? $filters['id_pelapor'] ?? null;
         $query->when(
             !empty($pelapor),
             function (Builder $q) use ($pelapor) {
