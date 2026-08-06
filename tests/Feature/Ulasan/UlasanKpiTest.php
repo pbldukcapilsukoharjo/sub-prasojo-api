@@ -121,4 +121,32 @@ class UlasanKpiTest extends TestCase
         $response->assertStatus(200);
         $response->assertHeader('content-type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     }
+
+    public function test_ulasan_endpoints_accept_pelapor_parameter()
+    {
+        $this->instance(
+            UlasanService::class,
+            Mockery::mock(UlasanService::class, function (MockInterface $mock) {
+                $mock->shouldReceive('getKpi')
+                    ->once()
+                    ->withArgs(fn($filter) => $filter->request['pelapor'] === 'online')
+                    ->andReturn([
+                        'rata_rata_bintang' => 4.5,
+                        'distribusi' => [
+                            'bintang_5' => 10,
+                            'bintang_4' => 5,
+                            'bintang_3' => 2,
+                            'bintang_2' => 1,
+                            'bintang_1' => 0
+                        ]
+                    ]);
+            })
+        );
+
+        $this->authenticateWithPaseto();
+        
+        $response = $this->getJson('/api/v1/ulasan/kpi?pelapor=online');
+
+        $response->assertStatus(200);
+    }
 }

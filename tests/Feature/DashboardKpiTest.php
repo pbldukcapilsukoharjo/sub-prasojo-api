@@ -126,4 +126,31 @@ class DashboardKpiTest extends TestCase
                      ]
                  ]);
     }
+
+    public function test_kpi_endpoint_accepts_pelapor_parameter()
+    {
+        $this->authenticateWithPaseto();
+
+        $mockService = Mockery::mock(DashboardService::class);
+        $mockService->shouldReceive('getKpi')
+            ->once()
+            ->withArgs(fn($filter) => $filter->request['pelapor'] === 'online')
+            ->andReturn([
+                'total_pengajuan' => 100,
+                'total_pengajuan_trend_persen' => 10,
+                'total_selesai' => 80,
+                'total_selesai_trend_persen' => 5,
+                'total_ditolak' => 5,
+                'total_ditolak_trend_persen' => 0,
+                'rata_rata_sla_jam' => 24,
+                'rata_rata_sla_trend_persen' => -2,
+                'rata_rata_sla_text' => '24 Jam 0 Menit',
+            ]);
+        
+        $this->app->instance(DashboardService::class, $mockService);
+
+        $response = $this->getJson('/api/v1/dashboard/kpi?pelapor=online');
+
+        $response->assertStatus(200);
+    }
 }

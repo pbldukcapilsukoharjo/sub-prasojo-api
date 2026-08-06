@@ -24,6 +24,24 @@ final class DashboardFilter extends BaseFilter
             $query->where('ajuan_layanan_kode', $layanan);
         }
 
+        $pelapor = $this->request['pelapor'] ?? $this->request['reporter'] ?? $this->request['id_pelapor'] ?? null;
+        if (!empty($pelapor)) {
+            $pelaporLower = strtolower($pelapor);
+            if ($pelaporLower === 'online') {
+                $query->where('ajuan_is_online', 1);
+            } elseif ($pelaporLower === 'offline') {
+                $query->where('ajuan_is_online', 0);
+            } elseif ($pelaporLower === 'mandiri') {
+                $query->where('ajuan_is_mandiri', 1);
+            } elseif ($pelaporLower === 'operator') {
+                $query->where('ajuan_is_mandiri', 0);
+            } elseif ($pelaporLower === 'tamat') {
+                $query->whereRaw('UPPER(TRIM(ajuan_keterangan)) = ?', ['TAMAT']);
+            } else {
+                $query->where('ajuan_pelapor_role_name', 'like', "%{$pelapor}%");
+            }
+        }
+
         return $query;
     }
 

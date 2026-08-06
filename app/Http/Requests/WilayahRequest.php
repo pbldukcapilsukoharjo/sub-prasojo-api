@@ -36,6 +36,9 @@ final class WilayahRequest extends FormRequest
             'page'          => 'nullable|integer|min:1',
             'sort_by'       => 'nullable|string',
             'sort_dir'      => 'nullable|in:asc,desc,ASC,DESC',
+            'reporter'      => 'nullable|string',
+            'pelapor'       => 'nullable|string',
+            'id_pelapor'    => 'nullable|string',
         ];
     }
 

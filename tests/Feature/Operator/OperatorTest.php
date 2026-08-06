@@ -203,4 +203,26 @@ class OperatorTest extends TestCase
         $response = $this->getJson('/api/v1/operator/99999/kpi');
         $response->assertStatus(404);
     }
+
+    public function test_operator_endpoints_accept_pelapor_parameter()
+    {
+        $this->authenticateWithPaseto();
+
+        $mockService = Mockery::mock(OperatorService::class);
+        $mockService->shouldReceive('getKpiGlobal')
+            ->once()
+            ->withArgs(fn($filter) => $filter->request['pelapor'] === 'online')
+            ->andReturn([
+                'total_ajuan' => 100,
+                'total_selesai' => 80,
+                'tingkat_selesai' => 80.0,
+                'rata_rata_durasi' => 5.5,
+            ]);
+
+        $this->app->instance(OperatorService::class, $mockService);
+
+        $response = $this->getJson('/api/v1/operator/kpi-global?pelapor=online');
+
+        $response->assertStatus(200);
+    }
 }

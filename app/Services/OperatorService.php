@@ -158,6 +158,28 @@ class OperatorService
                            ->where('ajuan.ajuan_layanan_kode', $filters['id_layanan']);
             }
 
+            $pelapor = $filters['pelapor'] ?? $filters['reporter'] ?? $filters['id_pelapor'] ?? null;
+            if (!empty($pelapor)) {
+                if (empty($filters['id_layanan'])) {
+                    $statsQuery->join('ajuan', 'log_ajuan_status.log_ajuan_id', '=', 'ajuan.ajuan_id');
+                }
+                
+                $pelaporLower = strtolower($pelapor);
+                if ($pelaporLower === 'online') {
+                    $statsQuery->where('ajuan.ajuan_is_online', 1);
+                } elseif ($pelaporLower === 'offline') {
+                    $statsQuery->where('ajuan.ajuan_is_online', 0);
+                } elseif ($pelaporLower === 'mandiri') {
+                    $statsQuery->where('ajuan.ajuan_is_mandiri', 1);
+                } elseif ($pelaporLower === 'operator') {
+                    $statsQuery->where('ajuan.ajuan_is_mandiri', 0);
+                } elseif ($pelaporLower === 'tamat') {
+                    $statsQuery->whereRaw('UPPER(TRIM(ajuan.ajuan_keterangan)) = ?', ['TAMAT']);
+                } else {
+                    $statsQuery->where('ajuan.ajuan_pelapor_role_name', 'like', "%{$pelapor}%");
+                }
+            }
+
             $stats = $statsQuery->select(
                 DB::raw('COUNT(log_id) as total_ajuan'),
                 DB::raw("SUM(CASE WHEN UPPER(log_status) = 'SELESAI DIPROSES' THEN 1 ELSE 0 END) as total_selesai")
@@ -189,6 +211,27 @@ class OperatorService
             if (!empty($filters['id_layanan'])) {
                 $chartQuery->join('ajuan', 'log_ajuan_status.log_ajuan_id', '=', 'ajuan.ajuan_id')
                            ->where('ajuan.ajuan_layanan_kode', $filters['id_layanan']);
+            }
+
+            if (!empty($pelapor)) {
+                if (empty($filters['id_layanan'])) {
+                    $chartQuery->join('ajuan', 'log_ajuan_status.log_ajuan_id', '=', 'ajuan.ajuan_id');
+                }
+                
+                $pelaporLower = strtolower($pelapor);
+                if ($pelaporLower === 'online') {
+                    $chartQuery->where('ajuan.ajuan_is_online', 1);
+                } elseif ($pelaporLower === 'offline') {
+                    $chartQuery->where('ajuan.ajuan_is_online', 0);
+                } elseif ($pelaporLower === 'mandiri') {
+                    $chartQuery->where('ajuan.ajuan_is_mandiri', 1);
+                } elseif ($pelaporLower === 'operator') {
+                    $chartQuery->where('ajuan.ajuan_is_mandiri', 0);
+                } elseif ($pelaporLower === 'tamat') {
+                    $chartQuery->whereRaw('UPPER(TRIM(ajuan.ajuan_keterangan)) = ?', ['TAMAT']);
+                } else {
+                    $chartQuery->where('ajuan.ajuan_pelapor_role_name', 'like', "%{$pelapor}%");
+                }
             }
 
             $chartData = $chartQuery->select(
@@ -250,6 +293,26 @@ class OperatorService
                 $query->whereHas('ajuan', function($q) use ($search) {
                     $q->where('ajuan_no_reg', 'like', "%{$search}%")
                       ->orWhere('ajuan_pelapor_nik', 'like', "%{$search}%");
+                });
+            }
+
+            $pelapor = $filters['pelapor'] ?? $filters['reporter'] ?? $filters['id_pelapor'] ?? null;
+            if (!empty($pelapor)) {
+                $query->whereHas('ajuan', function ($q) use ($pelapor) {
+                    $pelaporLower = strtolower($pelapor);
+                    if ($pelaporLower === 'online') {
+                        $q->where('ajuan_is_online', 1);
+                    } elseif ($pelaporLower === 'offline') {
+                        $q->where('ajuan_is_online', 0);
+                    } elseif ($pelaporLower === 'mandiri') {
+                        $q->where('ajuan_is_mandiri', 1);
+                    } elseif ($pelaporLower === 'operator') {
+                        $q->where('ajuan_is_mandiri', 0);
+                    } elseif ($pelaporLower === 'tamat') {
+                        $q->whereRaw('UPPER(TRIM(ajuan_keterangan)) = ?', ['TAMAT']);
+                    } else {
+                        $q->where('ajuan_pelapor_role_name', 'like', "%{$pelapor}%");
+                    }
                 });
             }
 

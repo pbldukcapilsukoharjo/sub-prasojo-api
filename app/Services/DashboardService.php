@@ -84,6 +84,25 @@ class DashboardService
                     if (!empty($layanan)) {
                         $prevQuery->where('ajuan_layanan_kode', $layanan);
                     }
+
+                    $pelapor = $requestParams['pelapor'] ?? $requestParams['reporter'] ?? $requestParams['id_pelapor'] ?? null;
+                    if (!empty($pelapor)) {
+                        $pelaporLower = strtolower($pelapor);
+                        if ($pelaporLower === 'online') {
+                            $prevQuery->where('ajuan_is_online', 1);
+                        } elseif ($pelaporLower === 'offline') {
+                            $prevQuery->where('ajuan_is_online', 0);
+                        } elseif ($pelaporLower === 'mandiri') {
+                            $prevQuery->where('ajuan_is_mandiri', 1);
+                        } elseif ($pelaporLower === 'operator') {
+                            $prevQuery->where('ajuan_is_mandiri', 0);
+                        } elseif ($pelaporLower === 'tamat') {
+                            $prevQuery->whereRaw('UPPER(TRIM(ajuan_keterangan)) = ?', ['TAMAT']);
+                        } else {
+                            $prevQuery->where('ajuan_pelapor_role_name', 'like', "%{$pelapor}%");
+                        }
+                    }
+
                     $prevQuery->whereMonth('ajuan_create_datetime', $prevMonth)
                               ->whereYear('ajuan_create_datetime', $prevYear);
 
