@@ -33,7 +33,7 @@ final class SLAFilter extends BaseFilter
             } elseif ($pelapor === 'operator') {
                 $query->where('ajuan_is_mandiri', 0);
             } elseif ($pelapor === 'tamat') {
-                $query->where('ajuan_keterangan', 'LIKE', '%TAMAT%');
+                $query->whereRaw('UPPER(TRIM(ajuan_keterangan)) = ?', ['TAMAT']);
             } else {
                 $query->where('ajuan_pelapor_role_name', 'LIKE', '%' . $this->request['pelapor'] . '%');
             }

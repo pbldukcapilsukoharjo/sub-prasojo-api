@@ -179,6 +179,10 @@ class SLAService
                 $jml = $agregat ? (int) $agregat->jumlah_ajuan : 0;
                 $rataMenit = $agregat ? (float) $agregat->rata_rata_menit : 0;
 
+                if (!empty($filters['pelapor']) && $jml === 0) {
+                    continue;
+                }
+
                 $jam = floor($rataMenit / 60);
                 $menit = round($rataMenit % 60);
                 $waktuText = "";

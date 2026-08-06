@@ -9,6 +9,7 @@ use App\Models\Prasojo\Ajuan;
 use App\Models\Prasojo\IlokasiKecamatan;
 use App\Models\Prasojo\Layanan;
 use App\Models\Prasojo\JenisAjuan;
+use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
 final class FilterController extends Controller
@@ -16,12 +17,37 @@ final class FilterController extends Controller
     /**
      * Filter Layanan
      */
-    public function layanan(): JsonResponse
+    public function layanan(Request $request): JsonResponse
     {
-        $data = Layanan::select('layanan_kode as id', 'layanan_nama as name')
-            ->where('layanan_is_active', 1)
-            ->orderBy('layanan_pos')
-            ->get();
+        $query = Layanan::select('layanan_kode as id', 'layanan_nama as name')
+            ->where('layanan_is_active', 1);
+
+        if ($request->filled('pelapor')) {
+            $pelapor = (string) $request->input('pelapor');
+            $pelaporLower = strtolower($pelapor);
+
+            $ajuanQuery = Ajuan::query()->distinct();
+
+            if ($pelaporLower === 'online') {
+                $ajuanQuery->where('ajuan_is_online', 1);
+            } elseif ($pelaporLower === 'offline') {
+                $ajuanQuery->where('ajuan_is_online', 0);
+            } elseif ($pelaporLower === 'mandiri') {
+                $ajuanQuery->where('ajuan_is_mandiri', 1);
+            } elseif ($pelaporLower === 'operator') {
+                $ajuanQuery->where('ajuan_is_mandiri', 0);
+            } elseif ($pelaporLower === 'tamat') {
+                $ajuanQuery->whereRaw('UPPER(TRIM(ajuan_keterangan)) = ?', ['TAMAT']);
+            } else {
+                $ajuanQuery->where('ajuan_pelapor_role_name', 'LIKE', '%' . $pelapor . '%');
+            }
+
+            $layananKodes = $ajuanQuery->pluck('ajuan_layanan_kode')->toArray();
+
+            $query->whereIn('layanan_kode', $layananKodes);
+        }
+
+        $data = $query->orderBy('layanan_pos')->get();
 
         return response()->json([
             'status' => true,
