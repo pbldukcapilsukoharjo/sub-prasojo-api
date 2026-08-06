@@ -184,4 +184,100 @@ class SLAController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Gagal mengambil target SLA operator', 'error' => $e->getMessage()], 500);
         }
     }
+
+    /**
+     * Get User SLA configuration settings
+     */
+    public function getSettings(): JsonResponse
+    {
+        try {
+            $userId = request()->attributes->get('auth_user_id') ?: (auth()->user()?->id);
+            if (!$userId) {
+                return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
+            }
+            $data = $this->service->getUserSettings($userId);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Berhasil mengambil konfigurasi status SLA',
+                'data' => $data,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('[SLAController@getSettings] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return response()->json(['status' => 'error', 'message' => 'Gagal mengambil konfigurasi status SLA', 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Update User SLA configuration settings
+     */
+    public function updateSettings(\App\Http\Requests\UpdateSlaSettingsRequest $request): JsonResponse
+    {
+        try {
+            $userId = $request->attributes->get('auth_user_id') ?: (auth()->user()?->id);
+            if (!$userId) {
+                return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
+            }
+            $data = $this->service->updateUserSettings($userId, $request->validated());
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Konfigurasi status SLA berhasil diperbarui dan disinkronkan.',
+                'data' => $data,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('[SLAController@updateSettings] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return response()->json(['status' => 'error', 'message' => 'Gagal memperbarui konfigurasi status SLA', 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Get target SLA for a specific ajuan
+     */
+    public function getAjuanTarget(string|int $ajuan_id): JsonResponse
+    {
+        try {
+            $data = $this->service->getAjuanTarget($ajuan_id);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Berhasil mengambil target SLA ajuan',
+                'data' => $data,
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 404);
+        } catch (\Throwable $e) {
+            Log::error('[SLAController@getAjuanTarget] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return response()->json(['status' => 'error', 'message' => 'Gagal mengambil target SLA ajuan', 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Update target SLA for a specific ajuan
+     */
+    public function updateAjuanTarget(string|int $ajuan_id, \App\Http\Requests\UpdateAjuanSlaTargetRequest $request): JsonResponse
+    {
+        try {
+            $data = $this->service->updateAjuanTarget($ajuan_id, $request->validated());
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Target SLA ajuan berhasil diperbarui.',
+                'data' => $data,
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 404);
+        } catch (\Throwable $e) {
+            Log::error('[SLAController@updateAjuanTarget] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return response()->json(['status' => 'error', 'message' => 'Gagal memperbarui target SLA ajuan', 'error' => $e->getMessage()], 500);
+        }
+    }
 }

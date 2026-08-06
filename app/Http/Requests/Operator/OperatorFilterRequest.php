@@ -64,6 +64,18 @@ final class OperatorFilterRequest extends FormRequest
             'id_layanan' => [
                 'nullable',
             ],
+            'reporter' => [
+                'nullable',
+                'string',
+            ],
+            'pelapor' => [
+                'nullable',
+                'string',
+            ],
+            'id_pelapor' => [
+                'nullable',
+                'string',
+            ],
         ];
     }
 }

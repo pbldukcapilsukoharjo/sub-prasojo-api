@@ -29,6 +29,9 @@ final class IndexProdukRequest extends FormRequest
             'status' => ['nullable', 'string'],
             'layanan' => ['nullable', 'string'],
             'nama_identitas_produk' => ['nullable', 'string'],
+            'reporter' => ['nullable', 'string'],
+            'pelapor' => ['nullable', 'string'],
+            'id_pelapor' => ['nullable', 'string'],
         ];
     }
 }
