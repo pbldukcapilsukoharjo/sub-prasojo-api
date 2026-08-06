@@ -142,6 +142,7 @@ Route::prefix('v1')->group(function () {
             Route::get('/template', 'template');
             Route::post('/import', 'import');
             Route::delete('/bulk', 'destroyBulk');
+            Route::get('/{id}', 'show');
             Route::put('/{id}', 'update');
             Route::patch('/{id}', 'update');
             Route::delete('/{id}', 'destroy');
