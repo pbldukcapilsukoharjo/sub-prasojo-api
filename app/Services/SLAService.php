@@ -39,7 +39,7 @@ class SLAService
                 $targetSlaText = $user->sla_target_value . " " . ucfirst($user->sla_target_unit);
             }
 
-            $cacheKey = 'sla:kpi:' . md5(json_encode($requestParams) . ':' . $userId . ':' . $targetSlaMenit);
+            $cacheKey = 'sla:kpi:' . md5(json_encode($filters) . ':' . $userId . ':' . $targetSlaMenit);
 
             return Cache::remember($cacheKey, 600, function () use ($filters, $targetSlaMenit, $targetSlaText) {
                 $query = Ajuan::query()->from('ajuan');
@@ -72,8 +72,8 @@ class SLAService
                 
                 $capaianPersen = $totalAjuan > 0 ? round(($totalMemenuhi / $totalAjuan) * 100, 2) : 0.0;
 
-                $jam = floor($rataRataMenit / 60);
-                $menit = round($rataRataMenit % 60);
+                $jam = (int) floor($rataRataMenit / 60);
+                $menit = (int) round(fmod($rataRataMenit, 60));
                 $slaText = "";
                 if ($jam > 0) {
                     $slaText .= $jam . " Jam ";
@@ -158,6 +158,10 @@ class SLAService
                 $layanansQuery->whereRaw('LOWER(layanan_nama) LIKE ?', ["%{$search}%"]);
             }
 
+            if (!empty($filters['id_layanan'])) {
+                $layanansQuery->where('layanan_kode', $filters['id_layanan']);
+            }
+
             $layanans = $layanansQuery->get();
             
             $agregatLayanan = (clone $query)->whereIn('ajuan.ajuan_status', $statusSelesai)
@@ -175,8 +179,12 @@ class SLAService
                 $jml = $agregat ? (int) $agregat->jumlah_ajuan : 0;
                 $rataMenit = $agregat ? (float) $agregat->rata_rata_menit : 0;
 
-                $jam = floor($rataMenit / 60);
-                $menit = round($rataMenit % 60);
+                if (!empty($filters['pelapor']) && $jml === 0) {
+                    continue;
+                }
+
+                $jam = (int) floor($rataMenit / 60);
+                $menit = (int) round(fmod($rataMenit, 60));
                 $waktuText = "";
                 if ($jam > 0) {
                     $waktuText .= $jam . " Jam ";
@@ -372,5 +380,119 @@ class SLAService
             'sla_target_value' => $user->sla_target_value ?? config('sla.default_jam', 6),
             'sla_target_unit' => $user->sla_target_unit ?? 'jam',
         ];
+    }
+
+    /**
+     * Mendapatkan sample data ajuan SLA untuk verifikasi/audit SLA.
+     *
+     * @param array $filters
+     * @return array{list: array, meta: array}
+     */
+    public function getSamples(array $filters): array
+    {
+        try {
+            $page = (int) ($filters['page'] ?? 1);
+            $perPage = (int) ($filters['per_page'] ?? 10);
+
+            $userId = request()->attributes->get('auth_user_id');
+            $user = $userId ? \App\Models\Monitoring\SubUser::find($userId) : null;
+
+            $defaultJam = config('sla.default_jam', 6);
+            $targetSlaMenit = $defaultJam * 60;
+
+            if ($user && $user->sla_target_value && $user->sla_target_unit) {
+                if ($user->sla_target_unit === 'menit') {
+                    $targetSlaMenit = $user->sla_target_value;
+                } elseif ($user->sla_target_unit === 'jam') {
+                    $targetSlaMenit = $user->sla_target_value * 60;
+                } elseif ($user->sla_target_unit === 'hari') {
+                    $targetSlaMenit = $user->sla_target_value * 1440;
+                }
+            }
+
+            $query = Ajuan::query()->from('ajuan')
+                ->with(['layanan', 'pelapor']);
+
+            // Filter standard via SLAFilter
+            $filter = new SLAFilter($filters);
+            $query = $filter->apply($query);
+
+            // Join summary SLA (precalculated times & durations)
+            $query = $this->applyLogSummarySubquery($query);
+
+            // Hanya ajuan yang sudah selesai
+            $statusSelesai = AjuanStatus::getStatusSelesai();
+            $query->whereIn('ajuan.ajuan_status', $statusSelesai);
+
+            if (!empty($filters['max_sla_minutes'])) {
+                $query->where('sla_summary.durasi_sla_menit', '<=', (int) $filters['max_sla_minutes']);
+            }
+
+            if (!empty($filters['operator_id'])) {
+                $query->where('sla_summary.operator_user_id', $filters['operator_id']);
+            }
+
+            // Pemilihan manual via ajuan_id
+            if (!empty($filters['ajuan_id'])) {
+                $query->where('ajuan.ajuan_id', $filters['ajuan_id']);
+            }
+
+            // Kategori sample
+            $kategori = $filters['kategori'] ?? null;
+            if ($kategori === 'tercepat') {
+                $query->orderBy('sla_summary.durasi_sla_menit', 'asc');
+            } elseif ($kategori === 'terlambat') {
+                $query->orderBy('sla_summary.durasi_sla_menit', 'desc');
+            } elseif ($kategori === 'terbaru') {
+                $query->orderBy('ajuan.ajuan_create_datetime', 'desc');
+            } elseif ($kategori === '30_hari') {
+                $thirtyDaysAgo = \Carbon\Carbon::now()->subDays(30);
+                $query->where(function ($q) use ($thirtyDaysAgo) {
+                    $q->where('sla_summary.waktu_selesai', '>=', $thirtyDaysAgo)
+                      ->orWhere('ajuan.ajuan_create_datetime', '>=', $thirtyDaysAgo);
+                })->orderBy('sla_summary.waktu_selesai', 'desc');
+            }
+
+            // Explicit sort_by overrides
+            if (!empty($filters['sort_by'])) {
+                if ($filters['sort_by'] === 'fastest') {
+                    $query->orderBy('sla_summary.durasi_sla_menit', 'asc');
+                } elseif ($filters['sort_by'] === 'slowest') {
+                    $query->orderBy('sla_summary.durasi_sla_menit', 'desc');
+                } elseif ($filters['sort_by'] === 'newest') {
+                    $query->orderBy('ajuan.ajuan_create_datetime', 'desc');
+                } elseif ($filters['sort_by'] === 'oldest') {
+                    $query->orderBy('ajuan.ajuan_create_datetime', 'asc');
+                }
+            } elseif (empty($kategori)) {
+                $query->orderBy('ajuan.ajuan_create_datetime', 'desc');
+            }
+
+            $query->select(
+                'ajuan.*',
+                'sla_summary.waktu_mulai',
+                'sla_summary.waktu_selesai',
+                'sla_summary.durasi_sla_menit',
+                'sla_summary.target_sla_menit_aktual',
+                'sla_summary.operator_user_id'
+            );
+
+            $paginator = $query->paginate($perPage, ['*'], 'page', $page);
+
+            return [
+                'list' => $paginator->items(),
+                'meta' => [
+                    'page' => $paginator->currentPage(),
+                    'per_page' => $paginator->perPage(),
+                    'total' => $paginator->total(),
+                    'total_page' => $paginator->lastPage(),
+                ],
+            ];
+        } catch (\Throwable $e) {
+            Log::error('[SLAService@getSamples] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            throw $e;
+        }
     }
 }

@@ -128,7 +128,7 @@ final class LembarKerjaFilter
                 } elseif ($pelaporLower === 'operator') {
                     $q->where('lk_ajuan_is_mandiri', 0);
                 } elseif ($pelaporLower === 'tamat') {
-                    $q->whereHas('ajuan', fn (Builder $aq) => $aq->where('ajuan_keterangan', 'LIKE', '%TAMAT%'));
+                    $q->whereHas('ajuan', fn (Builder $aq) => $aq->whereRaw('UPPER(TRIM(ajuan_keterangan)) = ?', ['TAMAT']));
                 } else {
                     $q->where('lk_pelapor_role_name', 'like', "%{$pelapor}%");
                 }

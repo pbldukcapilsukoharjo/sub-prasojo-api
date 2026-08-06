@@ -24,8 +24,11 @@ final class WilayahRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'search'        => 'nullable|string|max:100',
+            'q'             => 'nullable|string|max:100',
             'id_kecamatan'  => 'nullable|string',
             'id_layanan'    => 'nullable|integer',
+            'layanan_kode'  => 'nullable|string',
             'periode_bulan' => 'nullable|integer|min:1|max:12',
             'start_date'    => 'nullable|date_format:d-m-Y',
             'end_date'      => 'nullable|date_format:d-m-Y|after_or_equal:start_date',
@@ -34,5 +37,17 @@ final class WilayahRequest extends FormRequest
             'sort_by'       => 'nullable|string',
             'sort_dir'      => 'nullable|in:asc,desc,ASC,DESC',
         ];
+    }
+
+    /**
+     * Prepare data for validation.
+     */
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('q') && !$this->has('search')) {
+            $this->merge([
+                'search' => $this->input('q'),
+            ]);
+        }
     }
 }

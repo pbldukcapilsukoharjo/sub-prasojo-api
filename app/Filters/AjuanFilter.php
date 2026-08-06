@@ -80,7 +80,7 @@ final class AjuanFilter
                 } elseif ($pelaporLower === 'operator') {
                     $q->where('ajuan_is_mandiri', 0);
                 } elseif ($pelaporLower === 'tamat') {
-                    $q->where('ajuan_keterangan', 'LIKE', '%TAMAT%');
+                    $q->whereRaw('UPPER(TRIM(ajuan_keterangan)) = ?', ['TAMAT']);
                 } else {
                     $q->where('ajuan_pelapor_role_name', 'like', "%{$pelapor}%");
                 }
@@ -176,7 +176,7 @@ final class AjuanFilter
             } elseif ($pelapor === 'operator') {
                 $query->where('ajuan_is_mandiri', 0);
             } elseif ($pelapor === 'tamat') {
-                $query->where('ajuan_keterangan', 'LIKE', '%TAMAT%');
+                $query->whereRaw('UPPER(TRIM(ajuan_keterangan)) = ?', ['TAMAT']);
             } else {
                 $query->where('ajuan_pelapor_role_name', 'LIKE', '%' . $filters['pelapor'] . '%');
             }
