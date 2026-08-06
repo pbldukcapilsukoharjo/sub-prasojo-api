@@ -39,7 +39,7 @@ class SLAService
                 $targetSlaText = $user->sla_target_value . " " . ucfirst($user->sla_target_unit);
             }
 
-            $cacheKey = 'sla:kpi:' . md5(json_encode($requestParams) . ':' . $userId . ':' . $targetSlaMenit);
+            $cacheKey = 'sla:kpi:' . md5(json_encode($filters) . ':' . $userId . ':' . $targetSlaMenit);
 
             return Cache::remember($cacheKey, 600, function () use ($filters, $targetSlaMenit, $targetSlaText) {
                 $query = Ajuan::query()->from('ajuan');
@@ -72,8 +72,8 @@ class SLAService
                 
                 $capaianPersen = $totalAjuan > 0 ? round(($totalMemenuhi / $totalAjuan) * 100, 2) : 0.0;
 
-                $jam = floor($rataRataMenit / 60);
-                $menit = round($rataRataMenit % 60);
+                $jam = (int) floor($rataRataMenit / 60);
+                $menit = (int) round(fmod($rataRataMenit, 60));
                 $slaText = "";
                 if ($jam > 0) {
                     $slaText .= $jam . " Jam ";
@@ -183,8 +183,8 @@ class SLAService
                     continue;
                 }
 
-                $jam = floor($rataMenit / 60);
-                $menit = round($rataMenit % 60);
+                $jam = (int) floor($rataMenit / 60);
+                $menit = (int) round(fmod($rataMenit, 60));
                 $waktuText = "";
                 if ($jam > 0) {
                     $waktuText .= $jam . " Jam ";

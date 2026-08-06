@@ -24,14 +24,34 @@ abstract class BaseFilter
         return $query;
     }
 
+    protected function parseDate(string $value, bool $isEnd = false): Carbon
+    {
+        try {
+            $date = Carbon::createFromFormat('d-m-Y', $value);
+        } catch (\Throwable) {
+            $date = Carbon::parse($value);
+        }
+
+        return $isEnd ? $date->endOfDay() : $date->startOfDay();
+    }
+
     protected function applyDateFilters(Builder $query): void
     {
         if (!empty($this->request['start_date']) && !empty($this->request['end_date'])) {
-            $start_date = Carbon::createFromFormat('d-m-Y', $this->request['start_date'])->startOfDay();
-            $end_date = Carbon::createFromFormat('d-m-Y', $this->request['end_date'])->endOfDay();
+            $start_date = $this->parseDate($this->request['start_date']);
+            $end_date = $this->parseDate($this->request['end_date'], true);
             $query->whereBetween($this->dateColumn, [$start_date, $end_date]);
-        } elseif (!empty($this->request['periode_bulan'])) {
-            $month = (int)$this->request['periode_bulan'];
+        } elseif (!empty($this->request['start_date'])) {
+            $start_date = $this->parseDate($this->request['start_date']);
+            $query->whereDate($this->dateColumn, '>=', $start_date);
+        } elseif (!empty($this->request['end_date'])) {
+            $end_date = $this->parseDate($this->request['end_date'], true);
+            $query->whereDate($this->dateColumn, '<=', $end_date);
+        }
+
+        $periode = $this->request['periode_bulan'] ?? $this->request['periode'] ?? null;
+        if (!empty($periode)) {
+            $month = (int) $periode;
             $query->whereMonth($this->dateColumn, $month)
                   ->whereYear($this->dateColumn, Carbon::now()->year);
         }
