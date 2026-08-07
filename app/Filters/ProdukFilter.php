@@ -54,6 +54,31 @@ final class ProdukFilter
                 $q->where('prod_layanan_kode', $filters['layanan'])
         );
 
+        $pelapor = $filters['pelapor'] ?? $filters['reporter'] ?? $filters['id_pelapor'] ?? null;
+        $query->when(
+            !empty($pelapor),
+            fn (Builder $q) =>
+                $q->whereHas(
+                    'ajuan',
+                    function (Builder $aq) use ($pelapor): void {
+                        $pelaporLower = strtolower($pelapor);
+                        if ($pelaporLower === 'online') {
+                            $aq->where('ajuan_is_online', 1);
+                        } elseif ($pelaporLower === 'offline') {
+                            $aq->where('ajuan_is_online', 0);
+                        } elseif ($pelaporLower === 'mandiri') {
+                            $aq->where('ajuan_is_mandiri', 1);
+                        } elseif ($pelaporLower === 'operator') {
+                            $aq->where('ajuan_is_mandiri', 0);
+                        } elseif ($pelaporLower === 'tamat') {
+                            $aq->whereRaw('UPPER(TRIM(ajuan_keterangan)) = ?', ['TAMAT']);
+                        } else {
+                            $aq->where('ajuan_pelapor_role_name', 'like', "%{$pelapor}%");
+                        }
+                    }
+                )
+        );
+
         // Not using start_date and end_date for Produk as per analysis, but to prevent breaking frontend 
         // if they still send it, we could leave it. Actually the analysis said:
         // "Produk TIDAK punya filter Pelapor, Status, maupun Rentang Tanggal."

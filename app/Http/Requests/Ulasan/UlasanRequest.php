@@ -23,6 +23,9 @@ final class UlasanRequest extends FormRequest
             'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
             'rating' => ['nullable', 'integer', 'min:1', 'max:5'],
             'layanan_kode' => ['nullable', 'string'],
+            'reporter' => ['nullable', 'string'],
+            'pelapor' => ['nullable', 'string'],
+            'id_pelapor' => ['nullable', 'string'],
         ];
     }
 }

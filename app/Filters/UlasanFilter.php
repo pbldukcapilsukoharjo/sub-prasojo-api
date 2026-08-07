@@ -24,6 +24,26 @@ final class UlasanFilter extends BaseFilter
             $query->where('review_rating', (int)$this->request['rating']);
         }
 
+        $pelapor = $this->request['pelapor'] ?? $this->request['reporter'] ?? $this->request['id_pelapor'] ?? null;
+        if (!empty($pelapor)) {
+            $query->whereHas('ajuan', function (Builder $q) use ($pelapor) {
+                $pelaporLower = strtolower($pelapor);
+                if ($pelaporLower === 'online') {
+                    $q->where('ajuan_is_online', 1);
+                } elseif ($pelaporLower === 'offline') {
+                    $q->where('ajuan_is_online', 0);
+                } elseif ($pelaporLower === 'mandiri') {
+                    $q->where('ajuan_is_mandiri', 1);
+                } elseif ($pelaporLower === 'operator') {
+                    $q->where('ajuan_is_mandiri', 0);
+                } elseif ($pelaporLower === 'tamat') {
+                    $q->whereRaw('UPPER(TRIM(ajuan_keterangan)) = ?', ['TAMAT']);
+                } else {
+                    $q->where('ajuan_pelapor_role_name', 'like', "%{$pelapor}%");
+                }
+            });
+        }
+
         return $query;
     }
 

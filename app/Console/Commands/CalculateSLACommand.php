@@ -51,9 +51,9 @@ class CalculateSLACommand extends Command
             $endTime = $ajuan->log_create_datetime;
             $operatorId = $ajuan->log_admin_id;
 
-            // Target SLA snapshot (menggunakan default global)
-            // Evaluasi sebenarnya dilakukan secara dinamis di SLAService berdasarkan user yang sedang login.
-            $targetMenit = config('sla.default_jam', 6) * 60; 
+            // Cari target SLA ajuan ini (default 6 jam = 360 menit)
+            $existingSummary = AjuanSlaSummary::where('ajuan_id', $ajuan->log_ajuan_id)->first();
+            $targetMenit = $existingSummary ? ($existingSummary->target_sla_menit ?? 360) : 360;
 
             // Find start time Mode B (PROSES VERIFIKASI terakhir)
             $startTimeRow = DB::connection('mysql_prasojo')
@@ -92,6 +92,7 @@ class CalculateSLACommand extends Command
                 [
                     'operator_user_id' => $operatorId,
                     'target_sla_menit_aktual' => $targetMenit,
+                    'target_sla_menit' => $targetMenit,
                     'waktu_mulai' => $waktuMulaiModeB, // Default legacy
                     'waktu_selesai' => $endTime,
                     'durasi_sla_menit' => $minutesB, // Default legacy
@@ -101,6 +102,9 @@ class CalculateSLACommand extends Command
                     'target_waktu_selesai_kondisi_b' => $targetDatetimeB,
                 ]
             );
+
+            // Sync ke summary kustom masing-masing user yang memiliki konfigurasi
+            \App\Services\SLAPrecalculator::syncAjuanForCustomUsers($ajuan->log_ajuan_id, (string)$endTime, (int)$operatorId);
 
             $processedCount++;
             $bar->advance();

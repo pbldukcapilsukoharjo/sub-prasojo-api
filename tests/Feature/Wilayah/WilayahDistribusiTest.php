@@ -169,6 +169,34 @@ class WilayahDistribusiTest extends TestCase
         $response->assertStatus(200);
         $response->assertHeader('content-type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     }
+
+    public function test_distribusi_endpoint_accepts_pelapor_parameter()
+    {
+        $this->authenticateWithPaseto();
+
+        $mockService = Mockery::mock(WilayahService::class);
+        $items = [
+            [
+                'id_kecamatan' => '35.73.01',
+                'nama_kecamatan' => 'Klojen',
+                'total_ajuan' => 10,
+                'rata_rata_waktu' => '1 Jam',
+                'rasio_selesai_persen' => 100.0
+            ]
+        ];
+        $paginator = new LengthAwarePaginator($items, 1, 10, 1);
+
+        $mockService->shouldReceive('getDistribusi')
+            ->once()
+            ->withArgs(fn($filter, $perPage) => $filter->request['pelapor'] === 'online')
+            ->andReturn($paginator);
+
+        $this->app->instance(WilayahService::class, $mockService);
+
+        $response = $this->getJson('/api/v1/wilayah/distribusi?pelapor=online');
+
+        $response->assertStatus(200);
+    }
 }
 
 
