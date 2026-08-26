@@ -234,7 +234,7 @@ class WilayahService
     public function getDistribusiExportData(WilayahFilter $filter): array
     {
         try {
-            $layanans = Layanan::orderBy('layanan_pos')->pluck('layanan_name', 'layanan_kode')->toArray();
+            $layanans = Layanan::orderBy('layanan_pos')->pluck('layanan_nama', 'layanan_kode')->toArray();
 
             $statusSelesai = "'" . implode("','", AjuanStatus::getStatusSelesai()) . "'";
             $defaultDb = config('database.connections.mysql.database');

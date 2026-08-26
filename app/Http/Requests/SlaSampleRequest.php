@@ -42,6 +42,7 @@ class SlaSampleRequest extends FormRequest
             ],
             'id_layanan' => [
                 'nullable',
+                'string',
             ],
             'operator_id' => [
                 'nullable',
