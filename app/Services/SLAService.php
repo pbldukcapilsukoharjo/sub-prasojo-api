@@ -25,12 +25,12 @@ class SLAService
         try {
             $requestParams = request()->all();
             $userId = request()->attributes->get('auth_user_id');
-            
+
             $user = $userId ? \App\Models\Monitoring\SubUser::find($userId) : null;
             $defaultJam = config('sla.default_jam', 6);
             $targetSlaMenit = $defaultJam * 60; // default 360 menit
             $targetSlaText = "{$defaultJam} Jam";
-            
+
             if ($user && $user->sla_target_value && $user->sla_target_unit) {
                 if ($user->sla_target_unit === 'menit') {
                     $targetSlaMenit = $user->sla_target_value;
@@ -83,7 +83,7 @@ class SLAService
                 $rataRataMenit = (float)($kpiGlobal->rata_rata_menit ?? 0);
                 $totalAjuan = (int)($kpiGlobal->total_ajuan ?? 0);
                 $totalMemenuhi = (int)($kpiGlobal->total_memenuhi ?? 0);
-                
+
                 $capaianPersen = $totalAjuan > 0 ? round(($totalMemenuhi / $totalAjuan) * 100, 2) : 0.0;
 
                 $jam = (int) floor($rataRataMenit / 60);
@@ -116,7 +116,7 @@ class SLAService
     /**
      * Mendapatkan data SLA.
      * Menggabungkan struktur output Falah dengan optimasi query SQL Amru.
-     * 
+     *
      * @param array $filters
      * @return array{list: array, meta: array}
      */
@@ -128,7 +128,7 @@ class SLAService
 
             // -- KODE AMRU (Base Query) -- //
             $query = Ajuan::query()->from('ajuan');
-            
+
             $filter = new SLAFilter($filters);
             $query = $filter->apply($query);
 
@@ -146,11 +146,11 @@ class SLAService
             }
 
             $statusSelesai = AjuanStatus::getStatusSelesai();
-            
+
             $user = auth()->user();
             $targetSlaMenit = config('sla.default_jam', 6) * 60; // 360 menit
             $targetSlaJam = config('sla.default_jam', 6);
-            
+
             if ($user && $user->sla_target_value && $user->sla_target_unit) {
                 if ($user->sla_target_unit === 'menit') {
                     $targetSlaMenit = $user->sla_target_value;
@@ -168,7 +168,7 @@ class SLAService
 
             // -- KODE AMRU (Optimasi: Ambil semua layanan, lalu fetch agregat 1x query untuk menghindari N+1) -- //
             $layanansQuery = Layanan::query()->orderBy('layanan_pos');
-            
+
             if (!empty($filters['search'])) {
                 $search = strtolower($filters['search']);
                 $layanansQuery->whereRaw('LOWER(layanan_nama) LIKE ?', ["%{$search}%"]);
@@ -179,7 +179,7 @@ class SLAService
             }
 
             $layanans = $layanansQuery->get();
-            
+
             $agregatLayanan = (clone $query)->whereIn('ajuan.ajuan_status', $statusSelesai)
                 ->select(
                     'ajuan.ajuan_layanan_kode',
@@ -212,7 +212,8 @@ class SLAService
                 }
 
                 $details[] = [
-                    'id' => $index + 2,
+                    'id' => $index + 1,
+                    'id_layanan' => $layanan->layanan_kode,
                     'jenis_layanan' => strtoupper($layanan->layanan_nama),
                     'jumlah_ajuan' => $jml,
                     'rata_rata_menit' => $rataMenit,
@@ -236,7 +237,7 @@ class SLAService
             }
 
             $total = $sortedCollection->count();
-            
+
             /** @var \Illuminate\Support\Collection $list */
             $list = $sortedCollection->forPage($page, $perPage)->map(function($item) {
                 unset($item['rata_rata_menit']);
@@ -266,10 +267,10 @@ class SLAService
     public function export(array $filters): \Illuminate\Support\Collection
     {
         try {
-            // Export mengambil semua data layanan tanpa paginasi 
+            // Export mengambil semua data layanan tanpa paginasi
             // dengan format data yang disesuaikan export.
             $query = Ajuan::query()->from('ajuan');
-            
+
             $filter = new SLAFilter($filters);
             $query = $filter->apply($query);
 
@@ -300,7 +301,7 @@ class SLAService
 
             $user = auth()->user();
             $defaultSla = config('sla.default_jam', 6) * 60;
-            
+
             if ($user && $user->sla_target_value && $user->sla_target_unit) {
                 if ($user->sla_target_unit === 'menit') {
                     $defaultSla = $user->sla_target_value;
@@ -310,7 +311,7 @@ class SLAService
                     $defaultSla = $user->sla_target_value * 1440;
                 }
             }
-            
+
             $perLayanan = config('sla.per_layanan', []);
 
             return $data->map(function ($item) use ($defaultSla, $perLayanan) {
@@ -320,13 +321,13 @@ class SLAService
                 $aktualText = "";
                 if ($jamAktual > 0) $aktualText .= $jamAktual . " Jam ";
                 $aktualText .= $menitAktual . " Menit";
-                
-                $targetMenit = isset($perLayanan[$item->layanan_kode]) 
-                    ? $perLayanan[$item->layanan_kode] * 60 
+
+                $targetMenit = isset($perLayanan[$item->layanan_kode])
+                    ? $perLayanan[$item->layanan_kode] * 60
                     : $defaultSla;
 
                 $statusSla = $rataRataMenit <= $targetMenit ? 'MEMENUHI' : 'TIDAK MEMENUHI';
-                
+
                 $targetJam = floor($targetMenit / 60);
                 $targetMenitSisa = $targetMenit % 60;
                 $targetText = "";
@@ -355,14 +356,14 @@ class SLAService
     protected function applyLogSummarySubquery(\Illuminate\Database\Eloquent\Builder $query, ?SubUser $user = null): \Illuminate\Database\Eloquent\Builder
     {
         $defaultDb = config('database.connections.mysql.database');
-        
+
         if ($user && ($user->sla_start_status || $user->sla_end_status)) {
             return $query->join(DB::raw("`{$defaultDb}`.`user_ajuan_sla_summaries` as sla_summary"), function ($join) use ($user) {
                 $join->on('sla_summary.ajuan_id', '=', 'ajuan.ajuan_id')
                      ->where('sla_summary.user_id', '=', $user->id);
             });
         }
-        
+
         return $query->join(DB::raw("`{$defaultDb}`.`ajuan_sla_summaries` as sla_summary"), 'sla_summary.ajuan_id', '=', 'ajuan.ajuan_id');
     }
 
@@ -552,7 +553,7 @@ class SLAService
     public function updateUserSettings(string|int $userId, array $data): array
     {
         $user = SubUser::findOrFail($userId);
-        
+
         $user->update([
             'sla_start_status' => $data['sla_start_status'] ?? null,
             'sla_end_status' => $data['sla_end_status'] ?? null,
@@ -643,7 +644,7 @@ class SLAService
         );
 
         $summary->target_sla_menit = $minutes;
-        
+
         // Recalculate target datetimes based on new target minutes
         // Mode A
         $startTimeFullRow = DB::connection('mysql_prasojo')
@@ -664,7 +665,7 @@ class SLAService
 
         $summary->target_waktu_selesai_kondisi_a = SLACalculator::calculateTargetDatetime($waktuMulaiModeA, $minutes);
         $summary->target_waktu_selesai_kondisi_b = SLACalculator::calculateTargetDatetime($waktuMulaiModeB, $minutes);
-        
+
         // If waktu_mulai is set, sync that as well
         if ($summary->waktu_mulai) {
             // Keep existing target_sla_menit_aktual sync
