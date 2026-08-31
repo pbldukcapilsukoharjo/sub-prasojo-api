@@ -172,4 +172,160 @@ class SLACalculator
 
         return $current;
     }
+
+    // ──────────────────────────────────────────────────────────────────────
+    // Batch-optimized methods (pre-loaded holidays & business hours)
+    // ──────────────────────────────────────────────────────────────────────
+
+    /**
+     * Pre-load holidays and business hours for a date range.
+     * Use this when calculating SLA for multiple ajuan in a batch
+     * to avoid repeated DB queries.
+     *
+     * @param Carbon $startDate
+     * @param Carbon $endDate
+     * @return array{masterJam: \Illuminate\Support\Collection, holidays: string[]}
+     */
+    public static function loadSharedData(Carbon $startDate, Carbon $endDate): array
+    {
+        $masterJam = MasterJamOperasional::all()->keyBy('hari_kode');
+
+        $years = range($startDate->year, $endDate->year);
+        $holidays = [];
+        foreach ($years as $year) {
+            $spatieHolidays = Holidays::for('id', $year)->get();
+            foreach ($spatieHolidays as $holiday) {
+                $holidays[] = Carbon::parse($holiday->date)->format('Y-m-d');
+            }
+        }
+
+        $dbHolidays = MasterLiburNasional::whereBetween('tanggal', [
+                $startDate->format('Y-m-d'),
+                $endDate->format('Y-m-d'),
+            ])
+            ->pluck('tanggal')
+            ->map(fn($date) => Carbon::parse($date)->format('Y-m-d'))
+            ->toArray();
+
+        return [
+            'masterJam' => $masterJam,
+            'holidays'  => array_unique(array_merge($holidays, $dbHolidays)),
+        ];
+    }
+
+    /**
+     * Calculate SLA duration in minutes using pre-loaded shared data.
+     * Same logic as calculateMinutes() but without DB queries.
+     *
+     * @param string|Carbon $startTime
+     * @param string|Carbon $endTime
+     * @param \Illuminate\Support\Collection $masterJam  keyed by hari_kode
+     * @param string[] $allHolidays  array of 'Y-m-d' strings
+     * @return int
+     */
+    public static function calculateMinutesWithCache($startTime, $endTime, $masterJam, array $allHolidays): int
+    {
+        $start = Carbon::parse($startTime);
+        $end   = Carbon::parse($endTime);
+
+        if ($end->lessThan($start)) {
+            return 0;
+        }
+
+        $totalMinutes = 0;
+        $current = $start->copy();
+
+        while ($current->lessThan($end)) {
+            $hariKode = $current->dayOfWeekIso;
+            $jamOp    = $masterJam->get($hariKode);
+
+            $isLiburNasional = in_array($current->format('Y-m-d'), $allHolidays);
+            $isLiburHari     = $jamOp ? $jamOp->is_libur : $current->isWeekend();
+
+            if (!$isLiburNasional && !$isLiburHari && $jamOp && $jamOp->jam_buka && $jamOp->jam_tutup) {
+                $partsBuka  = explode(':', $jamOp->jam_buka);
+                $partsTutup = explode(':', $jamOp->jam_tutup);
+
+                $businessStart = $current->copy()->setTime((int) $partsBuka[0], (int) $partsBuka[1], 0);
+                $businessEnd   = $current->copy()->setTime((int) $partsTutup[0], (int) $partsTutup[1], 0);
+
+                if ($current->isSameDay($start) && $current->isSameDay($end)) {
+                    $calcStart = $start->copy()->max($businessStart);
+                    $calcEnd   = $end->copy()->min($businessEnd);
+                    if ($calcStart->lessThan($calcEnd)) {
+                        $totalMinutes += $calcStart->diffInMinutes($calcEnd);
+                    }
+                } elseif ($current->isSameDay($start)) {
+                    $calcStart = $start->copy()->max($businessStart);
+                    if ($calcStart->lessThan($businessEnd)) {
+                        $totalMinutes += $calcStart->diffInMinutes($businessEnd);
+                    }
+                } elseif ($current->isSameDay($end)) {
+                    $calcEnd = $end->copy()->min($businessEnd);
+                    if ($businessStart->lessThan($calcEnd)) {
+                        $totalMinutes += $businessStart->diffInMinutes($calcEnd);
+                    }
+                } else {
+                    $totalMinutes += $businessStart->diffInMinutes($businessEnd);
+                }
+            }
+
+            $current->addDay()->startOfDay();
+        }
+
+        return $totalMinutes;
+    }
+
+    /**
+     * Calculate target datetime using pre-loaded shared data.
+     * Same logic as calculateTargetDatetime() but without DB queries.
+     *
+     * @param string|Carbon $startTime
+     * @param int $targetMinutes
+     * @param \Illuminate\Support\Collection $masterJam  keyed by hari_kode
+     * @param string[] $allHolidays  array of 'Y-m-d' strings
+     * @return Carbon|null
+     */
+    public static function calculateTargetDatetimeWithCache($startTime, int $targetMinutes, $masterJam, array $allHolidays): ?Carbon
+    {
+        if ($targetMinutes <= 0) {
+            return Carbon::parse($startTime);
+        }
+
+        $current = Carbon::parse($startTime);
+
+        while ($targetMinutes > 0) {
+            $hariKode = $current->dayOfWeekIso;
+            $jamOp    = $masterJam->get($hariKode);
+
+            $isLiburNasional = in_array($current->format('Y-m-d'), $allHolidays);
+            $isLiburHari     = $jamOp ? $jamOp->is_libur : $current->isWeekend();
+
+            if (!$isLiburNasional && !$isLiburHari && $jamOp && $jamOp->jam_buka && $jamOp->jam_tutup) {
+                $partsBuka  = explode(':', $jamOp->jam_buka);
+                $partsTutup = explode(':', $jamOp->jam_tutup);
+
+                $businessStart = $current->copy()->setTime((int) $partsBuka[0], (int) $partsBuka[1], 0);
+                $businessEnd   = $current->copy()->setTime((int) $partsTutup[0], (int) $partsTutup[1], 0);
+
+                if ($current->lessThan($businessStart)) {
+                    $current = $businessStart->copy();
+                }
+
+                if ($current->lessThan($businessEnd)) {
+                    $availableMinutes = $current->diffInMinutes($businessEnd);
+
+                    if ($availableMinutes >= $targetMinutes) {
+                        return $current->copy()->addMinutes($targetMinutes);
+                    } else {
+                        $targetMinutes -= $availableMinutes;
+                    }
+                }
+            }
+
+            $current->addDay()->startOfDay();
+        }
+
+        return $current;
+    }
 }
