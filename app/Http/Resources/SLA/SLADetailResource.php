@@ -22,7 +22,7 @@ class SLADetailResource extends JsonResource
                 $this['id'],
 
             'id_layanan' =>
-                $this['id_layanan'],
+                $this['id_layanan'] ?? null,
 
             'jenis_layanan' =>
                 $this['jenis_layanan'],
