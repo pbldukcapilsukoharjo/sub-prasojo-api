@@ -21,7 +21,8 @@ final class DashboardFilter extends BaseFilter
 
         $layanan = $this->request['id_layanan'] ?? $this->request['layanan'] ?? null;
         if (!empty($layanan)) {
-            $query->where('ajuan_layanan_kode', $layanan);
+            $layananKode = \App\Models\Prasojo\Layanan::resolveKode($layanan);
+            $query->where('ajuan_layanan_kode', $layananKode);
         }
 
         $pelapor = $this->request['pelapor'] ?? $this->request['reporter'] ?? $this->request['id_pelapor'] ?? null;

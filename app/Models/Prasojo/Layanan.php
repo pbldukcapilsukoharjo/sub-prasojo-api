@@ -144,4 +144,25 @@ final class Layanan extends Model
 
         return array_map('intval', explode(',', $this->layanan_jenis_ajuan_id_list));
     }
+
+    /**
+     * Resolve kode layanan from either ID (e.g. 1) or Kode (e.g. "KK").
+     */
+    public static function resolveKode(string|int|null $idOrKode): ?string
+    {
+        if ($idOrKode === null || $idOrKode === '') {
+            return null;
+        }
+
+        if (is_numeric($idOrKode)) {
+            static $map = null;
+            if ($map === null) {
+                $map = self::pluck('layanan_kode', 'layanan_id')->toArray();
+            }
+            return $map[(int) $idOrKode] ?? (string) $idOrKode;
+        }
+
+        return strtoupper((string) $idOrKode);
+    }
 }
+
