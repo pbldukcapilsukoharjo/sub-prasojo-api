@@ -41,7 +41,7 @@ final class AjuanFilter
         $query->when(
             !empty($layanan),
             fn (Builder $q) =>
-                $q->where('ajuan_layanan_kode', $layanan)
+                $q->where('ajuan_layanan_kode', \App\Models\Prasojo\Layanan::resolveKode($layanan))
         );
 
         $query->when(
@@ -141,7 +141,7 @@ final class AjuanFilter
         }
 
         if (!empty($filters['id_layanan'])) {
-            $query->where('ajuan_layanan_kode', $filters['id_layanan']);
+            $query->where('ajuan_layanan_kode', \App\Models\Prasojo\Layanan::resolveKode($filters['id_layanan']));
         }
 
         if (isset($filters['status'])) {

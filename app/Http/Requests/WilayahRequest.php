@@ -27,7 +27,7 @@ final class WilayahRequest extends FormRequest
             'search'        => 'nullable|string|max:100',
             'q'             => 'nullable|string|max:100',
             'id_kecamatan'  => 'nullable|string',
-            'id_layanan'    => 'nullable|integer',
+            'id_layanan'    => 'nullable|string',
             'layanan_kode'  => 'nullable|string',
             'periode_bulan' => 'nullable|integer|min:1|max:12',
             'start_date'    => 'nullable|date_format:d-m-Y',

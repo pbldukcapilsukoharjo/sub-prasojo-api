@@ -154,8 +154,9 @@ class OperatorService
                 $statsQuery->whereMonth('log_create_datetime', (int) $filters['periode_bulan']);
             }
             if (!empty($filters['id_layanan'])) {
+                $layananKode = \App\Models\Prasojo\Layanan::resolveKode($filters['id_layanan']);
                 $statsQuery->join('ajuan', 'log_ajuan_status.log_ajuan_id', '=', 'ajuan.ajuan_id')
-                           ->where('ajuan.ajuan_layanan_kode', $filters['id_layanan']);
+                           ->where('ajuan.ajuan_layanan_kode', $layananKode);
             }
 
             $pelapor = $filters['pelapor'] ?? $filters['reporter'] ?? $filters['id_pelapor'] ?? null;
@@ -209,8 +210,9 @@ class OperatorService
             }
 
             if (!empty($filters['id_layanan'])) {
+                $layananKode = \App\Models\Prasojo\Layanan::resolveKode($filters['id_layanan']);
                 $chartQuery->join('ajuan', 'log_ajuan_status.log_ajuan_id', '=', 'ajuan.ajuan_id')
-                           ->where('ajuan.ajuan_layanan_kode', $filters['id_layanan']);
+                           ->where('ajuan.ajuan_layanan_kode', $layananKode);
             }
 
             if (!empty($pelapor)) {
@@ -284,8 +286,9 @@ class OperatorService
                 $query->whereMonth('log_create_datetime', (int) $filters['periode_bulan']);
             }
             if (!empty($filters['id_layanan'])) {
-                $query->whereHas('ajuan', function($q) use ($filters) {
-                    $q->where('ajuan_layanan_kode', $filters['id_layanan']);
+                $layananKode = \App\Models\Prasojo\Layanan::resolveKode($filters['id_layanan']);
+                $query->whereHas('ajuan', function($q) use ($layananKode) {
+                    $q->where('ajuan_layanan_kode', $layananKode);
                 });
             }
             if (!empty($filters['search'])) {

@@ -18,9 +18,10 @@ final class WilayahFilter extends BaseFilter
             $query->where('ajuan.ajuan_kecamatan_code', $this->request['id_kecamatan']);
         }
 
-        $layanan = $this->request['id_layanan'] ?? $this->request['layanan_kode'] ?? null;
+        $layanan = $this->request['id_layanan'] ?? $this->request['layanan_kode'] ?? $this->request['layanan'] ?? null;
         if (!empty($layanan)) {
-            $query->where('ajuan.ajuan_layanan_kode', $layanan);
+            $layananKode = \App\Models\Prasojo\Layanan::resolveKode($layanan);
+            $query->where('ajuan.ajuan_layanan_kode', $layananKode);
         }
 
         $pelapor = $this->request['pelapor'] ?? $this->request['reporter'] ?? $this->request['id_pelapor'] ?? null;
