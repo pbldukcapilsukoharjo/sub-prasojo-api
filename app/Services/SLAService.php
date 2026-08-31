@@ -632,11 +632,12 @@ class SLAService
         };
 
         // Find or create summary in default DB
+        // waktu_selesai bisa null jika ajuan belum selesai diproses
         $summary = AjuanSlaSummary::firstOrCreate(
             ['ajuan_id' => $ajuanId],
             [
                 'waktu_mulai' => $ajuan->ajuan_create_datetime,
-                'waktu_selesai' => $ajuan->ajuan_update_datetime,
+                'waktu_selesai' => $ajuan->ajuan_update_datetime ?? null,
                 'durasi_sla_menit' => 0,
                 'durasi_kondisi_a_menit' => 0,
                 'durasi_kondisi_b_menit' => 0,

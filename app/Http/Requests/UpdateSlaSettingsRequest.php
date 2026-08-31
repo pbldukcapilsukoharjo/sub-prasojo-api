@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Enums\AjuanStatus;
 
 class UpdateSlaSettingsRequest extends FormRequest
 {
@@ -21,12 +22,25 @@ class UpdateSlaSettingsRequest extends FormRequest
      */
     public function rules(): array
     {
+        // Semua status dari AjuanStatus enum
         $validStatuses = [
-            'BELUM DIVERIFIKASI',
+            AjuanStatus::DIAJUKAN,
+            AjuanStatus::BELUM_DIVERIFIKASI,
+            AjuanStatus::DIVERIFIKASI,
+            AjuanStatus::DIPROSES,
+            AjuanStatus::MENUNGGU_KONFIRMASI,
+            AjuanStatus::DISETUJUI,
+            AjuanStatus::DITOLAK,
+            AjuanStatus::SELESAI,
+            AjuanStatus::SELESAI_DIPROSES,
+            AjuanStatus::DIAJUKAN_TTE,
+            AjuanStatus::TIDAK_DIPROSES,
+            AjuanStatus::SIAP_DOWNLOAD,
+            AjuanStatus::SIAP_DICETAK,
+            AjuanStatus::SUDAH_DICETAK,
+            AjuanStatus::SIAP_DIAMBIL,
+            // Status legacy di database yang belum ada di enum
             'PROSES VERIFIKASI',
-            'DISETUJUI',
-            'SELESAI DIPROSES',
-            'DITOLAK',
             'DIKOREKSI',
             'DISETUJUI TANPA NIK',
             'PROSES INPUT NIK',

@@ -52,6 +52,7 @@ class SlaKpiTest extends TestCase
                     'list' => [
                         [
                             'id' => 1,
+                            'id_layanan' => '1',
                             'jenis_layanan' => 'KTP',
                             'jumlah_ajuan' => 10,
                             'rata_rata_waktu' => '2 Jam'
@@ -79,6 +80,7 @@ class SlaKpiTest extends TestCase
                      'data' => [
                          '*' => [
                              'id',
+                             'id_layanan',
                              'jenis_layanan',
                              'jumlah_ajuan',
                              'rata_rata_waktu'
