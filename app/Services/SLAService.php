@@ -356,22 +356,14 @@ class SLAService
     protected function applyLogSummarySubquery(\Illuminate\Database\Eloquent\Builder $query, ?SubUser $user = null): \Illuminate\Database\Eloquent\Builder
     {
         $defaultDb = config('database.connections.mysql.database');
-<<<<<<< HEAD
 
-=======
-        
->>>>>>> origin/main
         if ($user && ($user->sla_start_status || $user->sla_end_status)) {
             return $query->join(DB::raw("`{$defaultDb}`.`user_ajuan_sla_summaries` as sla_summary"), function ($join) use ($user) {
                 $join->on('sla_summary.ajuan_id', '=', 'ajuan.ajuan_id')
                      ->where('sla_summary.user_id', '=', $user->id);
             });
         }
-<<<<<<< HEAD
 
-=======
-        
->>>>>>> origin/main
         return $query->join(DB::raw("`{$defaultDb}`.`ajuan_sla_summaries` as sla_summary"), 'sla_summary.ajuan_id', '=', 'ajuan.ajuan_id');
     }
 
@@ -561,11 +553,7 @@ class SLAService
     public function updateUserSettings(string|int $userId, array $data): array
     {
         $user = SubUser::findOrFail($userId);
-<<<<<<< HEAD
 
-=======
-        
->>>>>>> origin/main
         $user->update([
             'sla_start_status' => $data['sla_start_status'] ?? null,
             'sla_end_status' => $data['sla_end_status'] ?? null,
@@ -677,11 +665,7 @@ class SLAService
 
         $summary->target_waktu_selesai_kondisi_a = SLACalculator::calculateTargetDatetime($waktuMulaiModeA, $minutes);
         $summary->target_waktu_selesai_kondisi_b = SLACalculator::calculateTargetDatetime($waktuMulaiModeB, $minutes);
-<<<<<<< HEAD
 
-=======
-        
->>>>>>> origin/main
         // If waktu_mulai is set, sync that as well
         if ($summary->waktu_mulai) {
             // Keep existing target_sla_menit_aktual sync
@@ -709,8 +693,5 @@ class SLAService
             'target_sla_menit' => $minutes,
         ];
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> origin/main
+
