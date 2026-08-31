@@ -108,6 +108,23 @@ final class HolidayController extends Controller
         }
     }
 
+    /**
+     * Menampilkan detail satu hari libur.
+     */
+    public function show(int $id): JsonResponse
+    {
+        try {
+            $data = $this->service->show($id);
+            return ApiResponse::success('Berhasil mengambil detail hari libur', $data);
+        } catch (ModelNotFoundException $e) {
+            return ApiResponse::error('Hari libur tidak ditemukan', 404);
+        } catch (\Throwable $e) {
+            Log::error('[HolidayController@show] ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return ApiResponse::error('Gagal mengambil detail hari libur', 500, ['error' => $e->getMessage()]);
+        }
+    }
 
     /**
      * Memperbarui data satu hari libur.
