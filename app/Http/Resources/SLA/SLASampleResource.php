@@ -33,7 +33,7 @@ class SLASampleResource extends JsonResource
             $durasiText = "0 Menit";
         }
 
-        $targetSlaMenit = (int) (data_get($this->resource, 'target_sla_menit_aktual') ?? 360);
+        $targetSlaMenit = (int) (data_get($this->resource, 'target_sla_menit') ?? data_get($this->resource, 'target_sla_menit_aktual') ?? 360);
         if ($targetSlaMenit <= 0) {
             $targetSlaMenit = (int) (config('sla.default_jam', 6) * 60);
         }

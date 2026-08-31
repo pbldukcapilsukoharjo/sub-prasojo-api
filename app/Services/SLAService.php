@@ -175,7 +175,8 @@ class SLAService
             }
 
             if (!empty($filters['id_layanan'])) {
-                $layanansQuery->where('layanan_kode', $filters['id_layanan']);
+                $layananKode = Layanan::resolveKode($filters['id_layanan']);
+                $layanansQuery->where('layanan_kode', $layananKode);
             }
 
             $layanans = $layanansQuery->get();
