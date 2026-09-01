@@ -6,7 +6,9 @@ namespace App\Services;
 
 use App\Enums\AjuanStatus;
 use App\Filters\DashboardFilter;
+use App\Models\Monitoring\SubUser;
 use App\Models\Prasojo\Ajuan;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -33,9 +35,12 @@ class DashboardService
         try {
             // Parameter request untuk cache key
             $requestParams = request()->all();
-            $cacheKey = 'dashboard:kpi:' . md5(json_encode($requestParams));
+            $userId = request()->attributes->get('auth_user_id') ?: (auth()->user()?->id);
+            $user = $userId ? SubUser::find($userId) : null;
 
-            return Cache::remember($cacheKey, 600, function () use ($filter, $requestParams) {
+            $cacheKey = 'dashboard:kpi:' . md5(json_encode($requestParams) . ':' . ($userId ?? 'global'));
+
+            return Cache::remember($cacheKey, 600, function () use ($filter, $requestParams, $user) {
                 // 1. KPI Saat Ini
                 $query = Ajuan::query();
                 $query = $filter->apply($query);
@@ -43,8 +48,7 @@ class DashboardService
                 $statusSelesai = "'" . implode("','", AjuanStatus::getStatusSelesai()) . "'";
                 $statusDitolak = "'" . implode("','", AjuanStatus::getStatusDitolak()) . "'";
 
-                $defaultDb = config('database.connections.mysql.database');
-                $query->leftJoin(DB::raw("`{$defaultDb}`.`ajuan_sla_summaries` as sla_summary"), 'sla_summary.ajuan_id', '=', 'ajuan.ajuan_id');
+                $query = $this->applyLogSummarySubquery($query, $user);
 
                 $kpi = $query->select(
                     DB::raw('COUNT(ajuan.ajuan_id) as total_pengajuan'),
@@ -106,7 +110,7 @@ class DashboardService
                     $prevQuery->whereMonth('ajuan_create_datetime', $prevMonth)
                               ->whereYear('ajuan_create_datetime', $prevYear);
 
-                    $prevQuery->leftJoin(DB::raw("`{$defaultDb}`.`ajuan_sla_summaries` as sla_summary"), 'sla_summary.ajuan_id', '=', 'ajuan.ajuan_id');
+                    $prevQuery = $this->applyLogSummarySubquery($prevQuery, $user);
 
                     $prevKpi = $prevQuery->select(
                         DB::raw('COUNT(ajuan.ajuan_id) as total_pengajuan'),
@@ -128,12 +132,17 @@ class DashboardService
                 $trendSla = $this->calculateTrend($rata_rata_sla_menit, $prevSlaMenit);
 
                 // Format SLA
-                $jam = floor($rata_rata_sla_menit / 60);
-                $menit = round($rata_rata_sla_menit % 60);
+                $jam = (int) floor($rata_rata_sla_menit / 60);
+                $menit = (int) round(fmod($rata_rata_sla_menit, 60));
                 $sla_text = "";
-                if ($jam > 0) $sla_text .= $jam . " Jam ";
+                if ($jam > 0) {
+                    $sla_text .= $jam . " Jam ";
+                }
                 $sla_text .= $menit . " Menit";
-                if (trim($sla_text) === "0 Menit") $sla_text = "0 Menit";
+                $sla_text = trim($sla_text);
+                if ($sla_text === "0 Menit" || $sla_text === "") {
+                    $sla_text = "0 Menit";
+                }
 
                 return [
                     'total_pengajuan' => $total_pengajuan,
@@ -153,6 +162,23 @@ class DashboardService
             ]);
             throw $e;
         }
+    }
+
+    /**
+     * Terapkan subquery summary SLA (kustom per user jika dikonfigurasi, atau default global).
+     */
+    protected function applyLogSummarySubquery(Builder $query, ?SubUser $user = null): Builder
+    {
+        $defaultDb = config('database.connections.mysql.database');
+
+        if ($user && ($user->sla_start_status || $user->sla_end_status)) {
+            return $query->leftJoin(DB::raw("`{$defaultDb}`.`user_ajuan_sla_summaries` as sla_summary"), function ($join) use ($user) {
+                $join->on('sla_summary.ajuan_id', '=', 'ajuan.ajuan_id')
+                     ->where('sla_summary.user_id', '=', $user->id);
+            });
+        }
+
+        return $query->leftJoin(DB::raw("`{$defaultDb}`.`ajuan_sla_summaries` as sla_summary"), 'sla_summary.ajuan_id', '=', 'ajuan.ajuan_id');
     }
 
     public function getChartTrend(DashboardFilter $filter): array
